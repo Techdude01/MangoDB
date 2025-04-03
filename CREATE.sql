@@ -64,3 +64,26 @@ CREATE TABLE Question(
 	FOREIGN KEY (userID) REFERENCES User(userID),
 	FOREIGN KEY (TimeStampID) REFERENCES TimeStamp(TimeStampID)
 );
+
+CREATE TABLE Response(
+	responseID INT PRIMARY KEY,
+	userID INT,
+	responseText TEXT,
+	TimeStampID INT,
+	FOREIGN KEY (userID) REFERENCES User(userID),
+	FOREIGN KEY (TimeStampID) REFERENCES TimeStamp(TimeStampID)
+);
+
+CREATE TABLE TimeStamp(
+	TimeStampID INT PRIMARY KEY,
+	ChatMessageID INT,
+	ResponseID INT,
+	QuestionID INT,
+	CommentID INT,
+	sentTime TIME,
+	sentDate DATE,
+	FOREIGN KEY (ChatMessageID) REFERENCES ChatMessage(chatMessageID),
+	FOREIGN KEY (ResponseID) REFERENCES Response(responseID),
+	FOREIGN KEY (QuestionID) REFERENCES Question(questionID),
+	FOREIGN KEY (CommentID) REFERENCES Comment(commentID)
+);y
