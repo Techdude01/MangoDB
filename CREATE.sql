@@ -1,5 +1,5 @@
 CREATE TABLE User(
-	userID INT PRIMARY KEY,
+	userID INT AUTO_INCREMENT PRIMARY KEY,
 	userName VARCHAR(16),
 	password VARCHAR(32),
 	firstName VARCHAR(32),
@@ -7,7 +7,7 @@ CREATE TABLE User(
 );
 
 CREATE TABLE Tag(
-	tagID INT PRIMARY KEY,
+	tagID INT AUTO_INCREMENT PRIMARY KEY,
 	tagName VARCHAR(16)
 );
 
@@ -20,14 +20,14 @@ CREATE TABLE TagList(
 );
 
 CREATE TABLE Chat(
-	chatID INT PRIMARY KEY,
+	chatID INT AUTO_INCREMENT PRIMARY KEY,
 	userID INT,
 	chatName VARCHAR(32),
 	FOREIGN KEY (userID) REFERENCES User(userID)
 );
 
 CREATE TABLE ChatMessage(
-	chatMessageID INT PRIMARY KEY,
+	chatMessageID INT AUTO_INCREMENT PRIMARY KEY,
 	chatID INT,
 	userID INT,
 	messageText TEXT,
@@ -46,7 +46,7 @@ CREATE TABLE ChatMember(
 );
 
 CREATE TABLE Comment(
-	commentID INT PRIMARY KEY,
+	commentID INT AUTO_INCREMENT PRIMARY KEY,
 	userID INT,
 	questionID INT,
 	commentText TEXT,
@@ -57,7 +57,7 @@ CREATE TABLE Comment(
 );
 
 CREATE TABLE Question(
-	questionID INT PRIMARY KEY,
+	questionID INT AUTO_INCREMENT PRIMARY KEY,
 	userID INT,
 	questionText TEXT,
 	TimeStampID INT,
@@ -66,7 +66,7 @@ CREATE TABLE Question(
 );
 
 CREATE TABLE Response(
-	responseID INT PRIMARY KEY,
+	responseID INT AUTO_INCREMENT PRIMARY KEY,
 	userID INT,
 	responseText TEXT,
 	TimeStampID INT,
@@ -75,7 +75,7 @@ CREATE TABLE Response(
 );
 
 CREATE TABLE TimeStamp(
-	TimeStampID INT PRIMARY KEY,
+	TimeStampID INT AUTO_INCREMENT PRIMARY KEY,
 	ChatMessageID INT,
 	ResponseID INT,
 	QuestionID INT,
