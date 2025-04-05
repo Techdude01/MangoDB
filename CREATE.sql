@@ -80,8 +80,48 @@ CREATE TABLE TimeStamp( -- no foreign keys to avoid circular reference
 	sentDate DATE,
 );
 
+-- ADDITIONAL HELPER TABLES
 
--- populate tables (10 entries per table)
+-- table to handle chat requests
+CREATE TABLE ChatRequest (
+    requestID INT AUTO_INCREMENT PRIMARY KEY,
+    fromUserID INT,
+    toUserID INT,
+    chatID INT,
+    status VARCHAR(10),   -- ex. 'pending', 'accepted', 'rejected'
+    TimeStampID INT,
+    FOREIGN KEY (fromUserID) REFERENCES User(userID),
+    FOREIGN KEY (toUserID) REFERENCES User(userID),
+    FOREIGN KEY (chatID) REFERENCES Chat(chatID),
+    FOREIGN KEY (TimeStampID) REFERENCES TimeStamp(TimeStampID)
+);
+
+-- table to log question-related actions (enter/exit)
+CREATE TABLE QuestionLog (
+    logID INT AUTO_INCREMENT PRIMARY KEY,
+    userID INT,
+    questionID INT,
+    action VARCHAR(10),   -- 'enter' or 'exit'
+    TimeStampID INT,
+    FOREIGN KEY (userID) REFERENCES User(userID),
+    FOREIGN KEY (questionID) REFERENCES Question(questionID),
+    FOREIGN KEY (TimeStampID) REFERENCES TimeStamp(TimeStampID)
+);
+
+-- table to log chat-related actions (e.g., enter/exit)
+CREATE TABLE ChatLog (
+    logID INT AUTO_INCREMENT PRIMARY KEY,
+    userID INT,
+    chatID INT,
+    action VARCHAR(10),   -- 'enter' or 'exit'
+    TimeStampID INT,
+    FOREIGN KEY (userID) REFERENCES User(userID),
+    FOREIGN KEY (chatID) REFERENCES Chat(chatID),
+    FOREIGN KEY (TimeStampID) REFERENCES TimeStamp(TimeStampID)
+);
+
+
+-- POPULATE TABLES (10 entries per table)
 
 -- user entries
 INSERT INTO User (userName, password, firstName, lastName) VALUES 
@@ -183,3 +223,8 @@ INSERT INTO TimeStamp (sentTime, sentDate) VALUES
 ('11:30:00', '2025-01-28'),('12:40:00', '2025-01-29'),('13:25:00', '2025-01-30');
 
 
+
+-- ASK QUESTION
+INSERT INTO TimeStamp (sentTime, sentDate) -- deal with how to pass these parameters in later
+VALUES (CURTIME(), CUREDATE());
+SET (CURTIME(), CURDATE()):
