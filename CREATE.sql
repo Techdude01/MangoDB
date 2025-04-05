@@ -74,16 +74,15 @@ CREATE TABLE Response(
 	FOREIGN KEY (TimeStampID) REFERENCES TimeStamp(TimeStampID)
 );
 
-CREATE TABLE TimeStamp(
+CREATE TABLE TimeStamp( -- no foreign keys to avoid circular reference
 	TimeStampID INT AUTO_INCREMENT PRIMARY KEY,
-	ChatMessageID INT,
-	ResponseID INT,
-	QuestionID INT,
-	CommentID INT,
 	sentTime TIME,
 	sentDate DATE,
-	FOREIGN KEY (ChatMessageID) REFERENCES ChatMessage(chatMessageID),
-	FOREIGN KEY (ResponseID) REFERENCES Response(responseID),
-	FOREIGN KEY (QuestionID) REFERENCES Question(questionID),
-	FOREIGN KEY (CommentID) REFERENCES Comment(commentID)
-);y
+);
+
+
+INSERT INTO User VALUES ('jdoe', 'password123', 'John', 'Doe');
+INSERT INTO User VALUES ('asmith', 'securePass456', 'Alice', 'Smith');
+INSERT INTO User VALUES ('bwayne', 'batman2025', 'Bruce', 'Wayne');
+INSERT INTO User VALUES ('ckent', 'superman2025', 'Clark', 'Kent');
+INSERT INTO User VALUES ('dprince', 'wonderWoman!', 'Diana', 'Prince');
