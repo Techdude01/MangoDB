@@ -249,25 +249,25 @@ INSERT INTO Question (userID, questionText, TimeStampID, upvotes, downvotes, sta
 (10,'How to get better at chess?',10, 9, 1, 'published');
  
 -- response entries
-INSERT INTO Response (userID, questionID, responseText, TimeStampID) VALUES 
-(1,1,'299,792,458 m/s',11),
-(2,2,'Use Flask or Express',12),
-(3,3,'Dune by Frank Herbert',13),
-(4,4,'Consistency and diet',14),
-(5,5,'Doctor Strange, obviously!',15),
-(6,6,'Run short distances daily',16),
-(7,7,'Google is a great start',17),
-(8,8,'Spongebob Squarepants',18),
-(9,9,'We may never know...',19),
-(10,10,'Play puzzles and practice',20);
+INSERT INTO Response (userID, questionID, responseText, TimeStampID, status) VALUES 
+(1,1,'299,792,458 m/s',11, 'draft'),
+(2,2,'Use Flask or Express',12, 'draft'),
+(3,3,'Dune by Frank Herbert',13, 'published'),
+(4,4,'Consistency and diet',14, 'published'),
+(5,5,'Doctor Strange, obviously!',15, 'published'),
+(6,6,'Run short distances daily',16, 'draft'),
+(7,7,'Google is a great start',17, 'published'),
+(8,8,'Spongebob Squarepants',18, 'canceled'),
+(9,9,'We may never know...',19, 'published'),
+(10,10,'Play puzzles and practice',20, 'published');
  
  -- comment entries
-INSERT INTO Comment (userID, questionID, commentText, TimeStampID) VALUES 
-(3, 1, 'Good question!', 1),(4, 2, 'Helpful info.', 2),
-(5, 3, 'Thanks for sharing.', 3),(6, 4, 'Clarify more?', 4),
-(7, 5, 'Great explanation.', 5),(8, 6, 'Interesting.', 6),
-(9, 7, 'Didn’t know that.', 7),(10, 8, 'Cool.', 8),
-(1, 9, 'Thanks!', 9),(2, 10, 'Useful tip.', 10);
+INSERT INTO Comment (userID, questionID, commentText, TimeStampID, status) VALUES 
+(3, 1, 'Good question!', 1),(4, 2, 'Helpful info.', 2, 'published'),
+(5, 3, 'Thanks for sharing.', 3),(6, 4, 'Clarify more?', 4, 'draft'),
+(7, 5, 'Great explanation.', 5),(8, 6, 'Interesting.', 6, 'published'),
+(9, 7, 'Didn’t know that.', 7),(10, 8, 'Cool.', 8, 'published'),
+(1, 9, 'Thanks!', 9),(2, 10, 'Useful tip.', 10, 'canceled');
 
 -- chatmessage entires
 INSERT INTO ChatMessage (chatID, userID, messageText, TimeStampID) VALUES 
