@@ -63,7 +63,7 @@ CREATE TABLE Question(
 	TimeStampID INT,
 	upvotes INT DEFAULT 0 CHECK (upvotes >= 0), 
 	downvotes INT DEFAULT 0 CHECK (downvotes >= 0),
-	ENUM('draft', 'published', 'canceled') DEFAULT 'draft',
+	status ENUM('draft', 'published', 'canceled') DEFAULT 'draft',
 	FOREIGN KEY (userID) REFERENCES User(userID),
 	FOREIGN KEY (TimeStampID) REFERENCES TimeStamp(TimeStampID)
 );
@@ -71,6 +71,7 @@ CREATE TABLE Question(
 CREATE TABLE Response(
 	responseID INT AUTO_INCREMENT PRIMARY KEY,
 	userID INT,
+	questionID INT,
 	responseText TEXT,
 	TimeStampID INT,
 	FOREIGN KEY (questionID) REFERENCES Question(questionID),
@@ -81,7 +82,7 @@ CREATE TABLE Response(
 CREATE TABLE TimeStamp( -- no foreign keys to avoid circular reference
 	TimeStampID INT AUTO_INCREMENT PRIMARY KEY,
 	sentTime TIME,
-	sentDate DATE,
+	sentDate DATE
 );
 
 -- ADDITIONAL HELPER TABLES
@@ -170,7 +171,7 @@ DELIMITER //
 CREATE PROCEDURE CancelQuestion(IN p_questionID INT)
 BEGIN 
 	-- Update status of question to be 'cancelled'
-	UPDATE question
+	UPDATE Question
 	SET status = 'canceled'
 	WHERE questionID = p_questionID AND status = 'draft';
 END;
@@ -199,6 +200,16 @@ END;
 //
 DELIMITER;
 
+-- search for questions by keyword
+DELIMITER //
+CREATE PROCEDURE SearchQuestions (IN p_keyword VARCHAR(100))
+BEGIN
+	SELECT questionID, questionText
+	FROM Question
+	WHERE questionText LIKE CONCAT ('%', p_keyword, '%');
+END;
+// 
+DELIMITER ;
 ---------------------------------------------------------------------------------
 --                          CHAT BASED PROCEDURES
 ---------------------------------------------------------------------------------
@@ -370,9 +381,9 @@ DELIMITER ;
 DELIMITER //
 CREATE PROCEDURE GetRecentQuestions ()
 BEGIN
-    SELECT q.questionText, t.sentTime, t.sentDate
+    SELECT q.questionID, q.questionText, t.sentTime, t.sentDate
     FROM Question q
-    JOIN TimeStamp t ON q.questionID = t.questionID
+    JOIN TimeStamp t ON q.TimeStampID = t.TimeStampID
     ORDER BY t.sentDate DESC, t.sentTime DESC
     LIMIT 10;
 END;
@@ -426,6 +437,19 @@ BEGIN
     GROUP BY q.questionID, q.questionText, t.sentTime, t.sentDate
     ORDER BY count(*) DESC, t.sentDate DESC, t.sentTime DESC
     LIMIT 10;
+END;
+//
+DELIMITER ;
+
+-- Get Questions by Tag
+DELIMITER //
+CREATE PROCEDURE GetQuestionsByTag(IN p_tagName VARCHAR(16))
+BEGIN
+	SELECT DISTINCT q.questionID, q.questionText
+	FROM Question q
+	JOIN TagList t1 ON q.userID = t1.userID
+	JOIN Tag t ON t1.tagID = t.tagID
+	WHERE t.tagName = p_tagName;
 END;
 //
 DELIMITER ;
