@@ -62,6 +62,7 @@ CREATE TABLE Question(
 	questionText TEXT,
 	TimeStampID INT,
 	upvotes INT DEFAULT 0 CHECK (upvotes >= 0), 
+	downvotes INT DEFAULT 0 CHECK (downvotes >= 0),
 	FOREIGN KEY (userID) REFERENCES User(userID),
 	FOREIGN KEY (TimeStampID) REFERENCES TimeStamp(TimeStampID)
 );
@@ -121,8 +122,17 @@ CREATE TABLE ChatLog (
     FOREIGN KEY (TimeStampID) REFERENCES TimeStamp(TimeStampID)
 );
 
--- table to log which users upvoted which questions, prevents duplicate upvotes
+-- table to track who upvoted, prevents duplicate upvotes
 CREATE TABLE QuestionUpvote (
+	userID INT,
+	questionID INT,
+	PRIMARY KEY (userID, questionID),
+	FOREIGN KEY (userID) REFERENCES User(userID),
+	FOREIGN KEY (questionID) REFERENCES Question(questionID)
+);
+
+-- table to track who downvoted, prevents duplicate downvotes
+CREATE TABLE QuestionDownvote (
 	userID INT,
 	questionID INT,
 	PRIMARY KEY (userID, questionID),
@@ -417,12 +427,13 @@ DELIMITER ;
 DELIMITER //
 CREATE PROCEDURE GetPopularQuestions ()
 BEGIN
-    SELECT q.questionText, t.sentTime, t.sentDate
+    SELECT q.questionText, t.sentTime, t.sentDate,
+		   q.upvotes, COUNT(c.commentID) AS commentCount
     FROM Question q
-    JOIN TimeStamp t ON q.questionID = t.questionID
-    JOIN Comment c ON c.questionID = q.questionID
-    GROUP BY q.questionID, q.questionText, t.sentTime, t.sentDate
-    ORDER BY q.upvotes DESC, COUNT(c.commentID) DESC, t.sentDate DESC, t.sentTime DESC
+    JOIN TimeStamp t ON q.TimestampID = t.TimeStampID
+    LEFT JOIN Comment c ON c.questionID = q.questionID
+    GROUP BY q.questionID, q.questionText, t.sentTime, t.sentDate, q.upvotes
+    ORDER BY q.upvotes DESC, commentCount DESC, t.sentDate DESC, t.sentTime DESC
     LIMIT 10;
 END;
 //
@@ -451,16 +462,41 @@ END;
 //
 DELIMITER ;
 
+DELIMITER //
+
+CREATE PROCEDURE DownvoteQuestion(IN p_userID INT, IN p_questionID INT)
+BEGIN
+	-- check if user already downvoted this question
+	IF NOT EXISTS (
+		SELECT 1 FROM QuestionDownvoote
+		WHERE userID = p_userID AND questionID = p_questionID
+	)
+	THEN
+		-- log downvoate
+		INSERT INTO QuestionDownvote (userID, questionID)
+		VALUES (p_userID, p_questionID);
+
+		-- increment downvote count
+		UPDATE Question
+		SET downvotes = downvotes + 1
+		WHERE questionID = p_questionID;
+	END IF;
+END;
+//
+DELIMITER ;
+
 -- Get Controversial Questions
 DELIMITER //
 CREATE PROCEDURE GetControversialQuestions ()
 BEGIN
-    SELECT q.questionText, t.sentTime, t.sentDate
+    SELECT q.questionText, t.sentTime, t.sentDate, 
+		   q.downvotes, COUNT(c.commentID) AS commentCount,
+		   (q.downvotes + COUNT(c.commentID)) AS controversyScore
     FROM Question q
-    JOIN TimeStamp t ON q.questionID = t.questionID
-    JOIN Comment c ON c.questionID = q.questionID
-    GROUP BY q.questionID, q.questionText, t.sentTime, t.sentDate
-    ORDER BY q.downvotes DESC, COUNT(c.commentID) DESC, t.sentDate DESC, t.sentTime DESC
+    JOIN TimeStamp t ON q.TimeStampID = t.TimeStampID
+    LEFT JOIN Comment c ON c.questionID = q.questionID
+    GROUP BY q.questionID, q.questionText, t.sentTime, t.sentDate, q.downvotes
+    ORDER BY controversyScore DESC, t.sentDate DESC, t.sentTime DESC
     LIMIT 10;
 END;
 //
