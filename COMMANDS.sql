@@ -177,16 +177,33 @@ END;
 //
 DELIMITER ;
 
--- Cancel question, not deleting it
+-- Cancel 'draft' question, not deleting it
 DELIMITER //
 CREATE PROCEDURE CancelQuestion(IN p_questionID INT)
+BEGIN 
+	-- Update status of question to be 'cancelled'
+	UPDATE question
+	SET status = 'canceled'
+	WHERE questionID = p_questionID AND status = 'draft';
+END;
+//
+DELIMITER ;
+
+-- Delete question that is already 'published'
+DELIMITER //
+CREATE PROCEDURE DeleteQuestion(IN p_questionID INT)
 BEGIN
-	-- Delete related entries in dependent tables
-	DELETE FROM Comment WHERE questionID = p_questionID,
-	DELETE FROM Response WHERE questionID = p_questionID,
-	DELETE FROM QuestionLog WHERE questionID = p_questionID,
-	-- Delete question itself
-	DELETE FROM Question WHERE questionID = p_questionID;
+	-- Check if question is 'published'
+	IF (SELECT status FROM Question WHERE questionID = p_questionID) = 'published' THEN
+		-- Delete related entries in dependent tables
+		DELETE FROM Comment WHERE questionID = p_questionID,
+		DELETE FROM Response WHERE questionID = p_questionID,
+		DELETE FROM QuestionLog WHERE questionID = p_questionID,
+		DELETE FROM QuestionUpvote WHERE questionID = p_questionID,
+		DELETE FROM QuestionDownvote WHERE questionID = p_questionID,
+		-- Delete question itself
+		DELETE FROM Question WHERE questionID = p_questionID;
+	END IF;
 END;
 //
 DELIMITER;
