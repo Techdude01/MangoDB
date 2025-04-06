@@ -51,7 +51,7 @@ CREATE TABLE Response(
     questionID INT,
     responseText TEXT,
     TimeStampID INT,
-    status VARCHAR(10),
+    status ENUM('draft', 'published', 'canceled') DEFAULT 'draft',
     FOREIGN KEY (questionID) REFERENCES Question(questionID),
     FOREIGN KEY (userID) REFERENCES User(userID),
     FOREIGN KEY (TimeStampID) REFERENCES TimeStamp(TimeStampID)
@@ -63,7 +63,7 @@ CREATE TABLE Comment(
     questionID INT,
     commentText TEXT,
     TimeStampID INT,
-    status VARCHAR(10),
+    status ENUM('draft', 'published', 'canceled') DEFAULT 'draft',
     FOREIGN KEY (questionID) REFERENCES Question(questionID),
     FOREIGN KEY (userID) REFERENCES User(userID),
     FOREIGN KEY (TimeStampID) REFERENCES TimeStamp(TimeStampID)
