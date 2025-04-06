@@ -763,7 +763,6 @@ BEGIN
    INSERT INTO TimeStamp (sentTime, sentDate) VALUES (CURTIME(), CURDATE());
    SET @tsID = LAST_INSERT_ID();
 
-
    INSERT INTO Response (userID, responseText, TimeStampID)
    VALUES (p_userID, p_responseText, @tsID)
 END;
@@ -771,7 +770,7 @@ END;
 DELIMITER;
 
 
--- CANCEL RESPONSE
+-- DELETE RESPONSE
 DELIMITER //
 CREATE PROCEDURE CancelResponse(IN p_responseID INT)
 BEGIN
