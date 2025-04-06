@@ -743,7 +743,7 @@ CREATE PROCEDURE GetChatIDsForUser (
     IN target_userID INT
 )
 BEGIN
-    SELECT c.chatID
+    SELECT DISTINCT c.chatID
     FROM ChatLog c
     JOIN TimeStamp t ON c.TimeStampID = t.TimeStampID
     WHERE c.userID = target_userID
