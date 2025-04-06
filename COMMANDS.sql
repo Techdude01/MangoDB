@@ -419,6 +419,21 @@ END;
 //
 DELIMITER ;
 
+-- Get Controversial Questions
+DELIMITER //
+CREATE PROCEDURE GetControversialQuestions ()
+BEGIN
+    SELECT q.questionText, t.sentTime, t.sentDate
+    FROM Question q
+    JOIN TimeStamp t ON q.questionID = t.questionID
+    JOIN Comment c ON c.questionID = q.questionID
+    GROUP BY q.questionID, q.questionText, t.sentTime, t.sentDate
+    ORDER BY q.downvotes DESC, COUNT(c.commentID) DESC, t.sentDate DESC, t.sentTime DESC
+    LIMIT 10;
+END;
+//
+DELIMITER ;
+
 -- Get Relevant Questions
 DELIMITER //
 CREATE PROCEDURE GetRelevantQuestions (
