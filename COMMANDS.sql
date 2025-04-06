@@ -121,6 +121,14 @@ CREATE TABLE ChatLog (
     FOREIGN KEY (TimeStampID) REFERENCES TimeStamp(TimeStampID)
 );
 
+-- table to log which users upvoted which questions, prevents duplicate upvotes
+CREATE TABLE QuestionUpvote (
+	userID INT,
+	questionID INT,
+	PRIMARY KEY (userID, questionID),
+	FOREIGN KEY (userID) REFERENCES User(userID),
+	FOREIGN KEY (questionID) REFERENCES Question(questionID)
+);
 
 ---------------------------------------------------------------------------------------
 --                  POPULATE TABLES (10 entries per table)
@@ -423,11 +431,22 @@ DELIMITER ;
 -- users can upvote a question
 DELIMITER //
 
-CREATE PROCEDURE UpvoteQuestion(IN p_questionID INT)
+CREATE PROCEDURE UpvoteQuestion(IN p_questionID INT, IN p_questionID INT)
 BEGIN 
-	UPDATE Question
-	SET upvotes = upvotes + 1
-	WHERE questionID = p_questionID;
+	-- check if user already upvoted this question
+	IF NOT EXISTS (
+		SELECT 1 FROM QuestionUpvote
+		WHERE userID = p_userID AND questionID = p_questionID
+	)
+	THEN
+		-- log upvote
+		INSERT INTO QuestionUpvote (userID, questionID)
+		VALUES (p_userID, p_questionID);
+		-- increment upvote count
+		UPDATE Question
+		SET upvotes = upvotes + 1
+		WHERE questionID = p_questionID;
+	END IF;
 END;
 //
 DELIMITER ;
