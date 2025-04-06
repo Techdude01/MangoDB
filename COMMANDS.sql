@@ -96,7 +96,7 @@ CREATE TABLE ChatRequest (
     fromUserID INT,
     toUserID INT,
     chatID INT,
-    status VARCHAR(10),   -- ex. 'pending', 'accepted', 'rejected'
+    status ENUM('accepted', 'rejected') DEFAULT 'pending',  
     TimeStampID INT,
     FOREIGN KEY (fromUserID) REFERENCES User(userID),
     FOREIGN KEY (toUserID) REFERENCES User(userID),
