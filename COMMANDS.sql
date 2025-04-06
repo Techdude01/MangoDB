@@ -512,13 +512,13 @@ DELIMITER ;
 -- Get Chat Order By UserID
 DELIMITER //
 CREATE PROCEDURE GetChatIDsForUser (
-    IN targID INT
+    IN target_userID INT
 )
 BEGIN
     SELECT c.chatID
     FROM ChatLog c
     JOIN TimeStamp t ON c.TimeStampID = t.TimeStampID
-    WHERE c.userID = targID
+    WHERE c.userID = target_userID
     ORDER BY t.sentTime DESC, t.sentDate DESC;
 END;
 //
