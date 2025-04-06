@@ -851,8 +851,8 @@ BEGIN
    INSERT INTO TimeStamp (sentTime, sentDate) VALUES (CURTIME(), CURDATE());
    SET @tsID = LAST_INSERT_ID();
 
-   INSERT INTO Comment(p_userID, p_commentText, TimeStampID)
-   VALUES (userID, commentText, commentID, @tsID)
+   INSERT INTO Comment(userID, commentText, TimeStampID)
+   VALUES (p_userID, p_commentText, @tsID)
 END;
 //
 DELIMITER;
