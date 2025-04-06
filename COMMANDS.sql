@@ -420,6 +420,18 @@ END;
 //
 DELIMITER ;
 
+-- users can upvote a question
+DELIMITER //
+
+CREATE PROCEDURE UpvoteQuestion(IN p_questionID INT)
+BEGIN 
+	UPDATE Question
+	SET upvotes = upvotes + 1
+	WHERE questionID = p_questionID;
+END;
+//
+DELIMITER ;
+
 -- Get Controversial Questions
 DELIMITER //
 CREATE PROCEDURE GetControversialQuestions ()
