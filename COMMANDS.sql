@@ -100,18 +100,6 @@ CREATE TABLE ChatRequest (
     FOREIGN KEY (TimeStampID) REFERENCES TimeStamp(TimeStampID)
 );
 
--- table to log question-related actions (enter/exit)
-CREATE TABLE QuestionLog (
-    logID INT AUTO_INCREMENT PRIMARY KEY,
-    userID INT,
-    questionID INT,
-    action VARCHAR(10),   -- 'enter' or 'exit'
-    TimeStampID INT,
-    FOREIGN KEY (userID) REFERENCES User(userID),
-    FOREIGN KEY (questionID) REFERENCES Question(questionID),
-    FOREIGN KEY (TimeStampID) REFERENCES TimeStamp(TimeStampID)
-);
-
 -- table to log chat-related actions (e.g., enter/exit)
 CREATE TABLE ChatLog (
     logID INT AUTO_INCREMENT PRIMARY KEY,
@@ -200,12 +188,10 @@ BEGIN
 
 		DELETE FROM Response WHERE questionID = p_questionID,
 
-		DELETE FROM QuestionLog WHERE questionID = p_questionID,
-
 		DELETE FROM QuestionUpvote WHERE questionID = p_questionID,
 
 		DELETE FROM QuestionDownvote WHERE questionID = p_questionID,
-		
+
 		-- Delete question itself
 		DELETE FROM Question WHERE questionID = p_questionID;
 	END IF;
@@ -213,27 +199,16 @@ END;
 //
 DELIMITER;
 
--- LOG QUESTION "ENTER/EXIT" ACTIONS
-DELIMITER //
-CREATE PROCEDURE LogQuestionAction(IN p_userID INT, IN p_questionID INT, IN p_action VARCHAR(10))
-BEGIN
-	INSERT INTO TimeStamp (sentTime, sentDate) VALUES (CURTIME(), CURDATE());
-	SET @tsID = LAST_INSERT_ID();
-
-	INSERT INTO QuestionLog (userID, questionID, action, TimeStampID)
-	VALUES (p_userID, p_questionID, p_action, @tsID);
-END;
-//
-DELIMITER;
-
-
 ---------------------------------------------------------------------------------
 --                          CHAT BASED PROCEDURES
 ---------------------------------------------------------------------------------
 
 -- "CREATE CHAT" AND SEND CHAT REQUEST
 DELIMITER //
-CREATE PROCEDURE CreateChatAndRequest(IN p_fromUserID INT, IN p_chatName VARCHAR(32), IN p_toUserID INT)
+CREATE PROCEDURE CreateChatAndRequest(
+	IN p_fromUserID INT, 
+	IN p_chatName VARCHAR(32), 
+	IN p_toUserID INT)
 BEGIN
 	-- create new chat by sender
 	INSERT INTO Chat (userID, chatName) VALUES (p_fromUserID, p_chatName);
@@ -294,7 +269,10 @@ END;
 DELIMITER;
 
 -- LOG CHAT "ENTER/EXIT" ACTIONS
-DELIMITER // CREATE PROCEDURE LogChatAction(IN p_userID INT, IN p_chatID INT, IN p_action VARCHAR(10))
+DELIMITER // CREATE PROCEDURE LogChatAction(
+	IN p_userID INT, 
+	IN p_chatID INT, 
+	IN p_action VARCHAR(10))
 BEGIN
 	INSERT INTO TimeStamp (sentTime, sentDate) VALUES (CURTIME(), CURDATE());
 	SET @tsID = LAST_INSERT_ID();
@@ -377,8 +355,6 @@ BEGIN
     DELETE FROM QuestionUpvote WHERE userID = OLD.userID;
 
 	DELETE FROM QuestionDownvote WHERE userID = OLD.userID;
-
-    DELETE FROM QuestionLog WHERE userID = OLD.userID;
 
     DELETE FROM ChatRequest WHERE fromUserID = OLD.userID OR toUserID = OLD.userID;
 
