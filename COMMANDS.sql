@@ -775,7 +775,7 @@ BEGIN
     ORDER BY t.sentDate DESC, t.sentTime DESC;
 END;
 //
-DELIMITER ;
+DELIMITER;
 
 ---------------------------------------------------------------------------------
 --                       RESPONSE BASED PROCEDURES
@@ -804,7 +804,7 @@ BEGIN
 	WHERE responseID = p_responseID AND status = 'draft';
 END;
 //
-DELIMITER ;
+DELIMITER;
 
 -- CANCEL RESPONSE
 DELIMITER //
@@ -815,7 +815,7 @@ BEGIN
 	WHERE responseID = p_responseID AND status = 'draft';
 END;
 //
-DELIMITER ;
+DELIMITER;
 
 -- CANCEL RESPONSE
 DELIMITER //
@@ -915,7 +915,6 @@ DELIMITER ;
 DELIMITER //
 CREATE PROCEDURE Cance(IN p_commentID INT)
 BEGIN 
-
 	UPDATE Comment
 	SET status = 'canceled'
 	WHERE questionID = p_questionID AND status = 'draft';
