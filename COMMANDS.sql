@@ -371,6 +371,8 @@ BEGIN
 
     DELETE FROM QuestionUpvote WHERE userID = OLD.userID;
 
+	DELETE FROM QuestionDownvote WHERE userID = OLD.userID;
+
     DELETE FROM QuestionLog WHERE userID = OLD.userID;
 
     DELETE FROM ChatRequest WHERE fromUserID = OLD.userID OR toUserID = OLD.userID;
