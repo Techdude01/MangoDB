@@ -1,135 +1,136 @@
 CREATE TABLE User(
-	userID INT AUTO_INCREMENT PRIMARY KEY,
-	userName VARCHAR(16) UNIQUE,
-	password VARCHAR(32),
-	firstName VARCHAR(32),
-	lastName VARCHAR(32)
+    userID INT AUTO_INCREMENT PRIMARY KEY,
+    userName VARCHAR(16) UNIQUE,
+    password VARCHAR(32),
+    firstName VARCHAR(32),
+    lastName VARCHAR(32)
 );
 
 CREATE TABLE Tag(
-	tagID INT AUTO_INCREMENT PRIMARY KEY,
-	tagName VARCHAR(16) UNIQUE
+    tagID INT AUTO_INCREMENT PRIMARY KEY,
+    tagName VARCHAR(16) UNIQUE
+);
+
+CREATE TABLE TimeStamp( 
+    TimeStampID INT AUTO_INCREMENT PRIMARY KEY,
+    sentTime TIME,
+    sentDate DATE
 );
 
 CREATE TABLE TagList(
-	tagID INT,
-	userID INT,
-	FOREIGN KEY (tagID) REFERENCES Tag(tagID),
-	FOREIGN KEY (userID) REFERENCES User(userID),
-	PRIMARY KEY (tagID, userID)
+    tagID INT,
+    userID INT,
+    FOREIGN KEY (tagID) REFERENCES Tag(tagID),
+    FOREIGN KEY (userID) REFERENCES User(userID),
+    PRIMARY KEY (tagID, userID)
 );
 
 CREATE TABLE Chat(
-	chatID INT AUTO_INCREMENT PRIMARY KEY,
-	userID INT,
-	chatName VARCHAR(32),
-	FOREIGN KEY (userID) REFERENCES User(userID)
-);
-
-CREATE TABLE ChatMessage(
-	chatMessageID INT AUTO_INCREMENT PRIMARY KEY,
-	chatID INT,
-	userID INT,
-	messageText TEXT,
-	TimeStampID INT,
-	FOREIGN KEY (chatID) REFERENCES Chat(chatID),
-	FOREIGN KEY (userID) REFERENCES User(userID),
-	FOREIGN KEY (TimeStampID) REFERENCES TimeStamp(TimeStampID)
-);
-
-CREATE TABLE ChatMember(
-	userID INT,
-	chatID INT,
-	FOREIGN KEY (userID) REFERENCES User(userID),
-	FOREIGN KEY (chatID) REFERENCES Chat(chatID),
-	PRIMARY KEY (userID, chatID)
-);
-
-CREATE TABLE Comment(
-	commentID INT AUTO_INCREMENT PRIMARY KEY,
-	userID INT,
-	questionID INT,
-	commentText TEXT,
-	TimeStampID INT,
-	FOREIGN KEY (questionID) REFERENCES Question(questionID),
-	FOREIGN KEY (userID) REFERENCES User(userID),
-	FOREIGN KEY (TimeStampID) REFERENCES TimeStamp(TimeStampID)
+    chatID INT AUTO_INCREMENT PRIMARY KEY,
+    userID INT,
+    chatName VARCHAR(32),
+    FOREIGN KEY (userID) REFERENCES User(userID)
 );
 
 CREATE TABLE Question(
-	questionID INT AUTO_INCREMENT PRIMARY KEY,
-	userID INT,
-	questionText TEXT,
-	TimeStampID INT,
-	upvotes INT DEFAULT 0 CHECK (upvotes >= 0), 
-	downvotes INT DEFAULT 0 CHECK (downvotes >= 0),
-	status ENUM('draft', 'published', 'canceled') DEFAULT 'draft',
-	FOREIGN KEY (userID) REFERENCES User(userID),
-	FOREIGN KEY (TimeStampID) REFERENCES TimeStamp(TimeStampID)
+    questionID INT AUTO_INCREMENT PRIMARY KEY,
+    userID INT,
+    questionText TEXT,
+    TimeStampID INT,
+    upvotes INT DEFAULT 0 CHECK (upvotes >= 0),
+    downvotes INT DEFAULT 0 CHECK (downvotes >= 0),
+    status ENUM('draft', 'published', 'canceled') DEFAULT 'draft',
+    FOREIGN KEY (userID) REFERENCES User(userID),
+    FOREIGN KEY (TimeStampID) REFERENCES TimeStamp(TimeStampID)
 );
 
 CREATE TABLE Response(
-	responseID INT AUTO_INCREMENT PRIMARY KEY,
-	userID INT,
-	questionID INT,
-	responseText TEXT,
-	TimeStampID INT,
-	FOREIGN KEY (questionID) REFERENCES Question(questionID),
-	FOREIGN KEY (userID) REFERENCES User(userID),
-	FOREIGN KEY (TimeStampID) REFERENCES TimeStamp(TimeStampID)
+    responseID INT AUTO_INCREMENT PRIMARY KEY,
+    userID INT,
+    questionID INT,
+    responseText TEXT,
+    TimeStampID INT,
+    FOREIGN KEY (questionID) REFERENCES Question(questionID),
+    FOREIGN KEY (userID) REFERENCES User(userID),
+    FOREIGN KEY (TimeStampID) REFERENCES TimeStamp(TimeStampID)
 );
 
-CREATE TABLE TimeStamp( -- no foreign keys to avoid circular reference
-	TimeStampID INT AUTO_INCREMENT PRIMARY KEY,
-	sentTime TIME,
-	sentDate DATE
+CREATE TABLE Comment(
+    commentID INT AUTO_INCREMENT PRIMARY KEY,
+    userID INT,
+    questionID INT,
+    commentText TEXT,
+    TimeStampID INT,
+    FOREIGN KEY (questionID) REFERENCES Question(questionID),
+    FOREIGN KEY (userID) REFERENCES User(userID),
+    FOREIGN KEY (TimeStampID) REFERENCES TimeStamp(TimeStampID)
+);
+
+CREATE TABLE ChatMessage(
+    chatMessageID INT AUTO_INCREMENT PRIMARY KEY,
+    chatID INT,
+    userID INT,
+    messageText TEXT,
+    TimeStampID INT,
+    FOREIGN KEY (chatID) REFERENCES Chat(chatID),
+    FOREIGN KEY (userID) REFERENCES User(userID),
+    FOREIGN KEY (TimeStampID) REFERENCES TimeStamp(TimeStampID)
+);
+
+CREATE TABLE ChatMember(
+    userID INT,
+    chatID INT,
+    FOREIGN KEY (userID) REFERENCES User(userID),
+    FOREIGN KEY (chatID) REFERENCES Chat(chatID),
+    PRIMARY KEY (userID, chatID)
 );
 
 -- ADDITIONAL HELPER TABLES
 
 -- table to handle chat requests
 CREATE TABLE ChatRequest (
-    requestID INT AUTO_INCREMENT PRIMARY KEY,
-    fromUserID INT,
-    toUserID INT,
-    chatID INT,
-    status VARCHAR(10),   -- ex. 'pending', 'accepted', 'rejected'
-    TimeStampID INT,
-    FOREIGN KEY (fromUserID) REFERENCES User(userID),
-    FOREIGN KEY (toUserID) REFERENCES User(userID),
-    FOREIGN KEY (chatID) REFERENCES Chat(chatID),
-    FOREIGN KEY (TimeStampID) REFERENCES TimeStamp(TimeStampID)
+    requestID INT AUTO_INCREMENT PRIMARY KEY,
+    fromUserID INT,
+    toUserID INT,
+    chatID INT,
+    status VARCHAR(10),   -- ex. 'pending', 'accepted', 'rejected'
+    TimeStampID INT,
+    FOREIGN KEY (fromUserID) REFERENCES User(userID),
+    FOREIGN KEY (toUserID) REFERENCES User(userID),
+    FOREIGN KEY (chatID) REFERENCES Chat(chatID),
+    FOREIGN KEY (TimeStampID) REFERENCES TimeStamp(TimeStampID)
 );
 
 -- table to log chat-related actions (e.g., enter/exit)
 CREATE TABLE ChatLog (
-    logID INT AUTO_INCREMENT PRIMARY KEY,
-    userID INT,
-    chatID INT,
-    action VARCHAR(10),   -- 'enter' or 'exit'
-    TimeStampID INT,
-    FOREIGN KEY (userID) REFERENCES User(userID),
-    FOREIGN KEY (chatID) REFERENCES Chat(chatID),
-    FOREIGN KEY (TimeStampID) REFERENCES TimeStamp(TimeStampID)
+    logID INT AUTO_INCREMENT PRIMARY KEY,
+    userID INT,
+    chatID INT,
+    action VARCHAR(10),   -- 'enter' or 'exit'
+    TimeStampID INT,
+    FOREIGN KEY (userID) REFERENCES User(userID),
+    FOREIGN KEY (chatID) REFERENCES Chat(chatID),
+    FOREIGN KEY (TimeStampID) REFERENCES TimeStamp(TimeStampID)
 );
 
 -- table to track who upvoted, prevents duplicate upvotes
 CREATE TABLE QuestionUpvote (
-	userID INT,
-	questionID INT,
-	PRIMARY KEY (userID, questionID),
-	FOREIGN KEY (userID) REFERENCES User(userID),
-	FOREIGN KEY (questionID) REFERENCES Question(questionID)
+    userID INT,
+    questionID INT,
+    PRIMARY KEY (userID, questionID),
+    FOREIGN KEY (userID) REFERENCES User(userID),
+    FOREIGN KEY (questionID) REFERENCES Question(questionID)
 );
 
 -- table to track who downvoted, prevents duplicate downvotes
 CREATE TABLE QuestionDownvote (
-	userID INT,
-	questionID INT,
-	PRIMARY KEY (userID, questionID),
-	FOREIGN KEY (userID) REFERENCES User(userID),
-	FOREIGN KEY (questionID) REFERENCES Question(questionID)
+    userID INT,
+    questionID INT,
+    PRIMARY KEY (userID, questionID),
+    FOREIGN KEY (userID) REFERENCES User(userID),
+    FOREIGN KEY (questionID) REFERENCES Question(questionID)
 );
+
 
 ---------------------------------------------------------------------------------
 --                  POPULATE TABLES (10 entries per table)
