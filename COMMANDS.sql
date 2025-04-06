@@ -767,7 +767,7 @@ CREATE PROCEDURE GetChatIDsForUser (
     IN target_userID INT
 )
 BEGIN
-    SELECT c.chatID
+    SELECT DISTINCT c.chatID
     FROM ChatLog c
     JOIN TimeStamp t ON c.TimeStampID = t.TimeStampID
     WHERE c.userID = target_userID
@@ -776,14 +776,12 @@ END;
 //
 DELIMITER ;
 
-
 ---------------------------------------------------------------------------------
 --                       RESPONSE BASED PROCEDURES
 ---------------------------------------------------------------------------------
-
--- POST RESPONSE
+-- DRAFT RESPONSE
 DELIMITER //
-CREATE PROCEDURE PostResponse(IN p_userID INT, IN p_responseText TEXT)
+CREATE PROCEDURE DraftResponse(IN p_userID INT, IN p_responseText TEXT)
 BEGIN
    INSERT INTO TimeStamp (sentTime, sentDate) 
    VALUES (CURTIME(), CURDATE());
@@ -795,48 +793,67 @@ END;
 //
 DELIMITER;
 
+-- PUBLISH RESPONSE
+DELIMITER //
+CREATE PROCEDURE PublishResponse(IN p_responseID INT)
+BEGIN
+	-- Update status of question to be 'published'
+	UPDATE Response
+	SET status = 'published'
+	WHERE responseID = p_responseID AND status = 'draft';
+END;
+//
+DELIMITER ;
+
+-- CANCEL RESPONSE
+DELIMITER //
+CREATE PROCEDURE CancelResponse(IN p_responseID INT)
+BEGIN 
+	UPDATE Response
+	SET status = 'canceled'
+	WHERE responseID = p_responseID AND status = 'draft';
+END;
+//
+DELIMITER ;
 
 -- CANCEL RESPONSE
 DELIMITER //
 CREATE PROCEDURE CancelResponse(IN p_responseID INT)
 BEGIN
-   DELETE FROM Response WHERE responseID = p_responseID;
-   DELETE FROM TimeStamp WHERE responseID = p_responseID;
-END
-//
-DELIMITER;
-
-
--- VALID RESPONSE PRESENT CHECK
-DELIMITER // 
-CREATE PROCEDURE ValidResponse(IN p_userID INT, IN p_questionID INT, OUT p_hasResponded BOOLEAN)
-BEGIN
-   IF EXISTS (SELECT 1 FROM Response WHERE userID = p_userID AND questionID = p_questionID) THEN
-       SET p_hasResponded = TRUE;
-   ELSE
-       SET p_hasResponded = FALSE;
-   END IF;
+	DELETE FROM Response WHERE responseID = p_responseID;
+	DELETE FROM TimeStamp WHERE responseID = p_responseID;
 END;
 //
 DELIMITER;
 
+-- VALID RESPONSE PRESENT?
+DELIMITER // 
+CREATE PROCEDURE ValidResponse(IN p_userID INT, IN p_questionID INT, OUT p_hasResponded BOOLEAN)
+BEGIN 
+	IF EXISTS (SELECT 1 FROM Response WHERE userID = p_userID AND questionID = p_questionID) THEN
+		SET p_hasResponded = TRUE;
+	ELSE 
+		SET p_hasResponded = FALSE;
+	END IF;
+END; 
+//
+DELIMITER;
 
 -- RETRIEVE RESPONSES
 DELIMITER // 
-CREATE PROCEDURE RetrieveResponses(IN p_userID INT, IN p_questionID INT)
-BEGIN
-   DECLARE p_hasResponse BOOLEAN;
-   CALL ValidResponse(p_userID, p_questionID, p_hasResponse);
+CREATE PROCEDURE RetrieveResponses(IN p_userID INT, IN p_questionID INT, OUT )
+BEGIN 
+	DECLARE p_hasResponse BOOLEAN;
+	CALL ValidResponse(p_userID, p_questionID, p_hasResponse);
 
-   IF p_hasResponse THEN
-       SELECT * FROM Response WHERE questionID = p_questionID;
-   ELSE
-       SELECT 'This user has not responded to this question yet!';
-   END IF;
+	IF p_hasResponse THEN
+		SELECT * FROM Response WHERE questionID = p_questionID;
+	ELSE 
+		SELECT 'This user has not responded to this question yet!';
+	END IF;
 END;
-//
+// 
 DELIMITER;
-
 
 -- TRIGGER TO AUTO-GENERATE TIMESTAMP FOR EACH RESPONSE
 -- UPON INSERTION ('POST)
@@ -845,57 +862,75 @@ CREATE TRIGGER BeforeInsertResponse
 BEFORE INSERT ON Response
 FOR EACH ROW
 BEGIN
-   IF NEW.TimeStampID IS NULL THEN
-       INSERT INTO TimeStamp (sentTime, sentDate) VALUES (CURTIME(), CURDATE());
-       SET NEW.TimeStampID = LAST_INSERT_ID();
-   END IF;
+	IF NEW.TimeStampID IS NULL THEN 
+		INSERT INTO TimeStamp (sentTime, sentDate) VALUES (CURTIME(), CURDATE());
+		SET NEW.TimeStampID = LAST_INSERT_ID();
+	END IF;
 END;
 //
-DELIMITER;
+DELIMITER; 
 
-
--- LOG RESPONSE "ENTER/EXIT" ACTIONS
-DELIMITER // CREATE PROCEDURE LogResponseAction(IN p_userID INT, IN p_responseID INT, IN p_action VARCHAR(10))
+-- LOG RESPONSE ACTIONS
+DELIMITER // 
+CREATE PROCEDURE LogResponseAction(IN p_userID INT, IN p_responseID INT, IN p_action VARCHAR(10))
 BEGIN
-   INSERT INTO TimeStamp(sentTime, sendDate) VALUES (CURTIME(), CURDATE());
-   SET @tsID = LAST_INSERT_ID();
+	INSERT INTO TimeStamp(sentTime, sendDate) VALUES (CURTIME(), CURDATE());
+	SET @tsID = LAST_INSERT_ID();
 
-
-   INSERT INTO (userID, responseID, action, TimeStampID)
-   VALUES (p_userID, p_responseID, p_action, @tsID);
+	INSERT INTO (userID, responseID, action, TimeStampID)
+	VALUES (p_userID, p_responseID, p_action, @tsID);
 END;
 //
 DELIMITER;
-
 
 ---------------------------------------------------------------------------------
 --                       COMMENT BASED PROCEDURES
 ---------------------------------------------------------------------------------
-
--- POST COMMENT
-DELIMITER //
-CREATE PROCEDURE PostComment(IN p_userID INT, IN p_commentText TEXT)
+-- DRAFT COMMENT
+DELIMITER // 
+CREATE PROCEDURE DraftCommment(IN p_userID INT, IN p_commentText TEXT)
 BEGIN
-   INSERT INTO TimeStamp (sentTime, sentDate) VALUES (CURTIME(), CURDATE());
-   SET @tsID = LAST_INSERT_ID();
+	INSERT INTO TimeStamp (sentTime, sentDate) VALUES (CURTIME(), CURDATE());
+	SET @tsID = LAST_INSERT_ID(); 
 
-   INSERT INTO Comment(userID, commentText, TimeStampID)
-   VALUES (p_userID, p_commentText, @tsID)
+	INSERT INTO Comment(p_userID, p_commentText, TimeStampID, status) 
+	VALUES (userID, commentText, commentID, @tsID, 'draft')
 END;
 //
 DELIMITER;
 
+-- PUBLISH COMMENT
+DELIMITER //
+CREATE PROCEDURE PublishComment(IN p_commentID INT)
+BEGIN
+	UPDATE Comment
+	SET status = 'published'
+	WHERE commentID = p_commentID AND status = 'draft';
+END;
+//
+DELIMITER ;
+
+-- CANCEL COMMENT
+DELIMITER //
+CREATE PROCEDURE Cance(IN p_commentID INT)
+BEGIN 
+
+	UPDATE Comment
+	SET status = 'canceled'
+	WHERE questionID = p_questionID AND status = 'draft';
+END;
+//
+DELIMITER ;
 
 -- DELETE COMMENT
 DELIMITER //
 CREATE PROCEDURE CancelComment(IN p_commentID INT)
 BEGIN
-   DELETE FROM Comment WHERE commentID = p_commentID;
-   DELETE FROM TimeStamp WHERE commentID = p_commentID;
+	DELETE FROM Comment WHERE commentID = p_commentID;
+	DELETE FROM TimeStamp WHERE commentID = p_commentID;
 END;
 //
 DELIMITER;
-
 
 -- TRIGGER TO AUTO-GENERATE TIMESTAMP FOR EACH COMMENT
 -- UPON INSERTION ('POST)
@@ -904,24 +939,22 @@ CREATE TRIGGER BeforeInsertComment
 BEFORE INSERT ON Comment
 FOR EACH ROW
 BEGIN
-   IF NEW.TimeStampID IS NULL THEN
-       INSERT INTO TimeStamp (sentTime, sentDate) VALUES (CURTIME(), CURDATE());
-       SET NEW.TimeStampID = LAST_INSERT_ID();
-   END IF;
+	IF NEW.TimeStampID IS NULL THEN 
+		INSERT INTO TimeStamp (sentTime, sentDate) VALUES (CURTIME(), CURDATE());
+		SET NEW.TimeStampID = LAST_INSERT_ID();
+	END IF;
 END;
 //
-DELIMITER;
-
+DELIMITER; 
 
 -- LOG RESPONSE "ENTER/EXIT" ACTIONS
-DELIMITER // CREATE PROCEDURE LogCommentAction(IN p_userID INT, IN p_commentID INT, IN p_action VARCHAR(10))
+DELIMITER // CREATE PROCEDURE LogCommentAction(IN p_userID INT, IN p_action VARCHAR(10))
 BEGIN
-   INSERT INTO TimeStamp(sentTime, sendDate) VALUES (CURTIME(), CURDATE());
-   SET @tsID = LAST_INSERT_ID(); 
+	INSERT INTO TimeStamp(sentTime, sendDate) VALUES (CURTIME(), CURDATE());
+	SET @tsID = LAST_INSERT_ID();
 
-   INSERT INTO (userID, commentID, action, TimeStampID)
-   VALUES (p_userID, p_commentID, p_action, @tsID);
+	INSERT INTO (userID, chatID, action, TimeStampID)
+	VALUES (p_userID, p_chatID, p_action, @tsID);
 END;
 //
 DELIMITER;
-
