@@ -497,7 +497,7 @@ BEGIN
     SELECT u.firstName, u.lastName
     FROM User u
     JOIN TagList t ON t.userID = u.userID
-    WHERE u.userID <> target_userID -- Exclude the target user from the results
+    WHERE u.userID <> target_userID 
     GROUP BY u.userID, u.firstName, u.lastName
     ORDER BY
         (SELECT COUNT(*)
