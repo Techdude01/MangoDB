@@ -343,6 +343,9 @@ INSERT INTO QuestionDownvote (userID, questionID) VALUES
 (8, 8),
 (9, 9),
 (10, 10);
+
+
+
 ---------------------------------------------------------------------------------
 --                          CHAT BASED PROCEDURES
 ---------------------------------------------------------------------------------
@@ -372,6 +375,7 @@ END;
 //
 DELIMITER;
 
+
 -- TRIGGER TO AUTOMATICALLY ADD USER TO CHAT 
 -- WHEN THEY ACCEPT CHAT REQUEST
 DELIMITER //
@@ -387,6 +391,7 @@ END;
 //
 DELIMITER;
 
+
 --	RETRIEVE CHAT NAME (BY CHATID)
 DELIMITER //
 CREATE PROCEDURE GetChatName(IN p_chatID INT)
@@ -395,6 +400,7 @@ BEGIN
 END;
 //
 DELIMITER;
+
 
 -- TRIGGER TO AUTO-GENERATE TIMESTAMP FOR EACH CHATMESSAGE 
 -- UPON INSERTION ('SEND')
@@ -411,6 +417,7 @@ BEGIN
 END;
 //
 DELIMITER;
+
 
 -- LOG CHAT "ENTER/EXIT" ACTIONS
 DELIMITER // CREATE PROCEDURE LogChatAction(
@@ -432,6 +439,7 @@ DELIMITER;
 ---------------------------------------------------------------------------------
 --                          LOGIN PROCEDURES
 ---------------------------------------------------------------------------------
+
 -- Insert New User
 DELIMITER //
 CREATE PROCEDURE InsertNewUser (
@@ -447,6 +455,7 @@ END;
 //
 DELIMITER ;
 
+
 -- Get User Credentials
 -- Password not selected bc we use hashing on insert and check
 DELIMITER //
@@ -461,6 +470,7 @@ END;
 //
 DELIMITER ;
 
+
 -- Delete User by Username
 DELIMITER //
 CREATE PROCEDURE DeleteUserByUsername (
@@ -472,6 +482,7 @@ BEGIN
 END;
 //
 DELIMITER ;
+
 
 -- Handle Delete on User to Update Tables
 DELIMITER //	
@@ -507,6 +518,7 @@ END;
 //
 DELIMITER ;
 
+
 ---------------------------------------------------------------------------------
 --                       QUESTION BASED PROCEDURES
 ---------------------------------------------------------------------------------
@@ -526,6 +538,7 @@ END;
 // 
 DELIMITER ;
 
+
 -- publish question
 DELIMITER //
 CREATE PROCEDURE PublishQuestion(IN p_questionID INT)
@@ -538,6 +551,7 @@ END;
 //
 DELIMITER ;
 
+
 -- Cancel 'draft' question, not deleting it
 DELIMITER //
 CREATE PROCEDURE CancelQuestion(IN p_questionID INT)
@@ -549,6 +563,7 @@ BEGIN
 END;
 //
 DELIMITER ;
+
 
 -- Delete question that is already 'published'
 DELIMITER //
@@ -589,6 +604,7 @@ END;
 //
 DELIMITER ;
 
+
 -- Get Popular Questions
 DELIMITER //
 CREATE PROCEDURE GetPopularQuestions ()
@@ -604,6 +620,7 @@ BEGIN
 END;
 //
 DELIMITER ;
+
 
 -- Get Controversial Questions
 DELIMITER //
@@ -621,6 +638,7 @@ BEGIN
 END;
 //
 DELIMITER ;
+
 
 -- Get Relevant Questions
 DELIMITER //
@@ -640,6 +658,7 @@ END;
 //
 DELIMITER ;
 
+
 -- Find questions related to tags that user follows
 DELIMITER //
 CREATE PROCEDURE GetQuestionsByTag(IN p_tagName VARCHAR(16))
@@ -653,6 +672,7 @@ END;
 //
 DELIMITER ;
 
+
 -- Search for questions by keyword
 DELIMITER //
 CREATE PROCEDURE SearchQuestions (IN p_keyword VARCHAR(100))
@@ -663,6 +683,7 @@ BEGIN
 END;
 // 
 DELIMITER ;
+
 
 -- users can upvote a question
 DELIMITER //
@@ -686,6 +707,7 @@ BEGIN
 END;
 //
 DELIMITER ;
+
 
 -- users can downvote a question
 DELIMITER //
@@ -722,20 +744,22 @@ CREATE PROCEDURE GetSimilarUsersByTags (
     IN target_userID INT
 )
 BEGIN
-    SELECT u.firstName, u.lastName
+    SELECT u.firstName, u.lastName, COUNT(*) as sharedTags
     FROM User u
     JOIN TagList t ON t.userID = u.userID
     WHERE u.userID <> target_userID 
+		AND t.tagID IN (
+			SELECT tagID
+			FROM TagList
+			WHERE userID = target_userID
+		)
     GROUP BY u.userID, u.firstName, u.lastName
-    ORDER BY
-        (SELECT COUNT(*)
-         FROM TagList a
-         WHERE a.userID = u.userID
-           AND a.tagID IN (SELECT tagID FROM TagList WHERE userID = target_userID)) DESC
-    LIMIT 4;
+    ORDER BY sharedTags DESC
+	LIMIT 4;
 END;
 //
 DELIMITER ;
+
 
 -- Get Chat Order By UserID
 DELIMITER //
@@ -747,7 +771,7 @@ BEGIN
     FROM ChatLog c
     JOIN TimeStamp t ON c.TimeStampID = t.TimeStampID
     WHERE c.userID = target_userID
-    ORDER BY t.sentTime DESC, t.sentDate DESC;
+    ORDER BY t.sentDate DESC, t.sentTime DESC;
 END;
 //
 DELIMITER ;
@@ -756,21 +780,23 @@ DELIMITER ;
 ---------------------------------------------------------------------------------
 --                       RESPONSE BASED PROCEDURES
 ---------------------------------------------------------------------------------
+
 -- POST RESPONSE
 DELIMITER //
 CREATE PROCEDURE PostResponse(IN p_userID INT, IN p_responseText TEXT)
 BEGIN
-   INSERT INTO TimeStamp (sentTime, sentDate) VALUES (CURTIME(), CURDATE());
+   INSERT INTO TimeStamp (sentTime, sentDate) 
+   VALUES (CURTIME(), CURDATE());
    SET @tsID = LAST_INSERT_ID();
 
    INSERT INTO Response (userID, responseText, TimeStampID)
-   VALUES (p_userID, p_responseText, @tsID)
+   VALUES (p_userID, p_responseText, @tsID);
 END;
 //
 DELIMITER;
 
 
--- DELETE RESPONSE
+-- CANCEL RESPONSE
 DELIMITER //
 CREATE PROCEDURE CancelResponse(IN p_responseID INT)
 BEGIN
@@ -782,7 +808,8 @@ DELIMITER;
 
 
 -- VALID RESPONSE PRESENT CHECK
-DELIMITER // CREATE PROCEDURE ValidResponse(IN p_userID INT, IN p_questionID INT, OUT p_hasResponded BOOLEAN)
+DELIMITER // 
+CREATE PROCEDURE ValidResponse(IN p_userID INT, IN p_questionID INT, OUT p_hasResponded BOOLEAN)
 BEGIN
    IF EXISTS (SELECT 1 FROM Response WHERE userID = p_userID AND questionID = p_questionID) THEN
        SET p_hasResponded = TRUE;
@@ -795,7 +822,8 @@ DELIMITER;
 
 
 -- RETRIEVE RESPONSES
-DELIMITER // CREATE PROCEDURE RetrieveResponses(IN p_userID INT, IN p_questionID INT)
+DELIMITER // 
+CREATE PROCEDURE RetrieveResponses(IN p_userID INT, IN p_questionID INT)
 BEGIN
    DECLARE p_hasResponse BOOLEAN;
    CALL ValidResponse(p_userID, p_questionID, p_hasResponse);
@@ -843,6 +871,7 @@ DELIMITER;
 ---------------------------------------------------------------------------------
 --                       COMMENT BASED PROCEDURES
 ---------------------------------------------------------------------------------
+
 -- POST COMMENT
 DELIMITER //
 CREATE PROCEDURE PostComment(IN p_userID INT, IN p_commentText TEXT)
