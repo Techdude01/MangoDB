@@ -138,66 +138,19 @@ CREATE TABLE QuestionDownvote (
 
 -- user entries
 
-INSERT INTO User (userName, password, firstName, lastName) VALUES 
+-- user entries
+INSERT INTO User (userName, password, firstName, lastName) VALUES
 ('jdoe', 'password123', 'John', 'Doe'),('asmith', 'securePass456', 'Alice', 'Smith'),
 ('bwayne', 'batman2025', 'Bruce', 'Wayne'),('ckent', 'superman2025', 'Clark', 'Kent'),
 ('dprince', 'wonderWoman!', 'Diana', 'Prince'),('pparker', 'sp1derman', 'Peter', 'Parker'),
 ('tstark', 'ironman3000', 'Tony', 'Stark'),('ssmith', 'spy123', 'Sam', 'Smith'),
 ('nbarton', 'hawkeye!', 'Natasha', 'Barton'),('srogers', 'capShield1', 'Steve', 'Rogers');
- 
+
 -- tag entries
-INSERT INTO Tag (tagName) VALUES 
+INSERT INTO Tag (tagName) VALUES
 ('tech'), ('lifestyle'), ('academics'), ('NYU Tandon'), ('raspberrypi'),
 ('fishhobbyists'), ('travel'), ('politics'), ('movies'), ('random');
 
--- taglist entries
-INSERT INTO TagList (tagID, userID) VALUES
-(1,1), (2,2), (3,3), (4,4), (5,5), 
-(3,6), (7,7), (4,8), (7,9), (8,10);
-
--- chat entries
-INSERT INTO Chat (userID, chatName) VALUES 
-(1, 'MangoDB'), (2, 'EG RAD'), (3, 'tomfoolery'), (4, 'benedict cumberpatch fans'), (5, 'pigeonreport'),
-(6, 'peanuts'), (7, 'flabbergasted'), (8, 'my name is fred'), (9, 'bettafish owners'), (10, 'revit');
-
--- chatmember entires
-INSERT INTO ChatMember (userID, chatID) VALUES
-(1,1), (2,1), (3,2), (4,3), (5,4),
-(6,5), (7,2), (8,5), (9,1), (10, 9);
-
--- chatmessage entires
-INSERT INTO ChatMessage (chatID, userID, messageText, TimeStampID) VALUES 
-(1, 1, 'Project is due tomorrow!!', 1),(2, 2, 'i think i fried the arduino', 2),
-(3, 3, 'Anyone playing tonight?', 3),(4, 4, 'his wifes so hot', 4),
-(5, 5, 'can we feed them laxatives?', 5),(6, 6, 'oven roast is better ', 6),
-(7, 7, 'Just chilling here.', 7),(8, 8, 'New tech trends?', 8),
-(9, 9, 'tried hikari fancy guppy pellets', 9),(10, 10, 'im getting fired...', 10);
- 
--- question entries
-INSERT INTO Question (userID, questionText, TimeStampID) VALUES 
-(1,'What is the speed of light?',1),(2,'How to build a REST API?',2),
-(3,'What’s the best sci-fi book?',3),(4,'Tips for staying fit?',4),
-(5,'Favorite Marvel character?',5),(6,'How to train for a marathon?',6),
-(7,'Whats the difference better INNER JOIN and LEFT JOIN?',7),
-(8,'Who lives in a pineapple under the sea?',8),(9,'What’s up?',9),
-(10,'How to get better at chess?',10);
- 
--- response entries
-INSERT INTO Response (userID, responseText, TimeStampID) VALUES 
-(1,'299,792,458 m/s',11),(2,'Use Flask or Express',12),
-(3,'Dune by Frank Herbert',13),(4,'Consistency and diet',14),
-(5,'Doctor Strange, obviously!',15),(6,'Run short distances daily',16),
-(7,'Google is a great start',17),(8,'Spongebob Squarepants',18),
-(9,'We may never know...',19),(10,'Play puzzles and practice',20);
- 
- -- comment entries
-INSERT INTO Comment (userID, questionID, commentText, TimeStampID) VALUES 
-(3, 1, 'Good question!', 1),(4, 2, 'Helpful info.', 2),
-(5, 3, 'Thanks for sharing.', 3),(6, 4, 'Clarify more?', 4),
-(7, 5, 'Great explanation.', 5),(8, 6, 'Interesting.', 6),
-(9, 7, 'Didn’t know that.', 7),(10, 8, 'Cool.', 8),
-(1, 9, 'Thanks!', 9),(2, 10, 'Useful tip.', 10);
- 
 -- timestamp entries
 INSERT INTO TimeStamp (sentTime, sentDate) VALUES
 ('08:00:00', '2025-01-01'),('09:10:00', '2025-01-02'),('10:30:00', '2025-01-03'),
@@ -214,7 +167,55 @@ INSERT INTO TimeStamp (sentTime, sentDate) VALUES
 ('08:45:00', '2025-03-04'),('09:00:00', '2025-03-05'),('09:15:00', '2025-03-06'),
 ('09:30:00', '2025-03-07'),('09:45:00', '2025-03-08'),('10:00:00', '2025-03-09'),
 ('10:15:00', '2025-03-10');
- 
+
+-- chat entries
+INSERT INTO Chat (userID, chatName) VALUES
+(1, 'MangoDB'), (2, 'EG RAD'), (3, 'tomfoolery'), (4, 'benedict cumberpatch fans'), (5, 'pigeonreport'),
+(6, 'peanuts'), (7, 'flabbergasted'), (8, 'my name is fred'), (9, 'bettafish owners'), (10, 'revit');
+
+-- question entries
+INSERT INTO Question (userID, questionText, TimeStampID) VALUES
+(1,'What is the speed of light?',1),(2,'How to build a REST API?',2),
+(3,'What’s the best sci-fi book?',3),(4,'Tips for staying fit?',4),
+(5,'Favorite Marvel character?',5),(6,'How to train for a marathon?',6),
+(7,'Whats the difference better INNER JOIN and LEFT JOIN?',7),
+(8,'Who lives in a pineapple under the sea?',8),(9,'What’s up?',9),
+(10,'How to get better at chess?',10);
+
+-- taglist entries
+INSERT INTO TagList (tagID, userID) VALUES
+(1,1), (2,2), (3,3), (4,4), (5,5),
+(3,6), (7,7), (4,8), (7,9), (8,10);
+
+-- response entries
+INSERT INTO Response (userID, responseText, TimeStampID) VALUES
+(1,'299,792,458 m/s',11),(2,'Use Flask or Express',12),
+(3,'Dune by Frank Herbert',13),(4,'Consistency and diet',14),
+(5,'Doctor Strange, obviously!',15),(6,'Run short distances daily',16),
+(7,'Google is a great start',17),(8,'Spongebob Squarepants',18),
+(9,'We may never know...',19),(10,'Play puzzles and practice',20);
+
+-- comment entries
+INSERT INTO Comment (userID, questionID, commentText, TimeStampID) VALUES
+(3, 1, 'Good question!', 1),(4, 2, 'Helpful info.', 2),
+(5, 3, 'Thanks for sharing.', 3),(6, 4, 'Clarify more?', 4),
+(7, 5, 'Great explanation.', 5),(8, 6, 'Interesting.', 6),
+(9, 7, 'Didn’t know that.', 7),(10, 8, 'Cool.', 8),
+(1, 9, 'Thanks!', 9),(2, 10, 'Useful tip.', 10);
+
+-- chatmessage entries
+INSERT INTO ChatMessage (chatID, userID, messageText, TimeStampID) VALUES
+(1, 1, 'Project is due tomorrow!!', 1),(2, 2, 'i think i fried the arduino', 2),
+(3, 3, 'Anyone playing tonight?', 3),(4, 4, 'his wifes so hot', 4),
+(5, 5, 'can we feed them laxatives?', 5),(6, 6, 'oven roast is better ', 6),
+(7, 7, 'Just chilling here.', 7),(8, 8, 'New tech trends?', 8),
+(9, 9, 'tried hikari fancy guppy pellets', 9),(10, 10, 'im getting fired...', 10);
+
+-- chatmember entires
+INSERT INTO ChatMember (userID, chatID) VALUES
+(1,1), (2,1), (3,2), (4,3), (5,4),
+(6,5), (7,2), (8,5), (9,1), (10, 9);
+
 -- chatrequest entries
 INSERT INTO ChatRequest (fromUserID, toUserID, chatID, status, TimeStampID) VALUES
 (3, 9, 5, 'pending', 31),(4, 10, 6, 'pending', 32),(2, 10, 5, 'pending', 33),(2, 6, 1, 'pending', 34),(1, 6, 3, 'pending', 35),
