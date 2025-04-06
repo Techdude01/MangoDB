@@ -197,10 +197,15 @@ BEGIN
 	IF (SELECT status FROM Question WHERE questionID = p_questionID) = 'published' THEN
 		-- Delete related entries in dependent tables
 		DELETE FROM Comment WHERE questionID = p_questionID,
+
 		DELETE FROM Response WHERE questionID = p_questionID,
+
 		DELETE FROM QuestionLog WHERE questionID = p_questionID,
+
 		DELETE FROM QuestionUpvote WHERE questionID = p_questionID,
+
 		DELETE FROM QuestionDownvote WHERE questionID = p_questionID,
+		
 		-- Delete question itself
 		DELETE FROM Question WHERE questionID = p_questionID;
 	END IF;
@@ -495,6 +500,7 @@ BEGIN
 END;
 //
 DELIMITER ;
+
 ---------------------------------------------------------------------------------
 --                          User POPULATION PROCEDURES
 ---------------------------------------------------------------------------------
