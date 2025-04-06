@@ -61,6 +61,7 @@ CREATE TABLE Question(
 	userID INT,
 	questionText TEXT,
 	TimeStampID INT,
+	upvotes INT DEFAULT 0 CHECK (upvotes >= 0), 
 	FOREIGN KEY (userID) REFERENCES User(userID),
 	FOREIGN KEY (TimeStampID) REFERENCES TimeStamp(TimeStampID)
 );
