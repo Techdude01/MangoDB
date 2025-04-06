@@ -63,6 +63,7 @@ CREATE TABLE Question(
 	TimeStampID INT,
 	upvotes INT DEFAULT 0 CHECK (upvotes >= 0), 
 	downvotes INT DEFAULT 0 CHECK (downvotes >= 0),
+	ENUM('draft', 'published', 'canceled') DEFAULT 'draft',
 	FOREIGN KEY (userID) REFERENCES User(userID),
 	FOREIGN KEY (TimeStampID) REFERENCES TimeStamp(TimeStampID)
 );
@@ -72,6 +73,7 @@ CREATE TABLE Response(
 	userID INT,
 	responseText TEXT,
 	TimeStampID INT,
+	FOREIGN KEY (questionID) REFERENCES Question(questionID),
 	FOREIGN KEY (userID) REFERENCES User(userID),
 	FOREIGN KEY (TimeStampID) REFERENCES TimeStamp(TimeStampID)
 );
@@ -245,25 +247,42 @@ INSERT INTO ChatLog (userID, chatID, action, TimeStampID) VALUES
 ---------------------------------------------------------------------------------
 --                       QUESTION BASED PROCEDURES
 ---------------------------------------------------------------------------------
--- ASK QUESTION
+-- Create question in 'draft' mode
 DELIMITER //
-CREATE PROCEDURE AskQuestion(IN p_userID INT, IN p_questionText TEXT)
+CREATE PROCEDURE StartQuestion(IN p_userID INT, IN p_questionText TEXT)
 BEGIN
 	-- Insert timestamp entry
 	INSERT INTO TimeStamp (sentTime, sentDate) VALUES (CURTIME(), CURDATE());
 	SET @tsID = LAST_INSERT_ID();
 
-	-- Insert new question
-	INSERT INTO Question (userID, questionText, TimeStampID)
-	VALUES (p_userID, p_questionText, @tsID);
+	-- Insert new question in 'draft' mode
+	INSERT INTO Question (userID, questionText, TimeStampID, status)
+	VALUES (p_userID, p_questionText, @tsID, 'draft');
 END;
 // 
-DELIMITER;
+DELIMITER ;
 
--- CANCEL QUESTION
+-- publish question
+DELIMITER //
+CREATE PROCEDURE PublishQuestion(IN p_questionID INT)
+BEGIN
+	-- Update status of question to be 'published'
+	UPDATE Question
+	SET status = 'published'
+	WHERE questionID = p_questionID AND status = 'draft';
+END;
+//
+DELIMITER ;
+
+-- Cancel question, not deleting it
 DELIMITER //
 CREATE PROCEDURE CancelQuestion(IN p_questionID INT)
 BEGIN
+	-- Delete related entries in dependent tables
+	DELETE FROM Comment WHERE questionID = p_questionID,
+	DELETE FROM Response WHERE questionID = p_questionID,
+	DELETE FROM QuestionLog WHERE questionID = p_questionID,
+	-- Delete question itself
 	DELETE FROM Question WHERE questionID = p_questionID;
 END;
 //
@@ -273,7 +292,7 @@ DELIMITER;
 DELIMITER //
 CREATE PROCEDURE LogQuestionAction(IN p_userID INT, IN p_questionID INT, IN p_action VARCHAR(10))
 BEGIN
-	INSERT INTO TimeStamp (sentTime, sentDate) VALUES (CURTIME(), CUREDATE());
+	INSERT INTO TimeStamp (sentTime, sentDate) VALUES (CURTIME(), CURDATE());
 	SET @tsID = LAST_INSERT_ID();
 
 	INSERT INTO QuestionLog (userID, questionID, action, TimeStampID)
