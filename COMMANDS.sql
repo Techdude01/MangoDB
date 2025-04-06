@@ -524,3 +524,38 @@ DELIMITER ;
 --                          User POPULATION PROCEDURES
 ---------------------------------------------------------------------------------
 
+-- Get Users with Most Shared Tags
+DELIMITER //
+CREATE PROCEDURE GetSimilarUsersByTags (
+    IN target_userID INT
+)
+BEGIN
+    SELECT u.firstName, u.lastName
+    FROM User u
+    JOIN TagList t ON t.userID = u.userID
+    WHERE u.userID <> target_userID 
+    GROUP BY u.userID, u.firstName, u.lastName
+    ORDER BY
+        (SELECT COUNT(*)
+         FROM TagList a
+         WHERE a.userID = u.userID
+           AND a.tagID IN (SELECT tagID FROM TagList WHERE userID = target_userID)) DESC
+    LIMIT 4;
+END;
+//
+DELIMITER ;
+
+-- Get Chat Order By UserID
+DELIMITER //
+CREATE PROCEDURE GetChatIDsForUser (
+    IN target_userID INT
+)
+BEGIN
+    SELECT c.chatID
+    FROM ChatLog c
+    JOIN TimeStamp t ON c.TimeStampID = t.TimeStampID
+    WHERE c.userID = target_userID
+    ORDER BY t.sentTime DESC, t.sentDate DESC;
+END;
+//
+DELIMITER ;
