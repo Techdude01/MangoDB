@@ -425,6 +425,40 @@ END;
 //
 DELIMITER ;
 
+-- Handle Delete on User to Update Tables
+DELIMITER //	
+CREATE TRIGGER after_user_deleted
+AFTER DELETE ON User
+FOR EACH ROW
+BEGIN
+    DELETE FROM TagList WHERE userID = OLD.userID;
+
+    DELETE FROM Chat WHERE userID = OLD.userID;
+
+    DELETE FROM ChatMessage WHERE userID = OLD.userID;
+
+    DELETE FROM ChatMember WHERE userID = OLD.userID;
+
+    DELETE FROM Comment WHERE userID = OLD.userID;
+
+    DELETE FROM Question WHERE userID = OLD.userID;
+
+    DELETE FROM Response WHERE userID = OLD.userID;
+
+    DELETE FROM TimeStamp WHERE userID = OLD.userID;
+
+    DELETE FROM ChatLog WHERE userID = OLD.userID;
+
+    DELETE FROM QuestionUpvote WHERE userID = OLD.userID;
+
+    DELETE FROM QuestionLog WHERE userID = OLD.userID;
+
+    DELETE FROM ChatRequest WHERE fromUserID = OLD.userID OR toUserID = OLD.userID;
+
+END;
+//
+DELIMITER ;
+
 ---------------------------------------------------------------------------------
 --                          QUESTION POPULATION PROCEDURES
 ---------------------------------------------------------------------------------
