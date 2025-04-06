@@ -42,6 +42,7 @@ CREATE TABLE Question(
     status ENUM('draft', 'published', 'canceled') DEFAULT 'draft',
     FOREIGN KEY (userID) REFERENCES User(userID),
     FOREIGN KEY (TimeStampID) REFERENCES TimeStamp(TimeStampID)
+    FOREIGN KEY (tagID) REFERENCES TagList(tagID)
 );
 
 CREATE TABLE Response(
