@@ -475,7 +475,7 @@ DELIMITER ;
 
 -- Handle Delete on User to Update Tables
 DELIMITER //	
-CREATE TRIGGER after_user_deleted
+CREATE TRIGGER OnUserDelete
 AFTER DELETE ON User
 FOR EACH ROW
 BEGIN
