@@ -51,6 +51,7 @@ CREATE TABLE Response(
     questionID INT,
     responseText TEXT,
     TimeStampID INT,
+    status VARCHAR(10),
     FOREIGN KEY (questionID) REFERENCES Question(questionID),
     FOREIGN KEY (userID) REFERENCES User(userID),
     FOREIGN KEY (TimeStampID) REFERENCES TimeStamp(TimeStampID)
@@ -62,6 +63,7 @@ CREATE TABLE Comment(
     questionID INT,
     commentText TEXT,
     TimeStampID INT,
+    status VARCHAR(10),
     FOREIGN KEY (questionID) REFERENCES Question(questionID),
     FOREIGN KEY (userID) REFERENCES User(userID),
     FOREIGN KEY (TimeStampID) REFERENCES TimeStamp(TimeStampID)
