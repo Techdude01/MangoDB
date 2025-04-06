@@ -698,6 +698,7 @@ BEGIN
 		WHERE userID = p_userID AND questionID = p_questionID
 	)
 	THEN
+	
 		-- log downvoate
 		INSERT INTO QuestionDownvote (userID, questionID)
 		VALUES (p_userID, p_questionID);
@@ -750,3 +751,149 @@ BEGIN
 END;
 //
 DELIMITER ;
+
+
+---------------------------------------------------------------------------------
+--                       RESPONSE BASED PROCEDURES
+---------------------------------------------------------------------------------
+-- POST RESPONSE
+DELIMITER //
+CREATE PROCEDURE PostResponse(IN p_userID INT, IN p_responseText TEXT)
+BEGIN
+   INSERT INTO TimeStamp (sentTime, sentDate) VALUES (CURTIME(), CURDATE());
+   SET @tsID = LAST_INSERT_ID();
+
+
+   INSERT INTO Response (userID, responseText, TimeStampID)
+   VALUES (p_userID, p_responseText, @tsID)
+END;
+//
+DELIMITER;
+
+
+-- CANCEL RESPONSE
+DELIMITER //
+CREATE PROCEDURE CancelResponse(IN p_responseID INT)
+BEGIN
+   DELETE FROM Response WHERE responseID = p_responseID;
+   DELETE FROM TimeStamp WHERE responseID = p_responseID;
+END
+//
+DELIMITER;
+
+
+-- VALID RESPONSE PRESENT CHECK
+DELIMITER // CREATE PROCEDURE ValidResponse(IN p_userID INT, IN p_questionID INT, OUT p_hasResponded BOOLEAN)
+BEGIN
+   IF EXISTS (SELECT 1 FROM Response WHERE userID = p_userID AND questionID = p_questionID) THEN
+       SET p_hasResponded = TRUE;
+   ELSE
+       SET p_hasResponded = FALSE;
+   END IF;
+END;
+//
+DELIMITER;
+
+
+-- RETRIEVE RESPONSES
+DELIMITER // CREATE PROCEDURE RetrieveResponses(IN p_userID INT, IN p_questionID INT)
+BEGIN
+   DECLARE p_hasResponse BOOLEAN;
+   CALL ValidResponse(p_userID, p_questionID, p_hasResponse);
+
+   IF p_hasResponse THEN
+       SELECT * FROM Response WHERE questionID = p_questionID;
+   ELSE
+       SELECT 'This user has not responded to this question yet!';
+   END IF;
+END;
+//
+DELIMITER;
+
+
+-- TRIGGER TO AUTO-GENERATE TIMESTAMP FOR EACH RESPONSE
+-- UPON INSERTION ('POST)
+DELIMITER //
+CREATE TRIGGER BeforeInsertResponse
+BEFORE INSERT ON Response
+FOR EACH ROW
+BEGIN
+   IF NEW.TimeStampID IS NULL THEN
+       INSERT INTO TimeStamp (sentTime, sentDate) VALUES (CURTIME(), CURDATE());
+       SET NEW.TimeStampID = LAST_INSERT_ID();
+   END IF;
+END;
+//
+DELIMITER;
+
+
+-- LOG RESPONSE "ENTER/EXIT" ACTIONS
+DELIMITER // CREATE PROCEDURE LogResponseAction(IN p_userID INT, IN p_responseID INT, IN p_action VARCHAR(10))
+BEGIN
+   INSERT INTO TimeStamp(sentTime, sendDate) VALUES (CURTIME(), CURDATE());
+   SET @tsID = LAST_INSERT_ID();
+
+
+   INSERT INTO (userID, responseID, action, TimeStampID)
+   VALUES (p_userID, p_responseID, p_action, @tsID);
+END;
+//
+DELIMITER;
+
+
+---------------------------------------------------------------------------------
+--                       COMMENT BASED PROCEDURES
+---------------------------------------------------------------------------------
+-- POST COMMENT
+DELIMITER //
+CREATE PROCEDURE PostComment(IN p_userID INT, IN p_commentText TEXT)
+BEGIN
+   INSERT INTO TimeStamp (sentTime, sentDate) VALUES (CURTIME(), CURDATE());
+   SET @tsID = LAST_INSERT_ID();
+
+   INSERT INTO Comment(p_userID, p_commentText, TimeStampID)
+   VALUES (userID, commentText, commentID, @tsID)
+END;
+//
+DELIMITER;
+
+
+-- CANCEL COMMENT
+DELIMITER //
+CREATE PROCEDURE CancelComment(IN p_commentID INT)
+BEGIN
+   DELETE FROM Comment WHERE commentID = p_commentID;
+   DELETE FROM TimeStamp WHERE commentID = p_commentID;
+END
+//
+DELIMITER;
+
+
+-- TRIGGER TO AUTO-GENERATE TIMESTAMP FOR EACH COMMENT
+-- UPON INSERTION ('POST)
+DELIMITER //
+CREATE TRIGGER BeforeInsertComment
+BEFORE INSERT ON Comment
+FOR EACH ROW
+BEGIN
+   IF NEW.TimeStampID IS NULL THEN
+       INSERT INTO TimeStamp (sentTime, sentDate) VALUES (CURTIME(), CURDATE());
+       SET NEW.TimeStampID = LAST_INSERT_ID();
+   END IF;
+END;
+//
+DELIMITER;
+
+
+-- LOG RESPONSE "ENTER/EXIT" ACTIONS
+DELIMITER // CREATE PROCEDURE LogCommentAction(IN p_userID INT, IN p_commentID INT, IN p_action VARCHAR(10))
+BEGIN
+   INSERT INTO TimeStamp(sentTime, sendDate) VALUES (CURTIME(), CURDATE());
+   SET @tsID = LAST_INSERT_ID(); 
+
+   INSERT INTO (userID, commentID, action, TimeStampID)
+   VALUES (p_userID, p_commentID, p_action, @tsID);
+END;
+//
+DELIMITER;
+
