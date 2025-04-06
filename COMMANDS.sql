@@ -439,52 +439,6 @@ END;
 //
 DELIMITER ;
 
--- users can upvote a question
-DELIMITER //
-
-CREATE PROCEDURE UpvoteQuestion(IN p_questionID INT, IN p_questionID INT)
-BEGIN 
-	-- check if user already upvoted this question
-	IF NOT EXISTS (
-		SELECT 1 FROM QuestionUpvote
-		WHERE userID = p_userID AND questionID = p_questionID
-	)
-	THEN
-		-- log upvote
-		INSERT INTO QuestionUpvote (userID, questionID)
-		VALUES (p_userID, p_questionID);
-		-- increment upvote count
-		UPDATE Question
-		SET upvotes = upvotes + 1
-		WHERE questionID = p_questionID;
-	END IF;
-END;
-//
-DELIMITER ;
-
-DELIMITER //
-
-CREATE PROCEDURE DownvoteQuestion(IN p_userID INT, IN p_questionID INT)
-BEGIN
-	-- check if user already downvoted this question
-	IF NOT EXISTS (
-		SELECT 1 FROM QuestionDownvoote
-		WHERE userID = p_userID AND questionID = p_questionID
-	)
-	THEN
-		-- log downvoate
-		INSERT INTO QuestionDownvote (userID, questionID)
-		VALUES (p_userID, p_questionID);
-
-		-- increment downvote count
-		UPDATE Question
-		SET downvotes = downvotes + 1
-		WHERE questionID = p_questionID;
-	END IF;
-END;
-//
-DELIMITER ;
-
 -- Get Controversial Questions
 DELIMITER //
 CREATE PROCEDURE GetControversialQuestions ()
@@ -520,6 +474,52 @@ END;
 //
 DELIMITER ;
 
+-- users can upvote a question
+DELIMITER //
+
+CREATE PROCEDURE UpvoteQuestion(IN p_questionID INT, IN p_questionID INT)
+BEGIN 
+	-- check if user already upvoted this question
+	IF NOT EXISTS (
+		SELECT 1 FROM QuestionUpvote
+		WHERE userID = p_userID AND questionID = p_questionID
+	)
+	THEN
+		-- log upvote
+		INSERT INTO QuestionUpvote (userID, questionID)
+		VALUES (p_userID, p_questionID);
+		-- increment upvote count
+		UPDATE Question
+		SET upvotes = upvotes + 1
+		WHERE questionID = p_questionID;
+	END IF;
+END;
+//
+DELIMITER ;
+
+-- users can downvote a question
+DELIMITER //
+
+CREATE PROCEDURE DownvoteQuestion(IN p_userID INT, IN p_questionID INT)
+BEGIN
+	-- check if user already downvoted this question
+	IF NOT EXISTS (
+		SELECT 1 FROM QuestionDownvoote
+		WHERE userID = p_userID AND questionID = p_questionID
+	)
+	THEN
+		-- log downvoate
+		INSERT INTO QuestionDownvote (userID, questionID)
+		VALUES (p_userID, p_questionID);
+
+		-- increment downvote count
+		UPDATE Question
+		SET downvotes = downvotes + 1
+		WHERE questionID = p_questionID;
+	END IF;
+END;
+//
+DELIMITER ;
 ---------------------------------------------------------------------------------
 --                          User POPULATION PROCEDURES
 ---------------------------------------------------------------------------------
