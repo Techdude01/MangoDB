@@ -218,17 +218,37 @@ INSERT INTO TimeStamp (sentTime, sentDate) VALUES
 INSERT INTO ChatRequest (fromUserID, toUserID, chatID, status, TimeStampID) VALUES
 (3, 9, 5, 'pending', 31),(4, 10, 6, 'pending', 32),(2, 10, 5, 'pending', 33),(2, 6, 1, 'pending', 34),(1, 6, 3, 'pending', 35),
 (3, 10, 10, 'pending', 36),(2, 10, 7, 'pending', 37),(5, 9, 8, 'pending', 38),(3, 7, 10, 'pending', 39),(4, 6, 6, 'pending', 40);
- 
--- questionlog entries
-INSERT INTO QuestionLog (userID, questionID, action, TimeStampID) VALUES
-(4, 6, 'enter', 31),(2, 5, 'enter', 32),(2, 8, 'exit', 33),(7, 2, 'enter', 34),(8, 9, 'enter', 35),
-(3, 10, 'enter', 36),(4, 2, 'exit', 37),(9, 3, 'exit', 38),(10, 2, 'exit', 39),(3, 2, 'exit', 40);
- 
+
 -- chatlog entries
 INSERT INTO ChatLog (userID, chatID, action, TimeStampID) VALUES
 (3, 4, 'enter', 31),(6, 7, 'exit', 32),(4, 8, 'enter', 33),(8, 2, 'exit', 34),(4, 9, 'exit', 35),
 (3, 2, 'enter', 36),(7, 8, 'exit', 37),(9, 8, 'exit', 38),(4, 5, 'exit', 39),(10, 1, 'exit', 40);
- 
+
+-- QuestionUpvote
+INSERT INTO QuestionUpvote (userID, questionID) VALUES
+(1, 1),
+(2, 2),
+(3, 3),
+(4, 4),
+(5, 5),
+(6, 6),
+(7, 7),
+(8, 8),
+(9, 9),
+(10, 10);
+
+-- QuestionDownvote
+INSERT INTO QuestionDownvote (userID, questionID) VALUES
+(1, 1),
+(2, 2),
+(3, 3),
+(4, 4),
+(5, 5),
+(6, 6),
+(7, 7),
+(8, 8),
+(9, 9),
+(10, 10);
 ---------------------------------------------------------------------------------
 --                          CHAT BASED PROCEDURES
 ---------------------------------------------------------------------------------
