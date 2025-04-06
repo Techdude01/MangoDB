@@ -864,7 +864,7 @@ CREATE PROCEDURE CancelComment(IN p_commentID INT)
 BEGIN
    DELETE FROM Comment WHERE commentID = p_commentID;
    DELETE FROM TimeStamp WHERE commentID = p_commentID;
-END
+END;
 //
 DELIMITER;
 
