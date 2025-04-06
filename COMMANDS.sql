@@ -137,80 +137,6 @@ CREATE TABLE QuestionDownvote (
 
 
 ---------------------------------------------------------------------------------
---                       QUESTION BASED PROCEDURES
----------------------------------------------------------------------------------
--- Create question in 'draft' mode
-DELIMITER //
-CREATE PROCEDURE StartQuestion(IN p_userID INT, IN p_questionText TEXT)
-BEGIN
-	-- Insert timestamp entry
-	INSERT INTO TimeStamp (sentTime, sentDate) VALUES (CURTIME(), CURDATE());
-	SET @tsID = LAST_INSERT_ID();
-
-	-- Insert new question in 'draft' mode
-	INSERT INTO Question (userID, questionText, TimeStampID, status)
-	VALUES (p_userID, p_questionText, @tsID, 'draft');
-END;
-// 
-DELIMITER ;
-
--- publish question
-DELIMITER //
-CREATE PROCEDURE PublishQuestion(IN p_questionID INT)
-BEGIN
-	-- Update status of question to be 'published'
-	UPDATE Question
-	SET status = 'published'
-	WHERE questionID = p_questionID AND status = 'draft';
-END;
-//
-DELIMITER ;
-
--- Cancel 'draft' question, not deleting it
-DELIMITER //
-CREATE PROCEDURE CancelQuestion(IN p_questionID INT)
-BEGIN 
-	-- Update status of question to be 'cancelled'
-	UPDATE Question
-	SET status = 'canceled'
-	WHERE questionID = p_questionID AND status = 'draft';
-END;
-//
-DELIMITER ;
-
--- Delete question that is already 'published'
-DELIMITER //
-CREATE PROCEDURE DeleteQuestion(IN p_questionID INT)
-BEGIN
-	-- Check if question is 'published'
-	IF (SELECT status FROM Question WHERE questionID = p_questionID) = 'published' THEN
-		-- Delete related entries in dependent tables
-		DELETE FROM Comment WHERE questionID = p_questionID,
-
-		DELETE FROM Response WHERE questionID = p_questionID,
-
-		DELETE FROM QuestionUpvote WHERE questionID = p_questionID,
-
-		DELETE FROM QuestionDownvote WHERE questionID = p_questionID,
-
-		-- Delete question itself
-		DELETE FROM Question WHERE questionID = p_questionID;
-	END IF;
-END;
-//
-DELIMITER;
-
--- search for questions by keyword
-DELIMITER //
-CREATE PROCEDURE SearchQuestions (IN p_keyword VARCHAR(100))
-BEGIN
-	SELECT questionID, questionText
-	FROM Question
-	WHERE questionText LIKE CONCAT ('%', p_keyword, '%');
-END;
-// 
-DELIMITER ;
----------------------------------------------------------------------------------
 --                          CHAT BASED PROCEDURES
 ---------------------------------------------------------------------------------
 
@@ -285,7 +211,8 @@ DELIMITER // CREATE PROCEDURE LogChatAction(
 	IN p_chatID INT, 
 	IN p_action VARCHAR(10))
 BEGIN
-	INSERT INTO TimeStamp (sentTime, sentDate) VALUES (CURTIME(), CURDATE());
+	INSERT INTO TimeStamp (sentTime, sentDate) 
+	VALUES (CURTIME(), CURDATE());
 	SET @tsID = LAST_INSERT_ID();
 
 	INSERT INTO ChatLog (userID, chatID, action, TimeStampID)
@@ -374,6 +301,71 @@ END;
 DELIMITER ;
 
 ---------------------------------------------------------------------------------
+--                       QUESTION BASED PROCEDURES
+---------------------------------------------------------------------------------
+
+-- Create question in 'draft' mode
+DELIMITER //
+CREATE PROCEDURE StartQuestion(IN p_userID INT, IN p_questionText TEXT)
+BEGIN
+	-- Insert timestamp entry
+	INSERT INTO TimeStamp (sentTime, sentDate) VALUES (CURTIME(), CURDATE());
+	SET @tsID = LAST_INSERT_ID();
+
+	-- Insert new question in 'draft' mode
+	INSERT INTO Question (userID, questionText, TimeStampID, status)
+	VALUES (p_userID, p_questionText, @tsID, 'draft');
+END;
+// 
+DELIMITER ;
+
+-- publish question
+DELIMITER //
+CREATE PROCEDURE PublishQuestion(IN p_questionID INT)
+BEGIN
+	-- Update status of question to be 'published'
+	UPDATE Question
+	SET status = 'published'
+	WHERE questionID = p_questionID AND status = 'draft';
+END;
+//
+DELIMITER ;
+
+-- Cancel 'draft' question, not deleting it
+DELIMITER //
+CREATE PROCEDURE CancelQuestion(IN p_questionID INT)
+BEGIN 
+	-- Update status of question to be 'cancelled'
+	UPDATE Question
+	SET status = 'canceled'
+	WHERE questionID = p_questionID AND status = 'draft';
+END;
+//
+DELIMITER ;
+
+-- Delete question that is already 'published'
+DELIMITER //
+CREATE PROCEDURE DeleteQuestion(IN p_questionID INT)
+BEGIN
+	-- Check if question is 'published'
+	IF (SELECT status FROM Question WHERE questionID = p_questionID) = 'published' THEN
+		-- Delete related entries in dependent tables
+		DELETE FROM Comment WHERE questionID = p_questionID,
+
+		DELETE FROM Response WHERE questionID = p_questionID,
+
+		DELETE FROM QuestionUpvote WHERE questionID = p_questionID,
+
+		DELETE FROM QuestionDownvote WHERE questionID = p_questionID,
+
+		-- Delete question itself
+		DELETE FROM Question WHERE questionID = p_questionID;
+	END IF;
+END;
+//
+DELIMITER;
+
+---------------------------------------------------------------------------------
 --                          QUESTION POPULATION PROCEDURES
 ---------------------------------------------------------------------------------
 
@@ -441,7 +433,7 @@ END;
 //
 DELIMITER ;
 
--- Get Questions by Tag
+-- Find questions related to tags that user follows
 DELIMITER //
 CREATE PROCEDURE GetQuestionsByTag(IN p_tagName VARCHAR(16))
 BEGIN
@@ -452,6 +444,17 @@ BEGIN
 	WHERE t.tagName = p_tagName;
 END;
 //
+DELIMITER ;
+
+-- Search for questions by keyword
+DELIMITER //
+CREATE PROCEDURE SearchQuestions (IN p_keyword VARCHAR(100))
+BEGIN
+	SELECT questionID, questionText
+	FROM Question
+	WHERE questionText LIKE CONCAT ('%', p_keyword, '%');
+END;
+// 
 DELIMITER ;
 
 -- users can upvote a question
