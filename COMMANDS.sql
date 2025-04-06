@@ -341,3 +341,103 @@ BEGIN
 END;
 //
 DELIMITER;
+
+
+---------------------------------------------------------------------------------
+--                          LOGIN PROCEDURES
+---------------------------------------------------------------------------------
+-- Insert New User
+DELIMITER //
+CREATE PROCEDURE InsertNewUser (
+    IN p_username VARCHAR(16),
+    IN p_password VARCHAR(32),
+    IN p_firstName VARCHAR(32),
+    IN p_lastName VARCHAR(32)
+)
+BEGIN
+    INSERT INTO User (userName, password, firstName, lastName)
+    VALUES (p_username, p_password, p_firstName, p_lastName);
+END;
+//
+DELIMITER ;
+
+-- Get User Credentials
+-- Password not selected bc we use hashing on insert and check
+DELIMITER //
+CREATE PROCEDURE GetUserCredentials (
+    IN p_username VARCHAR(16)
+)
+BEGIN
+    SELECT userName, password
+    FROM User
+    WHERE userName = p_username;
+END;
+//
+DELIMITER ;
+
+-- Delete User by Username
+DELIMITER //
+CREATE PROCEDURE DeleteUserByUsername (
+    IN p_username VARCHAR(16)
+)
+BEGIN
+    DELETE FROM User
+    WHERE userName = p_username;
+END;
+//
+DELIMITER ;
+
+---------------------------------------------------------------------------------
+--                          QUESTION POPULATION PROCEDURES
+---------------------------------------------------------------------------------
+
+-- Get Recent Questions
+DELIMITER //
+CREATE PROCEDURE GetRecentQuestions ()
+BEGIN
+    SELECT q.questionText, t.sentTime, t.sentDate
+    FROM Question q
+    JOIN TimeStamp t ON q.questionID = t.questionID
+    ORDER BY t.sentDate DESC, t.sentTime DESC
+    LIMIT 10;
+END;
+//
+DELIMITER ;
+
+-- Get Popular Questions
+DELIMITER //
+CREATE PROCEDURE GetPopularQuestions ()
+BEGIN
+    SELECT q.questionText, t.sentTime, t.sentDate
+    FROM Question q
+    JOIN TimeStamp t ON q.questionID = t.questionID
+    JOIN Comment c ON c.questionID = q.questionID
+    GROUP BY q.questionID, q.questionText, t.sentTime, t.sentDate
+    ORDER BY q.upvotes DESC, COUNT(c.commentID) DESC, t.sentDate DESC, t.sentTime DESC
+    LIMIT 10;
+END;
+//
+DELIMITER ;
+
+-- Get Relevant Questions
+DELIMITER //
+CREATE PROCEDURE GetRelevantQuestions (
+    IN p_username VARCHAR(16)
+)
+BEGIN
+    SELECT q.questionText, t.sentTime, t.sentDate
+    FROM Question q
+    JOIN TimeStamp t ON q.questionID = t.questionID
+    JOIN TagList l ON q.questionID = l.questionID 
+    WHERE q.tagID IN (SELECT tl.tagID FROM TagList tl JOIN User u ON tl.userID = u.userID WHERE u.userName = p_username)
+    GROUP BY q.questionID, q.questionText, t.sentTime, t.sentDate
+    ORDER BY count(*) DESC, t.sentDate DESC, t.sentTime DESC
+    LIMIT 10;
+END;
+//
+DELIMITER ;
+
+---------------------------------------------------------------------------------
+--                          User POPULATION PROCEDURES
+---------------------------------------------------------------------------------
+
