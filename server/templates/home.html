@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Database Project Home</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }   
+        .nav {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="nav">
+        <a href="/">Home</a>
+        {% if session.username %}
+            <a href="/dashboard">Dashboard</a>
+            <a href="/logout">Logout ({{ session.username }})</a>
+        {% else %}
+            <a href="/login">Login</a>
+        {% endif %}
+    </div>
+
+    <h1>Welcome to the Database Project</h1>
+    <p>This is a simple web application that demonstrates database connectivity with Flask.</p>
+
+    {% if session.username %}
+        <p>You are logged in as <strong>{{ session.username }}</strong> ({{ session.role }}).</p>
+    {% else %}
+        <p>Please <a href="/login">login</a> to access the dashboard.</p>
+    {% endif %}
+</body>
+</html>
