@@ -6,7 +6,7 @@
 
 
 {% block title %}
-Government Register 
+Mango User Registration
 {% endblock %}
 
 {% block body %}
@@ -24,8 +24,8 @@ Government Register
       {% endfor %}
     {% endif %}
 {% endwith %}
-<div class="govt-login">
-    <h1>Government Register</h1>
+<div class="user-login">
+    <h1>User Registration</h1>
     <h3>Enter your registration credentials</h3>
     <form id="register-form" action="{{ url_for('register_route') }}" method="post">
         <label for="register_username">
@@ -43,13 +43,6 @@ Government Register
                id="register_password"
                name="register_password"
                placeholder="Enter your Password" required>
-        <label for="register_id">
-            Badge Number:
-        </label>
-        <input type="text"
-                id="register_id"
-                name="register_id"
-                placeholder="Enter your Badge Number" required>
         <div class="wrap">
             <button type="button" onclick="validateLoginForm()">
                 Register
