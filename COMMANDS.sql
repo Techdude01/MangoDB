@@ -1,143 +1,168 @@
-CREATE TABLE User(
-    userID INT AUTO_INCREMENT PRIMARY KEY,
-    userName VARCHAR(16) UNIQUE,
-    password VARCHAR(32),
-    firstName VARCHAR(32),
-    lastName VARCHAR(32)
+CREATE TABLE `User` (
+  userID INT AUTO_INCREMENT PRIMARY KEY,
+  userName VARCHAR(16) UNIQUE,
+  password VARCHAR(32),
+  firstName VARCHAR(32),
+  lastName VARCHAR(32)
 );
 
-CREATE TABLE Tag(
-    tagID INT AUTO_INCREMENT PRIMARY KEY,
-    tagName VARCHAR(16) UNIQUE
+
+CREATE TABLE Tag (
+  tagID INT AUTO_INCREMENT PRIMARY KEY,
+  tagName VARCHAR(16) UNIQUE
 );
 
 CREATE TABLE TimeStamp( 
-    TimeStampID INT AUTO_INCREMENT PRIMARY KEY,
-    sentTime TIME,
-    sentDate DATE
+ TimeStampID INT AUTO_INCREMENT PRIMARY KEY,
+ sentTime TIME,
+ sentDate DATE
 );
 
 CREATE TABLE TagList(
-    tagID INT,
-    userID INT,
-    FOREIGN KEY (tagID) REFERENCES Tag(tagID),
-    FOREIGN KEY (userID) REFERENCES User(userID),
-    PRIMARY KEY (tagID, userID)
+ tagID INT,
+ userID INT,
+ FOREIGN KEY (tagID) REFERENCES Tag(tagID),
+ FOREIGN KEY (userID) REFERENCES User(userID),
+ PRIMARY KEY (tagID, userID)
 );
 
 CREATE TABLE Chat(
-    chatID INT AUTO_INCREMENT PRIMARY KEY,
-    userID INT,
-    chatName VARCHAR(32),
-    FOREIGN KEY (userID) REFERENCES User(userID)
+ chatID INT AUTO_INCREMENT PRIMARY KEY,
+ userID INT,
+ chatName VARCHAR(32),
+ FOREIGN KEY (userID) REFERENCES User(userID)
 );
 
 CREATE TABLE Question(
-    questionID INT AUTO_INCREMENT PRIMARY KEY,
-    userID INT,
-    questionText TEXT,
-    TimeStampID INT,
-    upvotes INT DEFAULT 0 CHECK (upvotes >= 0),
-    downvotes INT DEFAULT 0 CHECK (downvotes >= 0),
-    status ENUM('draft', 'published', 'canceled') DEFAULT 'draft',
-    FOREIGN KEY (userID) REFERENCES User(userID),
-    FOREIGN KEY (TimeStampID) REFERENCES TimeStamp(TimeStampID)
+ questionID INT AUTO_INCREMENT PRIMARY KEY,
+ userID INT,
+ questionText TEXT,
+ TimeStampID INT,
+ tagID INT,
+ upvotes INT DEFAULT 0 CHECK (upvotes >= 0),
+ downvotes INT DEFAULT 0 CHECK (downvotes >= 0),
+ status ENUM('draft', 'published', 'canceled') DEFAULT 'draft',
+ FOREIGN KEY (userID) REFERENCES User(userID),
+ FOREIGN KEY (TimeStampID) REFERENCES TimeStamp(TimeStampID),
     FOREIGN KEY (tagID) REFERENCES TagList(tagID)
 );
 
 CREATE TABLE Response(
-    responseID INT AUTO_INCREMENT PRIMARY KEY,
-    userID INT,
-    questionID INT,
-    responseText TEXT,
-    TimeStampID INT,
+ responseID INT AUTO_INCREMENT PRIMARY KEY,
+ userID INT,
+ questionID INT,
+ responseText TEXT,
+ TimeStampID INT,
     status ENUM('draft', 'published', 'canceled') DEFAULT 'draft',
-    FOREIGN KEY (questionID) REFERENCES Question(questionID),
-    FOREIGN KEY (userID) REFERENCES User(userID),
-    FOREIGN KEY (TimeStampID) REFERENCES TimeStamp(TimeStampID)
+ FOREIGN KEY (questionID) REFERENCES Question(questionID),
+ FOREIGN KEY (userID) REFERENCES User(userID),
+ FOREIGN KEY (TimeStampID) REFERENCES TimeStamp(TimeStampID)
 );
 
 CREATE TABLE Comment(
-    commentID INT AUTO_INCREMENT PRIMARY KEY,
-    userID INT,
-    questionID INT,
-    commentText TEXT,
-    TimeStampID INT,
+ commentID INT AUTO_INCREMENT PRIMARY KEY,
+ userID INT,
+ questionID INT,
+ commentText TEXT,
+ TimeStampID INT,
     status ENUM('draft', 'published', 'canceled') DEFAULT 'draft',
-    FOREIGN KEY (questionID) REFERENCES Question(questionID),
-    FOREIGN KEY (userID) REFERENCES User(userID),
-    FOREIGN KEY (TimeStampID) REFERENCES TimeStamp(TimeStampID)
+ FOREIGN KEY (questionID) REFERENCES Question(questionID),
+ FOREIGN KEY (userID) REFERENCES User(userID),
+ FOREIGN KEY (TimeStampID) REFERENCES TimeStamp(TimeStampID)
 );
 
 CREATE TABLE ChatMessage(
-    chatMessageID INT AUTO_INCREMENT PRIMARY KEY,
-    chatID INT,
-    userID INT,
-    messageText TEXT,
-    TimeStampID INT,
-    FOREIGN KEY (chatID) REFERENCES Chat(chatID),
-    FOREIGN KEY (userID) REFERENCES User(userID),
-    FOREIGN KEY (TimeStampID) REFERENCES TimeStamp(TimeStampID)
+ chatMessageID INT AUTO_INCREMENT PRIMARY KEY,
+ chatID INT,
+ userID INT,
+ messageText TEXT,
+ TimeStampID INT,
+ FOREIGN KEY (chatID) REFERENCES Chat(chatID),
+ FOREIGN KEY (userID) REFERENCES User(userID),
+ FOREIGN KEY (TimeStampID) REFERENCES TimeStamp(TimeStampID)
 );
 
 CREATE TABLE ChatMember(
-    userID INT,
-    chatID INT,
-    FOREIGN KEY (userID) REFERENCES User(userID),
-    FOREIGN KEY (chatID) REFERENCES Chat(chatID),
-    PRIMARY KEY (userID, chatID)
+ userID INT,
+ chatID INT,
+ FOREIGN KEY (userID) REFERENCES User(userID),
+ FOREIGN KEY (chatID) REFERENCES Chat(chatID),
+ PRIMARY KEY (userID, chatID)
 );
 
 -- ADDITIONAL HELPER TABLES
 
 -- table to handle chat requests
 CREATE TABLE ChatRequest (
-    requestID INT AUTO_INCREMENT PRIMARY KEY,
-    fromUserID INT,
-    toUserID INT,
-    chatID INT,
-    status ENUM('accepted', 'rejected') DEFAULT 'pending',  
-    TimeStampID INT,
-    FOREIGN KEY (fromUserID) REFERENCES User(userID),
-    FOREIGN KEY (toUserID) REFERENCES User(userID),
-    FOREIGN KEY (chatID) REFERENCES Chat(chatID),
-    FOREIGN KEY (TimeStampID) REFERENCES TimeStamp(TimeStampID)
+  requestID INT AUTO_INCREMENT PRIMARY KEY,
+  fromUserID INT,
+  toUserID INT,
+  chatID INT,
+  status ENUM('pending', 'accepted', 'rejected') DEFAULT 'pending',
+  TimeStampID INT,
+  FOREIGN KEY (fromUserID) REFERENCES `User`(userID),
+  FOREIGN KEY (toUserID) REFERENCES `User`(userID),
+  FOREIGN KEY (chatID) REFERENCES Chat(chatID),
+  FOREIGN KEY (TimeStampID) REFERENCES TimeStamp(TimeStampID)
 );
+
 
 -- table to log chat-related actions (e.g., enter/exit)
 CREATE TABLE ChatLog (
-    logID INT AUTO_INCREMENT PRIMARY KEY,
-    userID INT,
-    chatID INT,
-    action VARCHAR(10),   -- 'enter' or 'exit'
-    TimeStampID INT,
-    FOREIGN KEY (userID) REFERENCES User(userID),
-    FOREIGN KEY (chatID) REFERENCES Chat(chatID),
-    FOREIGN KEY (TimeStampID) REFERENCES TimeStamp(TimeStampID)
+ logID INT AUTO_INCREMENT PRIMARY KEY,
+ userID INT,
+ chatID INT,
+ action VARCHAR(10), -- 'enter' or 'exit'
+ TimeStampID INT,
+ FOREIGN KEY (userID) REFERENCES User(userID),
+ FOREIGN KEY (chatID) REFERENCES Chat(chatID),
+ FOREIGN KEY (TimeStampID) REFERENCES TimeStamp(TimeStampID)
+);
+-- table to log Response based actions
+CREATE TABLE ResponseLog (
+ logID INT AUTO_INCREMENT PRIMARY KEY,
+ userID INT,
+ responseID INT,
+ action VARCHAR(10), -- 'enter' or 'exit'
+ TimeStampID INT,
+ FOREIGN KEY (userID) REFERENCES User(userID),
+ FOREIGN KEY (responseID) REFERENCES Response(responseID),
+ FOREIGN KEY (TimeStampID) REFERENCES TimeStamp(TimeStampID)
+);
+
+-- table to log Comment based actions
+CREATE TABLE CommentLog (
+ logID INT AUTO_INCREMENT PRIMARY KEY,
+ userID INT,
+ commentID INT,
+ action VARCHAR(10), -- 'enter' or 'exit'
+ TimeStampID INT,
+ FOREIGN KEY (userID) REFERENCES User(userID),
+ FOREIGN KEY (commentID) REFERENCES Comment(commentID),
+ FOREIGN KEY (TimeStampID) REFERENCES TimeStamp(TimeStampID)
 );
 
 -- table to track who upvoted, prevents duplicate upvotes
 CREATE TABLE QuestionUpvote (
-    userID INT,
-    questionID INT,
-    PRIMARY KEY (userID, questionID),
-    FOREIGN KEY (userID) REFERENCES User(userID),
-    FOREIGN KEY (questionID) REFERENCES Question(questionID)
+ userID INT,
+ questionID INT,
+ PRIMARY KEY (userID, questionID),
+ FOREIGN KEY (userID) REFERENCES User(userID),
+ FOREIGN KEY (questionID) REFERENCES Question(questionID)
 );
 
 -- table to track who downvoted, prevents duplicate downvotes
 CREATE TABLE QuestionDownvote (
-    userID INT,
-    questionID INT,
-    PRIMARY KEY (userID, questionID),
-    FOREIGN KEY (userID) REFERENCES User(userID),
-    FOREIGN KEY (questionID) REFERENCES Question(questionID)
+ userID INT,
+ questionID INT,
+ PRIMARY KEY (userID, questionID),
+ FOREIGN KEY (userID) REFERENCES User(userID),
+ FOREIGN KEY (questionID) REFERENCES Question(questionID)
 );
 
 
----------------------------------------------------------------------------------
+
 --                  POPULATE TABLES (10 entries per table)
----------------------------------------------------------------------------------
 
 -- user entries
 
@@ -197,7 +222,7 @@ INSERT INTO TimeStamp (sentTime, sentDate) VALUES
 ('10:45:00', '2025-01-27'),
 ('11:30:00', '2025-01-28'),
 ('12:40:00', '2025-01-29'),
-('13:25:00', '2025-01-30');
+('13:25:00', '2025-01-30'),
 ('08:00:00', '2025-03-01'),
 ('08:15:00', '2025-03-02'),
 ('08:30:00', '2025-03-03'),
@@ -263,11 +288,17 @@ INSERT INTO Response (userID, questionID, responseText, TimeStampID, status) VAL
  
  -- comment entries
 INSERT INTO Comment (userID, questionID, commentText, TimeStampID, status) VALUES 
-(3, 1, 'Good question!', 1),(4, 2, 'Helpful info.', 2, 'published'),
-(5, 3, 'Thanks for sharing.', 3),(6, 4, 'Clarify more?', 4, 'draft'),
-(7, 5, 'Great explanation.', 5),(8, 6, 'Interesting.', 6, 'published'),
-(9, 7, 'Didn’t know that.', 7),(10, 8, 'Cool.', 8, 'published'),
-(1, 9, 'Thanks!', 9),(2, 10, 'Useful tip.', 10, 'canceled');
+(3, 1, 'Good question!', 1, 'published'),
+(4, 2, 'Helpful info.', 2, 'published'),
+(5, 3, 'Thanks for sharing.', 3, 'published'),
+(6, 4, 'Clarify more?', 4, 'draft'),
+(7, 5, 'Great explanation.', 5, 'published'),
+(8, 6, 'Interesting.', 6, 'published'),
+(9, 7, 'Didn’t know that.', 7, 'published'),
+(10, 8, 'Cool.', 8, 'published'),
+(1, 9, 'Thanks!', 9, 'published'),
+(2, 10, 'Useful tip.', 10, 'canceled');
+
 
 -- chatmessage entires
 INSERT INTO ChatMessage (chatID, userID, messageText, TimeStampID) VALUES 
@@ -349,9 +380,9 @@ INSERT INTO QuestionDownvote (userID, questionID) VALUES
 
 
 
----------------------------------------------------------------------------------
+
 --                          CHAT BASED PROCEDURES
----------------------------------------------------------------------------------
+
 
 -- "CREATE CHAT" AND SEND CHAT REQUEST
 DELIMITER //
@@ -439,9 +470,9 @@ END;
 DELIMITER;
 
 
----------------------------------------------------------------------------------
+
 --                          LOGIN PROCEDURES
----------------------------------------------------------------------------------
+
 
 -- Insert New User
 DELIMITER //
@@ -511,6 +542,10 @@ BEGIN
 
     DELETE FROM ChatLog WHERE userID = OLD.userID;
 
+	DELETE FROM ResponseLog WHERE userID = OLD.userID;
+
+    DELETE FROM CommentLog WHERE userID = OLD.userID;
+
     DELETE FROM QuestionUpvote WHERE userID = OLD.userID;
 
 	DELETE FROM QuestionDownvote WHERE userID = OLD.userID;
@@ -522,9 +557,9 @@ END;
 DELIMITER ;
 
 
----------------------------------------------------------------------------------
+
 --                       QUESTION BASED PROCEDURES
----------------------------------------------------------------------------------
+
 
 -- Create question in 'draft' mode
 DELIMITER //
@@ -575,13 +610,13 @@ BEGIN
 	-- Check if question is 'published'
 	IF (SELECT status FROM Question WHERE questionID = p_questionID) = 'published' THEN
 		-- Delete related entries in dependent tables
-		DELETE FROM Comment WHERE questionID = p_questionID,
+		DELETE FROM Comment WHERE questionID = p_questionID;
 
-		DELETE FROM Response WHERE questionID = p_questionID,
+		DELETE FROM Response WHERE questionID = p_questionID;
 
-		DELETE FROM QuestionUpvote WHERE questionID = p_questionID,
+		DELETE FROM QuestionUpvote WHERE questionID = p_questionID;
 
-		DELETE FROM QuestionDownvote WHERE questionID = p_questionID,
+		DELETE FROM QuestionDownvote WHERE questionID = p_questionID;
 
 		-- Delete question itself
 		DELETE FROM Question WHERE questionID = p_questionID;
@@ -590,9 +625,9 @@ END;
 //
 DELIMITER;
 
----------------------------------------------------------------------------------
+
 --                          QUESTION POPULATION PROCEDURES
----------------------------------------------------------------------------------
+
 
 -- Get Recent Questions
 DELIMITER //
@@ -691,7 +726,7 @@ DELIMITER ;
 -- users can upvote a question
 DELIMITER //
 
-CREATE PROCEDURE UpvoteQuestion(IN p_questionID INT, IN p_questionID INT)
+CREATE PROCEDURE UpvoteQuestion(IN p_questionID INT, IN p_userID INT)
 BEGIN 
 	-- check if user already upvoted this question
 	IF NOT EXISTS (
@@ -737,9 +772,9 @@ END;
 //
 DELIMITER ;
 
----------------------------------------------------------------------------------
+
 --                          User POPULATION PROCEDURES
----------------------------------------------------------------------------------
+
 
 -- Get Users with Most Shared Tags
 DELIMITER //
@@ -779,9 +814,9 @@ END;
 //
 DELIMITER;
 
----------------------------------------------------------------------------------
+
 --                       RESPONSE BASED PROCEDURES
----------------------------------------------------------------------------------
+
 -- DRAFT RESPONSE
 DELIMITER //
 CREATE PROCEDURE DraftResponse(IN p_userID INT, IN p_responseText TEXT)
@@ -819,15 +854,6 @@ END;
 //
 DELIMITER;
 
--- CANCEL RESPONSE
-DELIMITER //
-CREATE PROCEDURE CancelResponse(IN p_responseID INT)
-BEGIN
-	DELETE FROM Response WHERE responseID = p_responseID;
-	DELETE FROM TimeStamp WHERE responseID = p_responseID;
-END;
-//
-DELIMITER;
 
 -- VALID RESPONSE PRESENT?
 DELIMITER // 
@@ -843,20 +869,24 @@ END;
 DELIMITER;
 
 -- RETRIEVE RESPONSES
-DELIMITER // 
-CREATE PROCEDURE RetrieveResponses(IN p_userID INT, IN p_questionID INT, OUT )
+DELIMITER //
+CREATE PROCEDURE RetrieveResponses(
+  IN p_userID INT,
+  IN p_questionID INT,
+  OUT p_hasResponse BOOLEAN
+)
 BEGIN 
-	DECLARE p_hasResponse BOOLEAN;
-	CALL ValidResponse(p_userID, p_questionID, p_hasResponse);
+  CALL ValidResponse(p_userID, p_questionID, p_hasResponse);
 
-	IF p_hasResponse THEN
-		SELECT * FROM Response WHERE questionID = p_questionID;
-	ELSE 
-		SELECT 'This user has not responded to this question yet!';
-	END IF;
+  IF p_hasResponse THEN
+    SELECT * FROM Response WHERE questionID = p_questionID;
+  ELSE 
+    SELECT 'This user has not responded to this question yet!' AS message;
+  END IF;
 END;
-// 
-DELIMITER;
+//
+DELIMITER ;
+
 
 -- TRIGGER TO AUTO-GENERATE TIMESTAMP FOR EACH RESPONSE
 -- UPON INSERTION ('POST)
@@ -874,33 +904,45 @@ END;
 DELIMITER; 
 
 -- LOG RESPONSE ACTIONS
-DELIMITER // 
-CREATE PROCEDURE LogResponseAction(IN p_userID INT, IN p_responseID INT, IN p_action VARCHAR(10))
+DELIMITER //
+CREATE PROCEDURE LogResponseAction(
+  IN p_userID INT,
+  IN p_responseID INT,
+  IN p_action VARCHAR(10)
+)
 BEGIN
-	INSERT INTO TimeStamp(sentTime, sendDate) VALUES (CURTIME(), CURDATE());
-	SET @tsID = LAST_INSERT_ID();
+  INSERT INTO TimeStamp(sentTime, sentDate)
+  VALUES (CURTIME(), CURDATE());
+  SET @tsID = LAST_INSERT_ID();
 
-	INSERT INTO (userID, responseID, action, TimeStampID)
-	VALUES (p_userID, p_responseID, p_action, @tsID);
+  INSERT INTO ResponseLog (userID, responseID, action, TimeStampID)
+  VALUES (p_userID, p_responseID, p_action, @tsID);
 END;
 //
-DELIMITER;
+DELIMITER ;
 
----------------------------------------------------------------------------------
+
+
 --                       COMMENT BASED PROCEDURES
----------------------------------------------------------------------------------
--- DRAFT COMMENT
-DELIMITER // 
-CREATE PROCEDURE DraftCommment(IN p_userID INT, IN p_commentText TEXT)
-BEGIN
-	INSERT INTO TimeStamp (sentTime, sentDate) VALUES (CURTIME(), CURDATE());
-	SET @tsID = LAST_INSERT_ID(); 
 
-	INSERT INTO Comment(p_userID, p_commentText, TimeStampID, status) 
-	VALUES (userID, commentText, commentID, @tsID, 'draft')
+-- DRAFT COMMENT
+DELIMITER //
+CREATE PROCEDURE DraftComment(
+  IN p_userID INT,
+  IN p_questionID INT,
+  IN p_commentText TEXT
+)
+BEGIN
+  INSERT INTO TimeStamp (sentTime, sentDate)
+  VALUES (CURTIME(), CURDATE());
+  SET @tsID = LAST_INSERT_ID();
+
+  INSERT INTO Comment (userID, questionID, commentText, TimeStampID, status)
+  VALUES (p_userID, p_questionID, p_commentText, @tsID, 'draft');
 END;
 //
-DELIMITER;
+DELIMITER ;
+
 
 -- PUBLISH COMMENT
 DELIMITER //
@@ -955,7 +997,7 @@ BEGIN
 	INSERT INTO TimeStamp(sentTime, sendDate) VALUES (CURTIME(), CURDATE());
 	SET @tsID = LAST_INSERT_ID();
 
-	INSERT INTO (userID, chatID, action, TimeStampID)
+	INSERT INTO CommentLog(userID, chatID, action, TimeStampID)
 	VALUES (p_userID, p_chatID, p_action, @tsID);
 END;
 //
