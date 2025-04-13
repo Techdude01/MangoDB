@@ -12,7 +12,7 @@ def connect_db(role='public_user', password=''):
             host='localhost',
             user=role,
             password=password,
-            db='your_database_name',
+            db='Mango',
             charset='utf8mb4',
             cursorclass=pymysql.cursors.DictCursor
         )
@@ -86,6 +86,65 @@ def dashboard():
 
     # Get user-specific data here
     return render_template('dashboard.html', username=session['username'])
+
+@app.route('/register', methods=['GET', 'POST'])
+def register_route():
+    """
+    Handle user registration
+    GET: Display registration form
+    POST: Process registration form submission
+    """
+    if request.method == 'POST':
+        # Get form data
+        username = request.form.get('username')
+        password = request.form.get('password')
+        confirm_password = request.form.get('confirm_password')
+        
+        # Basic validation
+        if not username or not password or not confirm_password:
+            flash('All fields are required')
+            return redirect(url_for('register_route'))
+        
+        if password != confirm_password:
+            flash('Passwords do not match')
+            return redirect(url_for('register_route'))
+        
+        # Check if user already exists
+        # Add your database logic here
+        
+        # Create new user
+        # Add your database logic here
+        
+        flash('Registration successful! Please log in.')
+        return redirect(url_for('home'))
+    
+    # GET request - show registration form
+    return render_template('register.html')
+
+@app.route('/admin-login', methods=['GET', 'POST'])
+def admin_login():
+    """
+    Handle admin login
+    GET: Display admin login form
+    POST: Process admin login form submission
+    """
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+
+        conn = connect_db()
+        authenticated, role = verify_user(conn, username, password)
+
+        # Check if user is authenticated and has admin role
+        if authenticated and role == 'admin':
+            session['username'] = username
+            session['role'] = role
+            # Redirect to admin dashboard or regular dashboard
+            return redirect(url_for('dashboard'))  # You might want a separate admin_dashboard
+        else:
+            flash('Invalid admin credentials')
+
+    return render_template('admin_login.html')  # You'll need to create this template
 
 if __name__ == '__main__':
     app.run(debug=True)
