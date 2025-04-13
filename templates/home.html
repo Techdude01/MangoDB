@@ -19,15 +19,15 @@ Jail Homepage
 <div class="main">
     <div class="main-query">
         <h1>Search Bar</h1>
-        <h3>Query by Case, Name, or Alias!</h3>
+        <h3>Query by UserID, Name, or Username!</h3>
         <form id="search-form" action="{{ url_for('home') }}" method="get">
             <div>
-                <label for="case-num">
-                    Case Number:
+                <label for="user-id">
+                    User ID:
                 </label>
                 <input type="number"
-                       id="case-num"
-                       name="case-num"
+                       id="user-id"
+                       name="user-id"
                        placeholder="Enter case number">
             </div>
             <div class="name">
@@ -49,13 +49,13 @@ Jail Homepage
                        placeholder="Last name">
             </div>
             <div>
-                <label for="alias">
-                    Alias:
+                <label for="username">
+                    Username:
                 </label>
                 <input type="text"
-                       id="alias"
-                       name="alias"
-                       placeholder="Enter alias">
+                       id="username"
+                       name="username"
+                       placeholder="Enter username">
             </div>
             <div class="wrap">
                 <button type="button" onclick="validateSearchForm()">
@@ -66,13 +66,13 @@ Jail Homepage
 
         <script>
         function validateSearchForm() {
-            var caseNum = document.getElementById("case-num").value;
+            var caseNum = document.getElementById("user-id").value;
             var firstName = document.getElementById("first-name").value;
             var lastName = document.getElementById("last-name").value;
-            var alias = document.getElementById("alias").value;
+            var username = document.getElementById("username").value;
 
-            if (!caseNum && !firstName && !lastName && !alias) {
-                alert("Please enter either Case Number, First Name and Last Name together, or Alias.");
+            if (!caseNum && !firstName && !lastName && !username) {
+                alert("Please enter either User ID, First Name and Last Name together, or Username.");
                 return false;
             }
 
