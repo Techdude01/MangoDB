@@ -1,39 +1,124 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Database Project Home</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }   
-        .nav {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 20px;
+{% extends "base.html" %}
+
+{% block style %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='./css/home.css') }}">    
+{% endblock %}
+
+{% block title %}
+Jail Homepage
+{% endblock %}
+
+{% block body %}
+<nav class="navbar">
+    <ul>
+        <li><a href="{{ url_for('home') }}">Home</a></li>
+        <li><a href="{{ url_for('register_route') }}">Register</a></li>
+        <li><a href="/crimes">Crime List</a></li>
+    </ul>
+</nav>
+<div class="main">
+    <div class="main-query">
+        <h1>Search Bar</h1>
+        <h3>Query by Case, Name, or Alias!</h3>
+        <form id="search-form" action="{{ url_for('home') }}" method="get">
+            <div>
+                <label for="case-num">
+                    Case Number:
+                </label>
+                <input type="number"
+                       id="case-num"
+                       name="case-num"
+                       placeholder="Enter case number">
+            </div>
+            <div class="name">
+                <label for="first-name">
+                    First Name:
+                </label>
+                <input type="text"
+                       id="first-name"
+                       name="first-name"
+                       placeholder="First name">
+            </div>
+            <div class="name">
+                <label for="last-name">
+                    Last Name:
+                </label>
+                <input type="text"
+                       id="last-name"
+                       name="last-name"
+                       placeholder="Last name">
+            </div>
+            <div>
+                <label for="alias">
+                    Alias:
+                </label>
+                <input type="text"
+                       id="alias"
+                       name="alias"
+                       placeholder="Enter alias">
+            </div>
+            <div class="wrap">
+                <button type="button" onclick="validateSearchForm()">
+                    Search
+                </button>
+            </div>
+        </form>
+
+        <script>
+        function validateSearchForm() {
+            var caseNum = document.getElementById("case-num").value;
+            var firstName = document.getElementById("first-name").value;
+            var lastName = document.getElementById("last-name").value;
+            var alias = document.getElementById("alias").value;
+
+            if (!caseNum && !firstName && !lastName && !alias) {
+                alert("Please enter either Case Number, First Name and Last Name together, or Alias.");
+                return false;
+            }
+
+            document.getElementById("search-form").submit();
         }
-    </style>
-</head>
-<body>
-    <div class="nav">
-        <a href="/">Home</a>
-        {% if session.username %}
-            <a href="/dashboard">Dashboard</a>
-            <a href="/logout">Logout ({{ session.username }})</a>
-        {% else %}
-            <a href="/login">Login</a>
-        {% endif %}
+        </script>
     </div>
-
-    <h1>Welcome to the Database Project</h1>
-    <p>This is a simple web application that demonstrates database connectivity with Flask.</p>
-
-    {% if session.username %}
-        <p>You are logged in as <strong>{{ session.username }}</strong> ({{ session.role }}).</p>
-    {% else %}
-        <p>Please <a href="/login">login</a> to access the dashboard.</p>
-    {% endif %}
-</body>
-</html>
+    <div class="govt-login">
+        <h1>Government Login</h1>
+        <h3>Enter your login credentials</h3>
+        <form id="login-form" action="{{ url_for('home') }}" method="post">
+            <label for="username">
+                Username:
+            </label>
+            <input type="text"
+                   id="username"
+                   name="username"
+                   placeholder="Enter your Username" required>
+    
+            <label for="password">
+                Password:
+            </label>
+            <input type="password"
+                   id="password"
+                   name="password"
+                   placeholder="Enter your Password" required>
+            <div class="wrap">
+                <button type="button" onclick="validateLoginForm()">
+                    Login
+                </button>
+            </div>
+            <p><a href="{{ url_for('admin_login')}}" style="text-decoration:none">Admin Login</a></p>
+        </form>
+    
+        <script>
+        function validateLoginForm() {
+            var username = document.getElementById("username").value;
+            var password = document.getElementById("password").value;
+    
+            if (!username || !password) {
+                alert("Please enter both Username and Password.");
+                return false;
+            }
+    
+            document.getElementById("login-form").submit();
+        }
+        </script>
+    </div>    
+{% endblock %}
