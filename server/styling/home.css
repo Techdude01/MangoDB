@@ -1,56 +1,253 @@
-/*home page most recent, controverisal, popular display*/
-.pagination {
-    margin-top: 20px;
-    text-align: center;
+/* ========== GLOBAL RESETS ========== */
+/* Remove default margins/paddings and set box-sizing for consistency */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-.pagination a {
-    margin: 0 10px;
-    text-decoration: none;
-    color: #007bff;
+/* Set a modern, readable font and background for the whole app */
+body {
+  font-family: "Segoe UI", Arial, sans-serif;
+  background: #f4f6fb;
+  color: #222;
+  min-height: 100vh;
 }
 
-.pagination a:hover {
-    text-decoration: underline;
+/* ========== NAVIGATION BAR ========== */
+.navbar {
+  background: linear-gradient(90deg, #007bff 60%, #0056b3 100%);
+  padding: 1rem 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+.navbar ul {
+  list-style: none;
+  display: flex;
+  gap: 2rem;
+}
+.navbar li a {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+.navbar li a:hover {
+  color: #ffe082;
 }
 
-.pagination span {
-    margin: 0 10px;
-    font-weight: bold;
+/* ========== MAIN CONTAINER ========== */
+.main {
+  max-width: 900px;
+  margin: 2rem auto;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.07);
+  padding: 2rem;
 }
 
+/* ========== SECTION HEADINGS ========== */
+.section h2,
+.main-query h1,
+.user-login h1 {
+  color: #007bff;
+  margin-bottom: 1rem;
+  font-size: 2rem;
+  letter-spacing: 1px;
+}
+
+/* ========== SEARCH BAR ========== */
+.main-query form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: flex-end;
+  margin-bottom: 2rem;
+}
+.main-query label {
+  font-weight: 500;
+  margin-bottom: 0.3rem;
+}
+.main-query input[type="text"] {
+  padding: 0.5rem;
+  border: 1px solid #bbb;
+  border-radius: 5px;
+  width: 200px;
+}
+.main-query button {
+  background: #007bff;
+  color: #fff;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+.main-query button:hover {
+  background: #0056b3;
+}
+
+/* ========== POST QUESTION ========== */
 .post-question {
-    margin-top: 20px;
+  margin: 2rem 0;
 }
-
-/*question posting */
+#post-question-btn {
+  background: #28a745;
+  color: #fff;
+  border: none;
+  padding: 0.7rem 1.5rem;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+#post-question-btn:hover {
+  background: #218838;
+}
 #question-form {
-    margin-top: 10px;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    background-color: #f9f9f9;
+  margin-top: 1rem;
+  padding: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #f9f9f9;
 }
-
-#question-form textarea {
-    width: 100%;
-    height: 100px;
-    margin-bottom: 10px;
+#question-form textarea,
+#question-form select,
+#question-form input[type="text"] {
+  width: 100%;
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  border-radius: 5px;
+  border: 1px solid #bbb;
 }
-
-#question-form select {
-    width: 100%;
-    margin-bottom: 10px;
-}
-
 #question-form button {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    cursor: pointer;
+  background: #007bff;
+  color: #fff;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 5px;
+  cursor: pointer;
+}
+#question-form button:hover {
+  background: #0056b3;
 }
 
-#question-form button:hover {
-    background-color: #0056b3;
+/* ========== USER LOGIN ========== */
+.user-login {
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background: #f1f8ff;
+  border-radius: 8px;
+  border: 1px solid #cce5ff;
+}
+.user-login label {
+  display: block;
+  margin-bottom: 0.3rem;
+  font-weight: 500;
+}
+.user-login input[type="text"],
+.user-login input[type="password"] {
+  width: 100%;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  border-radius: 5px;
+  border: 1px solid #bbb;
+}
+.user-login button {
+  background: #007bff;
+  color: #fff;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.user-login button:hover {
+  background: #0056b3;
+}
+
+/* ========== FLASH MESSAGES ========== */
+.flash-messages {
+  margin: 1rem 0;
+  padding: 1rem;
+  border-radius: 5px;
+  background: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeeba;
+}
+
+/* ========== QUESTION LISTS ========== */
+.section ul {
+  list-style: none;
+  padding: 0;
+}
+.section li {
+  background: #f8f9fa;
+  margin-bottom: 0.7rem;
+  padding: 0.8rem 1rem;
+  border-radius: 6px;
+  border: 1px solid #e2e6ea;
+  transition: background 0.2s;
+}
+.section li:hover {
+  background: #e3f2fd;
+}
+.section a {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: 500;
+}
+.section a:hover {
+  text-decoration: underline;
+}
+
+/* ========== PAGINATION ========== */
+.pagination {
+  margin: 2rem 0 1rem 0;
+  text-align: center;
+}
+.pagination a,
+.pagination span {
+  margin: 0 0.5rem;
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  color: #007bff;
+  text-decoration: none;
+  border: 1px solid #007bff;
+  background: #fff;
+  font-weight: 500;
+  transition: background 0.2s, color 0.2s;
+}
+.pagination a:hover {
+  background: #007bff;
+  color: #fff;
+}
+.pagination span {
+  background: #007bff;
+  color: #fff;
+  border: none;
+}
+
+/* ========== FOOTER ========== */
+footer {
+  text-align: center;
+  padding: 1rem 0;
+  background: #f1f1f1;
+  color: #888;
+  margin-top: 2rem;
+  border-top: 1px solid #e2e2e2;
+}
+
+/* ========== RESPONSIVE DESIGN ========== */
+@media (max-width: 700px) {
+  .main {
+    padding: 1rem;
+  }
+  .navbar ul {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .main-query form {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
 }
