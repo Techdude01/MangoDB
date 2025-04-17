@@ -1,0 +1,56 @@
+/*home page most recent, controverisal, popular display*/
+.pagination {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.pagination a {
+  margin: 0 10px;
+  text-decoration: none;
+  color: #007bff;
+}
+
+.pagination a:hover {
+  text-decoration: underline;
+}
+
+.pagination span {
+  margin: 0 10px;
+  font-weight: bold;
+}
+
+.post-question {
+  margin-top: 20px;
+}
+
+/*question posting */
+#question-form {
+  margin-top: 10px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+}
+
+#question-form textarea {
+  width: 100%;
+  height: 100px;
+  margin-bottom: 10px;
+}
+
+#question-form select {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+#question-form button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  cursor: pointer;
+}
+
+#question-form button:hover {
+  background-color: #0056b3;
+}
