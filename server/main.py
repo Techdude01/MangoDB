@@ -154,18 +154,29 @@ def home():
     cursor = conn.cursor(pymysql.cursors.DictCursor)
 
     # Fetch top 5 questions for each category
-    cursor.execute("CALL GetPopularQuestions()") 
+    cursor.execute("CALL GetPopularQuestionsWithPagination(5,0)") 
     most_popular = cursor.fetchall()
 
-    cursor.execute("CALL GetControversialQuestions()")
+    cursor.execute("CALL GetControversialQuestionsWithPagination(5,0)")
     most_controversial = cursor.fetchall()
 
-    cursor.execute("CALL GetRecentQuestions()")
+    cursor.execute("CALL GetRecentQuestionsWithPagination(5,0)")
     most_recent = cursor.fetchall()
 
     conn.close()
 
-    return render_template('home.html', most_popular=most_popular, most_controversial=most_controversial, most_recent=most_recent)
+    return render_template(
+        'home.html', 
+        most_popular=most_popular, 
+        most_controversial=most_controversial, 
+        most_recent=most_recent,
+        most_popular_page=1,
+        most_popular_total_pages=1,
+        most_controversial_page=1,
+        most_controversial_total_pages=1,
+        most_recent_page=1,
+        most_recent_total_pages=1
+        )
 
 @app.route('/question/<int:question_id>')
 def question_detail(question_id):
@@ -184,6 +195,41 @@ def question_detail(question_id):
 
     return render_template('question_detail.html', question=question, responses=responses)
 
+@app.route('/search', methods=['GET'])
+def search():
+    username = request.args.get('username')
+    keyword = request.args.get('keyword')
+    tag = request.args.get('tag')
+
+    conn = connect_db()
+    cursor = conn.cursor(pymysql.cursors.DictCursor)
+
+    # Search by Username
+    if username:
+        cursor.execute("SELECT * FROM Question WHERE userID = (SELECT userID FROM User WHERE userName = %s)", (username,))
+        questions = cursor.fetchall()
+        conn.close()
+        return render_template('search_results.html', questions=questions, search_type="Username", search_value=username)
+
+    # Search by Keyword
+    elif keyword:
+        cursor.execute("CALL SearchQuestions(%s)", (keyword,))
+        questions = cursor.fetchall()
+        conn.close()
+        return render_template('search_results.html', questions=questions, search_type="Keyword", search_value=keyword)
+
+    # Search by Tag
+    elif tag:
+        cursor.execute("CALL GetQuestionsByTag(%s)", (tag,))
+        questions = cursor.fetchall()
+        conn.close()
+        return render_template('search_results.html', questions=questions, tag_name=tag)
+
+    # If no input is provided
+    else:
+        conn.close()
+        return render_template('search_results.html', questions=[], search_type="None", search_value="None")
+    
 @app.route('/most_popular')
 def most_popular():
     # get current pag num from query parameters

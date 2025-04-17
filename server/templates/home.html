@@ -44,6 +44,13 @@ Mango Homepage
                        name="keyword"
                        placeholder="Enter keyword in question text">
             </div>
+            <!-- Search by Tag -->
+            <div>
+                <label for="tag">Tag:</label>
+                <input type="text" 
+                       id="tag" 
+                       placeholder="Enter tag name">
+            </div>
             
             <!-- Submit Button -->
             <div class="wrap">
@@ -119,7 +126,17 @@ Mango Homepage
                 </a>
             </li>
             {% endfor %}
-        </ul>
+        </ul><div class="pagination">
+            {% if most_popular_page > 1 %}
+            <a href="{{ url_for('most_popular', page=most_popular_page-1) }}">Previous</a>
+            {% endif %}
+    
+            <span>Page {{ most_popular_page }} of {{ most_popular_total_pages }}</span>
+    
+            {% if most_popular_page < most_popular_total_pages %}
+            <a href="{{ url_for('most_popular', page=most_popular_page+1) }}">Next</a>
+            {% endif %}
+        </div>
     </div>
      <!-- Section for Most Controversial Questions -->
     <div class="section">
@@ -133,6 +150,17 @@ Mango Homepage
             </li>
             {% endfor %}
         </ul>
+        <div class="pagination">
+            {% if most_controversial_page > 1 %}
+            <a href="{{ url_for('most_controversial', page=most_controversial_page-1) }}">Previous</a>
+            {% endif %}
+    
+            <span>Page {{ most_controversial_page }} of {{ most_controversial_total_pages }}</span>
+    
+            {% if most_controversial_page < most_controversial_total_pages %}
+            <a href="{{ url_for('most_controversial', page=most_controversial_page+1) }}">Next</a>
+            {% endif %}
+        </div>
     </div>
     <!-- Section for Most Recent Questions -->
     <div class="section">
@@ -146,6 +174,17 @@ Mango Homepage
             </li>
             {% endfor %}
         </ul>
+        <div class="pagination">
+            {% if most_recent_page > 1 %}
+            <a href="{{ url_for('most_recent', page=most_recent_page-1) }}">Previous</a>
+            {% endif %}
+    
+            <span>Page {{ most_recent_page }} of {{ most_recent_total_pages }}</span>
+    
+            {% if most_recent_page < most_recent_total_pages %}
+            <a href="{{ url_for('most_recent', page=most_recent_page+1) }}">Next</a>
+            {% endif %}
+        </div>
     </div>
 
 {% endblock %}
