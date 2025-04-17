@@ -315,35 +315,66 @@ def most_recent():
         'most_recent.html', questions=questions,
         page=page, total_pages=total_pages)
 
-@app.route('/post_question', methods=['POST'])
-def post_question():
-    question_text = request.form.get('question_text')
-    tag_ids = request.form.getlist('tags')  # Get selected tags as a list
-
-    if not question_text or not tag_ids:
-        flash('Please provide a question and at least one tag.')
-        return redirect(url_for('home'))
+@app.route('/start_question', methods=['POST'])
+def start_question():
+    user_id = request.form.get('user_id')  # Assume user ID is passed from the frontend
+    question_text = request.form.get('question_text', '')  # Default to an empty string
 
     conn = connect_db()
     cursor = conn.cursor()
 
     try:
-        # Insert the question into the Question table
-        cursor.execute("INSERT INTO Question (questionText, TimeStampID) VALUES (%s, NULL)", (question_text,))
-        question_id = cursor.lastrowid
-
-        # Insert the tags into the TagList table
-        for tag_id in tag_ids:
-            cursor.execute("INSERT INTO TagList (questionID, tagID) VALUES (%s, %s)", (question_id, tag_id))
-
+        # Call StartQuestion() to create a draft question
+        cursor.execute("CALL StartQuestion(%s, %s)", (user_id, question_text))
         conn.commit()
-        flash('Your question has been posted successfully!')
+        flash('Draft question created successfully!')
     except Exception as e:
         conn.rollback()
-        flash(f'An error occurred: {e}')
+        flash(f'Error starting question: {e}')
     finally:
         conn.close()
 
     return redirect(url_for('home'))
+
+@app.route('/publish_question', methods=['POST'])
+def publish_question():
+    question_id = request.form.get('question_id')  # Assume question ID is passed from the frontend
+
+    conn = connect_db()
+    cursor = conn.cursor()
+
+    try:
+        # Call PublishQuestion() to publish the question
+        cursor.execute("CALL PublishQuestion(%s)", (question_id,))
+        conn.commit()
+        flash('Question published successfully!')
+    except Exception as e:
+        conn.rollback()
+        flash(f'Error publishing question: {e}')
+    finally:
+        conn.close()
+
+    return redirect(url_for('home'))
+
+@app.route('/cancel_question', methods=['POST'])
+def cancel_question():
+    question_id = request.form.get('question_id')  # Assume question ID is passed from the frontend
+
+    conn = connect_db()
+    cursor = conn.cursor()
+
+    try:
+        # Call CancelQuestion() to cancel the draft
+        cursor.execute("CALL CancelQuestion(%s)", (question_id,))
+        conn.commit()
+        flash('Draft question cancelled successfully!')
+    except Exception as e:
+        conn.rollback()
+        flash(f'Error cancelling question: {e}')
+    finally:
+        conn.close()
+
+    return redirect(url_for('home'))
+
 if __name__ == '__main__':
     app.run(debug=True)
