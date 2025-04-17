@@ -1,3 +1,4 @@
+-- put in each individually works the best
 CREATE TABLE `User` (
   userID INT AUTO_INCREMENT PRIMARY KEY,
   userName VARCHAR(16) UNIQUE,
@@ -193,7 +194,8 @@ INSERT INTO Tag (tagName) VALUES
 ('random');
  
 -- timestamp entries
-INSERT INTO TimeStamp (sentTime, sentDate) VALUES
+-- input 20 rows first and then the other 20 rows or else there might be an error
+INSERT INTO `TimeStamp` (sentTime, sentDate) VALUES
 ('08:00:00', '2025-01-01'),
 ('09:10:00', '2025-01-02'),
 ('10:30:00', '2025-01-03'),
@@ -234,6 +236,8 @@ INSERT INTO TimeStamp (sentTime, sentDate) VALUES
 ('09:45:00', '2025-03-08'),
 ('10:00:00', '2025-03-09'),
 ('10:15:00', '2025-03-10');
+
+
 
 -- taglist entries
 INSERT INTO TagList (tagID, userID) VALUES
@@ -455,7 +459,8 @@ DELIMITER;
 
 
 -- LOG CHAT "ENTER/EXIT" ACTIONS
-DELIMITER // CREATE PROCEDURE LogChatAction(
+DELIMITER // 
+CREATE PROCEDURE LogChatAction(
 	IN p_userID INT, 
 	IN p_chatID INT, 
 	IN p_action VARCHAR(10))
@@ -469,6 +474,7 @@ BEGIN
 END;
 //
 DELIMITER;
+
 
 
 
@@ -507,16 +513,16 @@ DELIMITER ;
 
 
 -- Delete User by Username
-DELIMITER //
-CREATE PROCEDURE DeleteUserByUsername (
-    IN p_username VARCHAR(16)
-)
-BEGIN
-    DELETE FROM User
-    WHERE userName = p_username;
-END;
-//
-DELIMITER ;
+	DELIMITER //
+	CREATE PROCEDURE DeleteUserByUsername (
+	    IN p_username VARCHAR(16)
+	)
+	BEGIN
+	    DELETE FROM User
+	    WHERE userName = p_username;
+	END;
+	//
+	DELIMITER ;
 
 
 -- Handle Delete on User to Update Tables
