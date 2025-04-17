@@ -4,13 +4,14 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import pandas as pd
 
 app = Flask(__name__)
-app.secret_key = 'mango'
+#app.secret_key = 'mango'
 
-def connect_db(role='public_user', password=''):
+def connect_db(username='root', password=''):
+    print(f"Connecting as user: '{username}'")
     try:
         conn = pymysql.connect(
             host='localhost',
-            user=role,
+            user=username,  # Changed parameter name to be more explicit
             password=password,
             db='Mango',
             charset='utf8mb4',
@@ -52,8 +53,9 @@ def verify_user(connection, username, password):
     return False, None
 
 @app.route('/')
-def home():
-    return render_template('home.html')
+def root():
+    # Redirect root URL to /home for a single homepage logic source
+    return redirect(url_for('home'))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
