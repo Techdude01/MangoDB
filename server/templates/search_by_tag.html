@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}
+Search Results by Tag
+{% endblock %}
+
+{% block body %}
+<h1>Search Results for Tag: "{{ tag_name }}"</h1>
+<ul>
+    {% if questions %}
+        {% for question in questions %}
+        <li>
+            <a href="{{ url_for('question_detail', question_id=question['questionID']) }}">
+                {{ question['questionText'] }}
+            </a>
+        </li>
+        {% endfor %}
+    {% else %}
+        <p>No questions found for this tag.</p>
+    {% endif %}
+</ul>
+{% endblock %}
