@@ -339,10 +339,15 @@ def start_question():
 @app.route('/publish_question', methods=['POST'])
 def publish_question():
     question_id = request.form.get('question_id')  # Assume question ID is passed from the frontend
+    tag_ids = request.form.getlist('tags')
+
+    if not question_test or not tag_ids:
+        flash('Please provide a question and at least one tag.')
+        return redirect(url_for('home'))
 
     conn = connect_db()
     cursor = conn.cursor()
-
+    
     try:
         # Call PublishQuestion() to publish the question
         cursor.execute("CALL PublishQuestion(%s)", (question_id,))
