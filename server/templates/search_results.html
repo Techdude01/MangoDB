@@ -1,11 +1,11 @@
-{% extends "base.html" %}
+{% extends "home.html" %}
 
 {% block title %}
-Search Results by Tag
+Search Results
 {% endblock %}
 
 {% block body %}
-<h1>Search Results for Tag: "{{ tag_name }}"</h1>
+<h1>Search Results for {{ search_type }}: "{{ search_value }}"</h1>
 <ul>
     {% if questions %}
         {% for question in questions %}
@@ -16,7 +16,7 @@ Search Results by Tag
         </li>
         {% endfor %}
     {% else %}
-        <p>No questions found for this tag.</p>
+        <p>No results found for this {{ search_type.lower() }}.</p>
     {% endif %}
 </ul>
 {% endblock %}
