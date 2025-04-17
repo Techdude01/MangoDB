@@ -47,17 +47,18 @@ CREATE TABLE Question (
   FOREIGN KEY (tagID) REFERENCES Tag(tagID)
 );
 
-CREATE TABLE Response(
- responseID INT AUTO_INCREMENT PRIMARY KEY,
- userID INT,
- questionID INT,
- responseText TEXT,
- TimeStampID INT,
-    status ENUM('draft', 'published', 'canceled') DEFAULT 'draft',
- FOREIGN KEY (questionID) REFERENCES Question(questionID),
- FOREIGN KEY (userID) REFERENCES User(userID),
- FOREIGN KEY (TimeStampID) REFERENCES TimeStamp(TimeStampID)
+CREATE TABLE Response (
+  responseID INT AUTO_INCREMENT PRIMARY KEY,
+  userID INT,
+  questionID INT,
+  responseText TEXT,
+  TimeStampID INT,
+  status ENUM('draft', 'published', 'canceled') DEFAULT 'draft',
+  FOREIGN KEY (questionID) REFERENCES Question(questionID),
+  FOREIGN KEY (userID) REFERENCES User(userID),
+  FOREIGN KEY (TimeStampID) REFERENCES TimeStamp(TimeStampID)
 );
+
 
 CREATE TABLE Comment(
  commentID INT AUTO_INCREMENT PRIMARY KEY,
