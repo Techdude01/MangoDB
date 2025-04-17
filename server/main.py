@@ -64,14 +64,20 @@ def login():
         password = request.form['password']
 
         conn = connect_db()
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
         authenticated, role = verify_user(conn, username, password)
+        
+        cursor.execute("SELECT userID, passowrd, role FROM User WHERE userName = %s", (username,))
+        user = cursor.fetchone()
 
         if authenticated:
             session['username'] = username
             session['role'] = role
+            session['user_id'] = user['userID']
             return redirect(url_for('dashboard'))
         else:
             flash('Invalid credentials')
+            return redirect(url_for('login'))
 
     return render_template('user_login.html')
 
@@ -104,7 +110,7 @@ def register_route():
         
         # Basic validation
         if not username or not password or not confirm_password:
-            flash('All fields are required')
+            flash('All fields are required', 'danger')
             return redirect(url_for('register_route'))
         
         if password != confirm_password:
@@ -113,6 +119,21 @@ def register_route():
         
         # Check if user already exists
         # Add your database logic here
+        conn = connect_db()
+        cursor = conn.cursor()
+
+        try:
+            # Insert the new user into the database
+            hashed_password = generate_password_hash(password)
+            cursor.execute("INSERT INTO User (userName, password, role) VALUES (%s, %s, %s)", (username, hashed_password, 'user'))
+            conn.commit()
+            flash('Registration successful! You can now log in.', 'success')
+            return redirect(url_for('login'))
+        except Exception as e:
+            conn.rollback()
+            flash(f'Error during registration: {e}', 'danger')
+        finally:
+            conn.close()
         
         # Create new user
         # Add your database logic here
@@ -164,7 +185,7 @@ def home():
     most_recent = cursor.fetchall()
 
     cursor.execute("SELECT tagID, tagName FROM Tag")
-    most_recent = cursor.fetchall()
+    tags = cursor.fetchall()
 
     conn.close()
 
@@ -173,7 +194,7 @@ def home():
         most_popular=most_popular, 
         most_controversial=most_controversial, 
         most_recent=most_recent,
-        #tags=tags,
+        tags=tags,
         most_popular_page=1,
         most_popular_total_pages=1,
         most_controversial_page=1,
@@ -340,17 +361,23 @@ def start_question():
 def publish_question():
     question_id = request.form.get('question_id')  # Assume question ID is passed from the frontend
     tag_ids = request.form.getlist('tags')
+    user_id = session.get('user_id')
 
-    if not question_test or not tag_ids:
+    if not question_id or not tag_ids or not user_id:
         flash('Please provide a question and at least one tag.')
         return redirect(url_for('home'))
 
     conn = connect_db()
     cursor = conn.cursor()
-    
+
     try:
         # Call PublishQuestion() to publish the question
         cursor.execute("CALL PublishQuestion(%s)", (question_id,))
+
+        # Update the TagList table w selected tags
+        for tag_id in tag_ids:
+            cursor.execute("INSERT INTO TagList (questionID, tagID) VALUES (%s, %s, %s)", (tag_id, question_id, user_id))
+        
         conn.commit()
         flash('Question published successfully!')
     except Exception as e:

@@ -12,9 +12,10 @@ Mango User Registration
 {% block body %}
 <nav class="navbar">
     <ul>
-        <li><a href="/">Home</a></li>
+        <li><a href="{{ url_for('home') }}">Home</a></li>
     </ul>
 </nav>
+<!-- Flash Messages -->
 {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
       {% for category, message in messages %}
@@ -24,6 +25,7 @@ Mango User Registration
       {% endfor %}
     {% endif %}
 {% endwith %}
+
 <div class="user-login">
     <h1>User Registration</h1>
     <h3>Enter your registration credentials</h3>
@@ -43,26 +45,17 @@ Mango User Registration
                id="register_password"
                name="register_password"
                placeholder="Enter your Password" required>
+        <label for="confirm_password">
+            Confirm Password:
+        </label>
+        <input type="password"
+                id="confirm_password"
+                name="confirm_password"
+                placeholder="Confirm your Password" required>
+       
         <div class="wrap">
-            <button type="button" onclick="validateLoginForm()">
-                Register
-            </button>
+            <button type="submit">Register</button>button>
         </div>
     </form>
-
-    <script>
-    function validateLoginForm() {
-        var username = document.getElementById("register_username").value;
-        var password = document.getElementById("register_password").value;
-        var id = document.getElementById("register_id").value;
-
-        if (!username || !password || !id) {
-            alert("Please enter Username and Password:");
-            return false;
-        }
-
-        document.getElementById("register-form").submit();
-    }
-    </script>
 </div>    
 {% endblock %}

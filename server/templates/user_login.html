@@ -8,7 +8,17 @@
 User Login
 {% endblock %}
 {% block body %}
-<nav class="navbar">
+
+<h1>Login</h1>
+<form action="{{ url_for('login') }}" method="post">
+    <label for="username">Username:</label>
+    <input type="text" id="username" name="username" required>
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="password" required>
+    <button type="submit">Login</button>
+</form>
+{% endblock %}
+<!-- <nav class="navbar">
     <ul>
         <li><a href="/">Home</a></li>
     </ul>
@@ -56,4 +66,4 @@ User Login
         }
     </script>
 </div>
-{% endblock %}
+{% endblock %} -->
