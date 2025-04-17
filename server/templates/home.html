@@ -72,7 +72,7 @@ Mango Homepage
         <button id="post-question-btn" onclick="toggleQuestionForm()">Post a Question</button>
 
         <div id="question-form" style="display: none;">
-            <form action="{{ url_for('post_question') }}" method="post">
+            <form action="{{ url_for('publish_question') }}" method="post">
                 <div>
                     <label for="question-text">Question:</label>
                     <textarea id="question-text" name="question_text" placeholder="Write your question here..."
@@ -209,45 +209,42 @@ Mango Homepage
                 {% endif %}
         </div>
     </div>
-<<<<<<< HEAD
-</div>
-<div class="post-question">
-    <button id="post-question-btn" onclick="toggleQuestionForm()">Post a Question</button>
+    <div class="post-question">
+        <button id="post-question-btn" onclick="toggleQuestionForm()">Post a Question</button>
 
-    <div id="question-form" style="display: none;">
-        <form id="start-question-form" action="{{ url_for('start_question') }}" method="post">
-            <input type="hidden" name="user_id" value="{{ user_id }}"> <!-- Pass the user ID -->
-            <div>
-                <label for="question-text">Question:</label>
-                <textarea id="question-text" name="question_text" placeholder="Write your question here..." required></textarea>
-            </div>
-            <button type="submit">Start Draft</button>
-        </form>
+        <div id="question-form" style="display: none;">
+            <form id="start-question-form" action="{{ url_for('start_question') }}" method="post">
+                <input type="hidden" name="user_id" value="{{ user_id }}"> <!-- Pass the user ID -->
+                <div>
+                    <label for="question-text">Question:</label>
+                    <textarea id="question-text" name="question_text" placeholder="Write your question here..."
+                        required></textarea>
+                </div>
+                <button type="submit">Start Draft</button>
+            </form>
 
-        <form id="publish-question-form" action="{{ url_for('publish_question') }}" method="post" style="display: none;">
-            <input type="hidden" name="question_id" id="question-id">
-            <button type="submit">Publish Question</button>
-        </form>
+            <form id="publish-question-form" action="{{ url_for('publish_question') }}" method="post"
+                style="display: none;">
+                <input type="hidden" name="question_id" id="question-id">
+                <button type="submit">Publish Question</button>
+            </form>
 
-        <form id="cancel-question-form" action="{{ url_for('cancel_question') }}" method="post" style="display: none;">
-            <input type="hidden" name="question_id" id="cancel-question-id">
-            <button type="submit">Cancel</button>
-        </form>
+            <form id="cancel-question-form" action="{{ url_for('cancel_question') }}" method="post"
+                style="display: none;">
+                <input type="hidden" name="question_id" id="cancel-question-id">
+                <button type="submit">Cancel</button>
+            </form>
+        </div>
     </div>
-</div>
-<script>
-    function toggleQuestionForm() {
-        const form = document.getElementById('question-form');
-        form.style.display = form.style.display === 'none' ? 'block' : 'none';
-    }
-    function startDraft() {
-        document.getElementById('start-question-form').submit();
-        document.getElementById('publish-question-form').style.display = 'block';
-        document.getElementById('cancel-question-form').style.display = 'block';
-    }
-</script>
-{% endblock %}
-=======
-
+    <script>
+        function toggleQuestionForm() {
+            const form = document.getElementById('question-form');
+            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        }
+        function startDraft() {
+            document.getElementById('start-question-form').submit();
+            document.getElementById('publish-question-form').style.display = 'block';
+            document.getElementById('cancel-question-form').style.display = 'block';
+        }
+    </script>
     {% endblock %}
->>>>>>> 76552b6b932bc7209bebdf48e54d00e170832479
