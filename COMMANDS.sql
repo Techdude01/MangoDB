@@ -9,7 +9,7 @@ CREATE TABLE `User` (
 
 CREATE TABLE Tag (
   tagID INT AUTO_INCREMENT PRIMARY KEY,
-  tagName VARCHAR(16) UNIQUE
+  tagName VARCHAR(16) NOT NULL UNIQUE
 );
 
 CREATE TABLE TimeStamp( 
@@ -20,8 +20,10 @@ CREATE TABLE TimeStamp(
 
 CREATE TABLE TagList(
  tagID INT,
+ questionID INT,
  userID INT,
  FOREIGN KEY (tagID) REFERENCES Tag(tagID),
+ FOREIGN KEY (questionID) REFERENCES Question(questionID),
  FOREIGN KEY (userID) REFERENCES User(userID),
  PRIMARY KEY (tagID, userID)
 );
@@ -235,7 +237,7 @@ INSERT INTO TimeStamp (sentTime, sentDate) VALUES
 ('10:15:00', '2025-03-10');
 
 -- taglist entries
-INSERT INTO TagList (tagID, userID) VALUES
+INSERT INTO TagList (tagID, questionID) VALUES
 (1,1), 
 (2,2), 
 (3,3), 
@@ -524,8 +526,6 @@ CREATE TRIGGER OnUserDelete
 AFTER DELETE ON User
 FOR EACH ROW
 BEGIN
-    DELETE FROM TagList WHERE userID = OLD.userID;
-
     DELETE FROM Chat WHERE userID = OLD.userID;
 
     DELETE FROM ChatMessage WHERE userID = OLD.userID;
@@ -631,13 +631,15 @@ DELIMITER;
 
 -- Get Recent Questions
 DELIMITER //
-CREATE PROCEDURE GetRecentQuestions ()
+CREATE PROCEDURE GetRecentQuestionsWithPagination (
+	IN limit INT, IN offset INT
+)
 BEGIN
     SELECT q.questionID, q.questionText, t.sentTime, t.sentDate
     FROM Question q
     JOIN TimeStamp t ON q.TimeStampID = t.TimeStampID
     ORDER BY t.sentDate DESC, t.sentTime DESC
-    LIMIT 10;
+    LIMIT limit OFFSET offset;
 END;
 //
 DELIMITER ;
@@ -645,7 +647,9 @@ DELIMITER ;
 
 -- Get Popular Questions
 DELIMITER //
-CREATE PROCEDURE GetPopularQuestions ()
+CREATE PROCEDURE GetPopularQuestionsWithPagination (
+	IN limit INT, IN offset INT
+)
 BEGIN
     SELECT q.questionText, t.sentTime, t.sentDate,
 		   q.upvotes, COUNT(c.commentID) AS commentCount
@@ -654,7 +658,7 @@ BEGIN
     LEFT JOIN Comment c ON c.questionID = q.questionID
     GROUP BY q.questionID, q.questionText, t.sentTime, t.sentDate, q.upvotes
     ORDER BY q.upvotes DESC, commentCount DESC, t.sentDate DESC, t.sentTime DESC
-    LIMIT 10;
+    LIMIT limit OFFSET offset;
 END;
 //
 DELIMITER ;
@@ -662,7 +666,9 @@ DELIMITER ;
 
 -- Get Controversial Questions
 DELIMITER //
-CREATE PROCEDURE GetControversialQuestions ()
+CREATE PROCEDURE GetControversialQuestionswithPagination (
+	IN limit INT, IN offset INT
+)
 BEGIN
     SELECT q.questionText, t.sentTime, t.sentDate, 
 		   q.downvotes, COUNT(c.commentID) AS commentCount,
@@ -672,7 +678,7 @@ BEGIN
     LEFT JOIN Comment c ON c.questionID = q.questionID
     GROUP BY q.questionID, q.questionText, t.sentTime, t.sentDate, q.downvotes
     ORDER BY controversyScore DESC, t.sentDate DESC, t.sentTime DESC
-    LIMIT 10;
+    LIMIT limit OFFSET offset;
 END;
 //
 DELIMITER ;
@@ -754,7 +760,7 @@ CREATE PROCEDURE DownvoteQuestion(IN p_userID INT, IN p_questionID INT)
 BEGIN
 	-- check if user already downvoted this question
 	IF NOT EXISTS (
-		SELECT 1 FROM QuestionDownvoote
+		SELECT 1 FROM QuestionDownvote
 		WHERE userID = p_userID AND questionID = p_questionID
 	)
 	THEN
@@ -957,7 +963,7 @@ DELIMITER ;
 
 -- CANCEL COMMENT
 DELIMITER //
-CREATE PROCEDURE Cance(IN p_commentID INT)
+CREATE PROCEDURE Cancel(IN p_commentID INT)
 BEGIN 
 	UPDATE Comment
 	SET status = 'canceled'
