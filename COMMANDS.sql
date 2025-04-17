@@ -242,17 +242,17 @@ INSERT INTO `TimeStamp` (sentTime, sentDate) VALUES
 
 
 -- taglist entries
-INSERT INTO TagList (tagID, questionID) VALUES
-(1,1), 
-(2,2), 
-(3,3), 
-(4,4), 
-(5,5), 
-(3,6), 
-(7,7), 
-(4,8), 
-(7,9), 
-(8,10);
+INSERT INTO TagList (tagID, questionID, userID) VALUES
+(1,1,1), 
+(2,2,2), 
+(3,3,3), 
+(4,4,4), 
+(5,5,5), 
+(3,6,6), 
+(7,7,5), 
+(4,8,8), 
+(7,9,7), 
+(8,10,9);
 
 -- chat entries
 INSERT INTO Chat (userID, chatName) VALUES 
