@@ -173,7 +173,7 @@ def home():
         most_popular=most_popular, 
         most_controversial=most_controversial, 
         most_recent=most_recent,
-        tags=tags,
+        #tags=tags,
         most_popular_page=1,
         most_popular_total_pages=1,
         most_controversial_page=1,
