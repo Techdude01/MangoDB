@@ -356,6 +356,7 @@ def publish_question():
 
     return redirect(url_for('home'))
 
+
 @app.route('/cancel_question', methods=['POST'])
 def cancel_question():
     question_id = request.form.get('question_id')  # Assume question ID is passed from the frontend
