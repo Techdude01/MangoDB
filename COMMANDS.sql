@@ -639,7 +639,7 @@ DELIMITER;
 -- Get Recent Questions
 DELIMITER //
 CREATE PROCEDURE GetRecentQuestionsWithPagination (
-	IN limit INT, IN offset INT
+	IN lim INT, IN offset INT
 )
 BEGIN
     SELECT q.questionID, q.questionText, t.sentTime, t.sentDate
@@ -655,7 +655,7 @@ DELIMITER ;
 -- Get Popular Questions
 DELIMITER //
 CREATE PROCEDURE GetPopularQuestionsWithPagination (
-	IN limit INT, IN offset INT
+	IN lim INT, IN offset INT
 )
 BEGIN
     SELECT q.questionText, t.sentTime, t.sentDate,
@@ -674,7 +674,7 @@ DELIMITER ;
 -- Get Controversial Questions
 DELIMITER //
 CREATE PROCEDURE GetControversialQuestionswithPagination (
-	IN limit INT, IN offset INT
+	IN lim INT, IN offset INT
 )
 BEGIN
     SELECT q.questionText, t.sentTime, t.sentDate, 
