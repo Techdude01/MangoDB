@@ -146,5 +146,82 @@ def admin_login():
 
     return render_template('admin_login.html')  # You'll need to create this template
 
+@app.route('/home')
+def home():
+    conn = connect_db()
+    cursor = conn.cursor(pymysql.cursors.DictCursor)
+
+    # Fetch top 5 questions for each category
+    cursor.execute("CALL GetPopularQuestions()") 
+    most_popular = cursor.fetchall()
+
+    cursor.execute("CALL GetControversialQuestions()")
+    most_controversial = cursor.fetchall()
+
+    cursor.execute("CALL GetRecentQuestions()")
+    most_recent = cursor.fetchall()
+
+    conn.close()
+
+    return render_template('home.html', most_popular=most_popular, most_controversial=most_controversial, most_recent=most_recent)
+
+@app.route('/question/<int:question_id>')
+def question_detail(question_id):
+    conn = connect_db()
+    cursor = conn.cursor(pymysql.cursors.DictCursor)
+
+    # Fetch question details
+    cursor.execute("SELECT * FROM Question WHERE questionID = %s", (question_id,))
+    question = cursor.fetchone()
+
+    # Fetch responses/comments for the question
+    cursor.execute("SELECT * FROM Response WHERE questionID = %s", (question_id,))
+    responses = cursor.fetchall()
+
+    conn.close()
+
+    return render_template('question_detail.html', question=question, responses=responses)
+
+@app.route('/most_popular')
+def most_popular():
+    conn = connect_db()
+    cursor = conn.cursor(pymysql.cursors.DictCursor)
+
+    # Fetch all popular questions
+    cursor.execute("CALL GetPopularQuestions()") 
+    questions = cursor.fetchall()
+
+    conn.close()
+
+    return render_template('most_popular.html', questions=questions)
+
+
+@app.route('/most_controversial')
+def most_controversial():
+    conn = connect_db()
+    cursor = conn.cursor(pymysql.cursors.DictCursor)
+
+    # Fetch all controversial questions
+    cursor.execute("CALL GetControversialQuestions()") 
+    questions = cursor.fetchall()
+
+    conn.close()
+
+    return render_template('most_controversial.html', questions=questions)
+
+
+@app.route('/most_recent')
+def most_recent():
+    conn = connect_db()
+    cursor = conn.cursor(pymysql.cursors.DictCursor)
+
+    # Fetch all recent questions
+    cursor.execute("CALL GetRecentQuestions()") 
+    questions = cursor.fetchall()
+
+    conn.close()
+
+    return render_template('most_recent.html', questions=questions)
+
 if __name__ == '__main__':
     app.run(debug=True)

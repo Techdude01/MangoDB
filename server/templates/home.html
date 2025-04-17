@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block title %}
-Jail Homepage
+Mango Homepage
 {% endblock %}
 
 {% block body %}
@@ -104,5 +104,45 @@ Jail Homepage
             document.getElementById("login-form").submit();
         }
         </script>
-    </div>    
+    </div>  
+    <!-- Section for Most Popular Questions -->
+    <div class="section">
+        <h2><a href="{{ url_for('most_popular') }}">Most Popular</a></h2>
+        <ul>
+            {% for question in most_popular %}
+            <li>
+                <a href="{{ url_for('question_detail', question_id=question['questionID']) }}">
+                    {{ question['questionText'] }}
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+     <!-- Section for Most Controversial Questions -->
+    <div class="section">
+        <h2><a href="{{ url_for('most_controversial') }}">Most Controversial</a></h2>
+        <ul>
+            {% for question in most_controversial %}
+            <li>
+                <a href="{{ url_for('question_detail', question_id=question['questionID']) }}">
+                    {{ question['questionText'] }}
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    <!-- Section for Most Recent Questions -->
+    <div class="section">
+        <h2><a href="{{ url_for('most_recent') }}">Most Recent</a></h2>
+        <ul>
+            {% for question in most_recent %}
+            <li>
+                <a href="{{ url_for('question_detail', question_id=question['questionID']) }}">
+                    {{ question['questionText'] }}
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+
 {% endblock %}
