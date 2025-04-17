@@ -73,7 +73,7 @@ def login():
         else:
             flash('Invalid credentials')
 
-    return render_template('login.html')
+    return render_template('user_login.html')
 
 @app.route('/logout')
 def logout():
@@ -153,7 +153,7 @@ def home():
     conn = connect_db()
     cursor = conn.cursor(pymysql.cursors.DictCursor)
 
-    # Fetch top 5 questions for each category
+    #Fetch top 5 questions for each category
     cursor.execute("CALL GetPopularQuestionsWithPagination(5,0)") 
     most_popular = cursor.fetchall()
 

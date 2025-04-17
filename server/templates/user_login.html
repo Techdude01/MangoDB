@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block style %}
-<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='./css/register.css') }}">    
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='./css/register.css') }}">
 {% endblock %}
 
 {% block title %}
@@ -14,33 +14,27 @@ User Login
     </ul>
 </nav>
 {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-      {% for category, message in messages %}
-        <div class="alert alert-{{ category }}">
-          {{ message }}
-        </div>
-      {% endfor %}
-    {% endif %}
+{% if messages %}
+{% for category, message in messages %}
+<div class="alert alert-{{ category }}">
+    {{ message }}
+</div>
+{% endfor %}
+{% endif %}
 {% endwith %}
 <div class="usr-login">
     <h1>User Login</h1>
     <h3>Enter your login credentials</h3>
-    <form id="userlogin-form" action="{{ url_for('user_login') }}" method="post">
+    <form id="userlogin-form" action="{{ url_for('login') }}" method="post">
         <label for="user_username">
             Username:
         </label>
-        <input type="text"
-               id="user_password"
-               name="user_username"
-               placeholder="Enter your Username" required>
+        <input type="text" id="user_password" name="user_username" placeholder="Enter your Username" required>
 
         <label for="user_password">
             Password:
         </label>
-        <input type="password"
-               id="user_password"
-               name="user_password"
-               placeholder="Enter your Password" required>
+        <input type="password" id="user_password" name="user_password" placeholder="Enter your Password" required>
         <div class="wrap">
             <button type="button" onclick="validateLoginForm()">
                 Login
@@ -49,17 +43,17 @@ User Login
     </form>
 
     <script>
-    function validateLoginForm() {
-        var username = document.getElementById("user_password").value;
-        var password = document.getElementById("user_password").value;
+        function validateLoginForm() {
+            var username = document.getElementById("user_password").value;
+            var password = document.getElementById("user_password").value;
 
-        if (!username || !password) {
-            alert("Please enter Username and Password");
-            return false;
+            if (!username || !password) {
+                alert("Please enter Username and Password");
+                return false;
+            }
+
+            document.getElementById("userlogin-form").submit();
         }
-
-        document.getElementById("userlogin-form").submit();
-    }
     </script>
-</div>    
+</div>
 {% endblock %}
