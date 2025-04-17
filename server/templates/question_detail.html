@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}
+Question Details
+{% endblock %}
+
+{% block body %}
+<h1>{{ question['questionText'] }}</h1>
+<p>{{ question['questionDescription'] }}</p>
+
+<h2>Responses</h2>
+<ul>
+    {% for response in responses %}
+    <li>{{ response['responseText'] }}</li>
+    {% endfor %}
+</ul>
+{% endblock %}

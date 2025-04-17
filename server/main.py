@@ -184,44 +184,84 @@ def question_detail(question_id):
 
 @app.route('/most_popular')
 def most_popular():
+    # get current pag num from query parameters
+    page = request.args.get('page', 1, type=int)
+    per_page = 5
+
+    offset = (page - 1 ) * per_page
+
     conn = connect_db()
     cursor = conn.cursor(pymysql.cursors.DictCursor)
 
-    # Fetch all popular questions
-    cursor.execute("CALL GetPopularQuestions()") 
+    # Fetch paginated popular questions
+    cursor.execute("CALL GetPopularQuestionsWithPagination(%s, %s)",(per_page, offset))
     questions = cursor.fetchall()
+
+    # Fetch total num of questions for pagination
+    cursor.execute("SELECT COUNT(*) AS total FROM Question")
+    total_questions = cursor.fetchone()['total']
 
     conn.close()
 
-    return render_template('most_popular.html', questions=questions)
+    total_pages = (total_questions + per_page - 1) // per_page
+
+    return render_template(
+        'most_popular.html', questions=questions,
+        page=page, total_pages=total_pages)
 
 
 @app.route('/most_controversial')
 def most_controversial():
+    # get current pag num from query parameters
+    page = request.args.get('page', 1, type=int)
+    per_page = 5
+
+    offset = (page - 1 ) * per_page
     conn = connect_db()
     cursor = conn.cursor(pymysql.cursors.DictCursor)
 
-    # Fetch all controversial questions
-    cursor.execute("CALL GetControversialQuestions()") 
+    # Fetch paginated controversial questions
+    cursor.execute("CALL GetControversialQuestionsWithPagination(%s, %s)",(per_page, offset)) 
     questions = cursor.fetchall()
-
+    
+    # Fetch total num of questions for pagination
+    cursor.execute("SELECT COUNT(*) AS total FROM Question")
+    total_questions = cursor.fetchone()['total']
+    
     conn.close()
 
-    return render_template('most_controversial.html', questions=questions)
+    total_pages = (total_questions + per_page - 1) // per_page
+
+    return render_template(
+        'most_controversial.html', questions=questions,
+        page=page, total_pages=total_pages)
 
 
 @app.route('/most_recent')
 def most_recent():
+    # get current pag num from query parameters
+    page = request.args.get('page', 1, type=int)
+    per_page = 5
+
+    offset = (page - 1 ) * per_page
     conn = connect_db()
     cursor = conn.cursor(pymysql.cursors.DictCursor)
 
-    # Fetch all recent questions
-    cursor.execute("CALL GetRecentQuestions()") 
+    # Fetch paginated recent questions
+    cursor.execute("CALL GetRecentQuestionsWithPagination(%s, %s)",(per_page, offset)) 
     questions = cursor.fetchall()
 
+    # Fetch total num of questions for pagination
+    cursor.execute("SELECT COUNT(*) AS total FROM Question")
+    total_questions = cursor.fetchone()['total']
+    
     conn.close()
 
-    return render_template('most_recent.html', questions=questions)
+    total_pages = (total_questions + per_page - 1) // per_page
+
+    return render_template(
+        'most_recent.html', questions=questions,
+        page=page, total_pages=total_pages)
 
 if __name__ == '__main__':
     app.run(debug=True)
