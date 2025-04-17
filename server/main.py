@@ -163,6 +163,9 @@ def home():
     cursor.execute("CALL GetRecentQuestionsWithPagination(5,0)")
     most_recent = cursor.fetchall()
 
+    cursor.execute("SELECT tagID, tagName FROM Tag")
+    most_recent = cursor.fetchall()
+
     conn.close()
 
     return render_template(
@@ -170,6 +173,7 @@ def home():
         most_popular=most_popular, 
         most_controversial=most_controversial, 
         most_recent=most_recent,
+        tags=tags,
         most_popular_page=1,
         most_popular_total_pages=1,
         most_controversial_page=1,
@@ -311,5 +315,35 @@ def most_recent():
         'most_recent.html', questions=questions,
         page=page, total_pages=total_pages)
 
+@app.route('/post_question', methods=['POST'])
+def post_question():
+    question_text = request.form.get('question_text')
+    tag_ids = request.form.getlist('tags')  # Get selected tags as a list
+
+    if not question_text or not tag_ids:
+        flash('Please provide a question and at least one tag.')
+        return redirect(url_for('home'))
+
+    conn = connect_db()
+    cursor = conn.cursor()
+
+    try:
+        # Insert the question into the Question table
+        cursor.execute("INSERT INTO Question (questionText, TimeStampID) VALUES (%s, NULL)", (question_text,))
+        question_id = cursor.lastrowid
+
+        # Insert the tags into the TagList table
+        for tag_id in tag_ids:
+            cursor.execute("INSERT INTO TagList (questionID, tagID) VALUES (%s, %s)", (question_id, tag_id))
+
+        conn.commit()
+        flash('Your question has been posted successfully!')
+    except Exception as e:
+        conn.rollback()
+        flash(f'An error occurred: {e}')
+    finally:
+        conn.close()
+
+    return redirect(url_for('home'))
 if __name__ == '__main__':
     app.run(debug=True)

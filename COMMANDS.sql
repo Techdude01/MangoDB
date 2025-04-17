@@ -1,3 +1,4 @@
+-- put in each individually works the best
 CREATE TABLE `User` (
   userID INT AUTO_INCREMENT PRIMARY KEY,
   userName VARCHAR(16) UNIQUE,
@@ -9,7 +10,7 @@ CREATE TABLE `User` (
 
 CREATE TABLE Tag (
   tagID INT AUTO_INCREMENT PRIMARY KEY,
-  tagName VARCHAR(16) UNIQUE
+  tagName VARCHAR(16) NOT NULL UNIQUE
 );
 
 CREATE TABLE TimeStamp( 
@@ -20,8 +21,10 @@ CREATE TABLE TimeStamp(
 
 CREATE TABLE TagList(
  tagID INT,
+ questionID INT,
  userID INT,
  FOREIGN KEY (tagID) REFERENCES Tag(tagID),
+ FOREIGN KEY (questionID) REFERENCES Question(questionID),
  FOREIGN KEY (userID) REFERENCES User(userID),
  PRIMARY KEY (tagID, userID)
 );
@@ -33,31 +36,32 @@ CREATE TABLE Chat(
  FOREIGN KEY (userID) REFERENCES User(userID)
 );
 
-CREATE TABLE Question(
- questionID INT AUTO_INCREMENT PRIMARY KEY,
- userID INT,
- questionText TEXT,
- TimeStampID INT,
- tagID INT,
- upvotes INT DEFAULT 0 CHECK (upvotes >= 0),
- downvotes INT DEFAULT 0 CHECK (downvotes >= 0),
- status ENUM('draft', 'published', 'canceled') DEFAULT 'draft',
- FOREIGN KEY (userID) REFERENCES User(userID),
- FOREIGN KEY (TimeStampID) REFERENCES TimeStamp(TimeStampID),
-    FOREIGN KEY (tagID) REFERENCES TagList(tagID)
+CREATE TABLE Question (
+  questionID INT AUTO_INCREMENT PRIMARY KEY,
+  userID INT,
+  questionText TEXT,
+  TimeStampID INT,
+  tagID INT,
+  upvotes INT DEFAULT 0 CHECK (upvotes >= 0),
+  downvotes INT DEFAULT 0 CHECK (downvotes >= 0),
+  status ENUM('draft', 'published', 'canceled') DEFAULT 'draft',
+  FOREIGN KEY (userID) REFERENCES User(userID),
+  FOREIGN KEY (TimeStampID) REFERENCES TimeStamp(TimeStampID),
+  FOREIGN KEY (tagID) REFERENCES Tag(tagID)
 );
 
-CREATE TABLE Response(
- responseID INT AUTO_INCREMENT PRIMARY KEY,
- userID INT,
- questionID INT,
- responseText TEXT,
- TimeStampID INT,
-    status ENUM('draft', 'published', 'canceled') DEFAULT 'draft',
- FOREIGN KEY (questionID) REFERENCES Question(questionID),
- FOREIGN KEY (userID) REFERENCES User(userID),
- FOREIGN KEY (TimeStampID) REFERENCES TimeStamp(TimeStampID)
+CREATE TABLE Response (
+  responseID INT AUTO_INCREMENT PRIMARY KEY,
+  userID INT,
+  questionID INT,
+  responseText TEXT,
+  TimeStampID INT,
+  status ENUM('draft', 'published', 'canceled') DEFAULT 'draft',
+  FOREIGN KEY (questionID) REFERENCES Question(questionID),
+  FOREIGN KEY (userID) REFERENCES User(userID),
+  FOREIGN KEY (TimeStampID) REFERENCES TimeStamp(TimeStampID)
 );
+
 
 CREATE TABLE Comment(
  commentID INT AUTO_INCREMENT PRIMARY KEY,
@@ -192,7 +196,8 @@ INSERT INTO Tag (tagName) VALUES
 ('random');
  
 -- timestamp entries
-INSERT INTO TimeStamp (sentTime, sentDate) VALUES
+-- input 20 rows first and then the other 20 rows or else there might be an error
+INSERT INTO `TimeStamp` (sentTime, sentDate) VALUES
 ('08:00:00', '2025-01-01'),
 ('09:10:00', '2025-01-02'),
 ('10:30:00', '2025-01-03'),
@@ -234,18 +239,20 @@ INSERT INTO TimeStamp (sentTime, sentDate) VALUES
 ('10:00:00', '2025-03-09'),
 ('10:15:00', '2025-03-10');
 
+
+
 -- taglist entries
-INSERT INTO TagList (tagID, userID) VALUES
-(1,1), 
-(2,2), 
-(3,3), 
-(4,4), 
-(5,5), 
-(3,6), 
-(7,7), 
-(4,8), 
-(7,9), 
-(8,10);
+INSERT INTO TagList (tagID, questionID, userID) VALUES
+(1,1,1), 
+(2,2,2), 
+(3,3,3), 
+(4,4,4), 
+(5,5,5), 
+(3,6,6), 
+(7,7,5), 
+(4,8,8), 
+(7,9,7), 
+(8,10,9);
 
 -- chat entries
 INSERT INTO Chat (userID, chatName) VALUES 
@@ -454,7 +461,8 @@ DELIMITER;
 
 
 -- LOG CHAT "ENTER/EXIT" ACTIONS
-DELIMITER // CREATE PROCEDURE LogChatAction(
+DELIMITER // 
+CREATE PROCEDURE LogChatAction(
 	IN p_userID INT, 
 	IN p_chatID INT, 
 	IN p_action VARCHAR(10))
@@ -468,6 +476,7 @@ BEGIN
 END;
 //
 DELIMITER;
+
 
 
 
@@ -506,16 +515,16 @@ DELIMITER ;
 
 
 -- Delete User by Username
-DELIMITER //
-CREATE PROCEDURE DeleteUserByUsername (
-    IN p_username VARCHAR(16)
-)
-BEGIN
-    DELETE FROM User
-    WHERE userName = p_username;
-END;
-//
-DELIMITER ;
+	DELIMITER //
+	CREATE PROCEDURE DeleteUserByUsername (
+	    IN p_username VARCHAR(16)
+	)
+	BEGIN
+	    DELETE FROM User
+	    WHERE userName = p_username;
+	END;
+	//
+	DELIMITER ;
 
 
 -- Handle Delete on User to Update Tables
@@ -524,8 +533,6 @@ CREATE TRIGGER OnUserDelete
 AFTER DELETE ON User
 FOR EACH ROW
 BEGIN
-    DELETE FROM TagList WHERE userID = OLD.userID;
-
     DELETE FROM Chat WHERE userID = OLD.userID;
 
     DELETE FROM ChatMessage WHERE userID = OLD.userID;
@@ -631,13 +638,15 @@ DELIMITER;
 
 -- Get Recent Questions
 DELIMITER //
-CREATE PROCEDURE GetRecentQuestions ()
+CREATE PROCEDURE GetRecentQuestionsWithPagination (
+	IN lim INT, IN offset INT
+)
 BEGIN
     SELECT q.questionID, q.questionText, t.sentTime, t.sentDate
     FROM Question q
     JOIN TimeStamp t ON q.TimeStampID = t.TimeStampID
     ORDER BY t.sentDate DESC, t.sentTime DESC
-    LIMIT 10;
+    LIMIT lim OFFSET offset;
 END;
 //
 DELIMITER ;
@@ -645,7 +654,9 @@ DELIMITER ;
 
 -- Get Popular Questions
 DELIMITER //
-CREATE PROCEDURE GetPopularQuestions ()
+CREATE PROCEDURE GetPopularQuestionsWithPagination (
+	IN lim INT, IN offset INT
+)
 BEGIN
     SELECT q.questionText, t.sentTime, t.sentDate,
 		   q.upvotes, COUNT(c.commentID) AS commentCount
@@ -654,7 +665,7 @@ BEGIN
     LEFT JOIN Comment c ON c.questionID = q.questionID
     GROUP BY q.questionID, q.questionText, t.sentTime, t.sentDate, q.upvotes
     ORDER BY q.upvotes DESC, commentCount DESC, t.sentDate DESC, t.sentTime DESC
-    LIMIT 10;
+    LIMIT lim OFFSET offset;
 END;
 //
 DELIMITER ;
@@ -662,7 +673,9 @@ DELIMITER ;
 
 -- Get Controversial Questions
 DELIMITER //
-CREATE PROCEDURE GetControversialQuestions ()
+CREATE PROCEDURE GetControversialQuestionswithPagination (
+	IN lim INT, IN offset INT
+)
 BEGIN
     SELECT q.questionText, t.sentTime, t.sentDate, 
 		   q.downvotes, COUNT(c.commentID) AS commentCount,
@@ -672,7 +685,7 @@ BEGIN
     LEFT JOIN Comment c ON c.questionID = q.questionID
     GROUP BY q.questionID, q.questionText, t.sentTime, t.sentDate, q.downvotes
     ORDER BY controversyScore DESC, t.sentDate DESC, t.sentTime DESC
-    LIMIT 10;
+    LIMIT lim OFFSET offset;
 END;
 //
 DELIMITER ;
@@ -749,29 +762,22 @@ DELIMITER ;
 
 -- users can downvote a question
 DELIMITER //
-
 CREATE PROCEDURE DownvoteQuestion(IN p_userID INT, IN p_questionID INT)
 BEGIN
-	-- check if user already downvoted this question
-	IF NOT EXISTS (
-		SELECT 1 FROM QuestionDownvoote
-		WHERE userID = p_userID AND questionID = p_questionID
-	)
-	THEN
-	
-		-- log downvoate
-		INSERT INTO QuestionDownvote (userID, questionID)
-		VALUES (p_userID, p_questionID);
+  IF NOT EXISTS (
+    SELECT 1 FROM QuestionDownvote
+    WHERE userID = p_userID AND questionID = p_questionID
+  ) THEN
+    INSERT INTO QuestionDownvote (userID, questionID)
+    VALUES (p_userID, p_questionID);
 
-		-- increment downvote count
-		UPDATE Question
-		SET downvotes = downvotes + 1
-		WHERE questionID = p_questionID;
-	END IF;
+    UPDATE Question
+    SET downvotes = downvotes + 1
+    WHERE questionID = p_questionID;
+  END IF;
 END;
 //
 DELIMITER ;
-
 
 --                          User POPULATION PROCEDURES
 
@@ -957,11 +963,11 @@ DELIMITER ;
 
 -- CANCEL COMMENT
 DELIMITER //
-CREATE PROCEDURE Cance(IN p_commentID INT)
-BEGIN 
-	UPDATE Comment
-	SET status = 'canceled'
-	WHERE questionID = p_questionID AND status = 'draft';
+CREATE PROCEDURE CancelCommentDraft(IN p_commentID INT)
+BEGIN
+	  UPDATE Comment
+	  SET status = 'canceled'
+	  WHERE commentID = p_commentID AND status = 'draft';
 END;
 //
 DELIMITER ;
@@ -992,13 +998,19 @@ END;
 DELIMITER; 
 
 -- LOG RESPONSE "ENTER/EXIT" ACTIONS
-DELIMITER // CREATE PROCEDURE LogCommentAction(IN p_userID INT, IN p_action VARCHAR(10))
+DELIMITER //
+CREATE PROCEDURE LogCommentAction(
+  IN p_userID INT,
+  IN p_commentID INT,
+  IN p_action VARCHAR(10)
+)
 BEGIN
-	INSERT INTO TimeStamp(sentTime, sendDate) VALUES (CURTIME(), CURDATE());
-	SET @tsID = LAST_INSERT_ID();
+  INSERT INTO TimeStamp(sentTime, sentDate)
+  VALUES (CURTIME(), CURDATE());
+  SET @tsID = LAST_INSERT_ID();
 
-	INSERT INTO CommentLog(userID, chatID, action, TimeStampID)
-	VALUES (p_userID, p_chatID, p_action, @tsID);
+  INSERT INTO CommentLog(userID, commentID, action, TimeStampID)
+  VALUES (p_userID, p_commentID, p_action, @tsID);
 END;
 //
-DELIMITER;
+DELIMITER ;

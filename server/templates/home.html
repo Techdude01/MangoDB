@@ -66,6 +66,33 @@ Mango Homepage
             }
         </script>
     </div>
+
+    <!-- Post Question Section -->
+    <div class="post-question">
+        <button id="post-question-btn" onclick="toggleQuestionForm()">Post a Question</button>
+
+        <div id="question-form" style="display: none;">
+            <form action="{{ url_for('post_question') }}" method="post">
+                <div>
+                    <label for="question-text">Question:</label>
+                    <textarea id="question-text" name="question_text" placeholder="Write your question here..."
+                        required></textarea>
+                </div>
+
+                <div>
+                    <label for="tags">Tags:</label>
+                    <select id="tags" name="tags" multiple required>
+                        {% for tag in tags %}
+                        <option value="{{ tag['tagID'] }}">{{ tag['tagName'] }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <button type="submit">Post Question</button>
+            </form>
+        </div>
+    </div>
+
     <div class="user-login">
         <h1>User Login</h1>
         <h3>Enter your login credentials</h3>
