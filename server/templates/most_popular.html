@@ -8,11 +8,13 @@ Most Popular Questions
 <h1>Most Popular Questions</h1>
 <ul>
     {% for question in questions %}
+    {% if 'questionID' in question %}
     <li>
         <a href="{{ url_for('question_detail', question_id=question['questionID']) }}">
             {{ question['questionText'] }}
         </a>
     </li>
+    {% endif %}
     {% endfor %}
 </ul>
 <!-- Pagination Controls -->
@@ -23,8 +25,7 @@ Most Popular Questions
 
     <span>Page {{ page }} of {{ total_pages }}</span>
 
-    {% if page < total_pages %}
-    <a href="{{ url_for('most_popular', page=page+1) }}">Next</a>
-    {% endif %}
+    {% if page < total_pages %} <a href="{{ url_for('most_popular', page=page+1) }}">Next</a>
+        {% endif %}
 </div>
 {% endblock %}

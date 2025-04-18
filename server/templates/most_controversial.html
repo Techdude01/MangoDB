@@ -8,11 +8,15 @@ Most Controversial Questions
 <h1>Most Controversial Questions</h1>
 <ul>
     {% for question in questions %}
+    {% if 'questionID' in question %}
     <li>
+        {# Create a link to the specific question's detail page #}
         <a href="{{ url_for('question_detail', question_id=question['questionID']) }}">
+            {# Display the text of the question #}
             {{ question['questionText'] }}
         </a>
     </li>
+    {% endif %}
     {% endfor %}
 </ul>
 <!-- Pagination Controls -->
@@ -21,8 +25,7 @@ Most Controversial Questions
     <a href="{{ url_for('most_controversial', page=page-1) }}">Previous</a>
     {% endif %}
     <span>Page {{ page }} of {{ total_pages }}</span>
-    {% if page < total_pages %}
-    <a href="{{ url_for('most_controversial', page=page+1) }}">Next</a>
-    {% endif %}
+    {% if page < total_pages %} <a href="{{ url_for('most_controversial', page=page+1) }}">Next</a>
+        {% endif %}
 </div>
 {% endblock %}

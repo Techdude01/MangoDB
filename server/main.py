@@ -4,7 +4,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import pandas as pd
 
 app = Flask(__name__)
-#app.secret_key = 'mango'
+app.secret_key = 'mango'
 
 def connect_db(username='root', password=''):
     print(f"Connecting as user: '{username}'")
