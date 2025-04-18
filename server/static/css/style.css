@@ -1,5 +1,4 @@
 /* ========== GLOBAL RESETS ========== */
-/* Remove default margins/paddings and set box-sizing for consistency */
 * {
   margin: 0;
   padding: 0;
@@ -9,16 +8,24 @@
 /* Set a modern, readable font and background for the whole app */
 body {
   font-family: "Segoe UI", Arial, sans-serif;
-  background: #f4f6fb;
-  color: #222;
+  background: #fffbe6; /* light mango yellow */
+  color: #3e2723; /* deep brown for contrast */
   min-height: 100vh;
+  background-image: url("/static/img/mango.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
 }
 
 /* ========== NAVIGATION BAR ========== */
 .navbar {
-  background: linear-gradient(90deg, #007bff 60%, #0056b3 100%);
+  background: linear-gradient(
+    90deg,
+    #ffb300 60%,
+    #ff7043 100%
+  ); /* mango orange to ripe red */
   padding: 1rem 2rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 8px rgba(255, 167, 38, 0.08); /* soft orange shadow */
 }
 .navbar ul {
   list-style: none;
@@ -26,22 +33,24 @@ body {
   gap: 2rem;
 }
 .navbar li a {
-  color: #fff;
+  color: #fffde7; /* pale yellow */
   text-decoration: none;
   font-weight: 500;
   transition: color 0.2s;
 }
 .navbar li a:hover {
-  color: #ffe082;
+  color: #43a047; /* mango leaf green */
 }
 
 /* ========== MAIN CONTAINER ========== */
 .main {
   max-width: 900px;
   margin: 2rem auto;
-  background: #fff;
+  /*background: #fffde7; /* pale mango yellow */
+  background: rgba(255, 237, 148, 0.85); /* semi-transparent white */
+
   border-radius: 12px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.07);
+  box-shadow: 0 4px 24px rgba(255, 183, 77, 0.13); /* orange shadow */
   padding: 2rem;
 }
 
@@ -49,7 +58,7 @@ body {
 .section h2,
 .main-query h1,
 .user-login h1 {
-  color: #007bff;
+  color: #ff7043; /* ripe mango red */
   margin-bottom: 1rem;
   font-size: 2rem;
   letter-spacing: 1px;
@@ -69,12 +78,13 @@ body {
 }
 .main-query input[type="text"] {
   padding: 0.5rem;
-  border: 1px solid #bbb;
+  border: 1px solid #ffd54f; /* mango yellow border */
   border-radius: 5px;
   width: 200px;
+  background: #fffde7;
 }
 .main-query button {
-  background: #007bff;
+  background: #ffb300; /* mango orange */
   color: #fff;
   border: none;
   padding: 0.6rem 1.2rem;
@@ -84,7 +94,7 @@ body {
   transition: background 0.2s;
 }
 .main-query button:hover {
-  background: #0056b3;
+  background: #43a047; /* mango leaf green */
 }
 
 /* ========== POST QUESTION ========== */
@@ -92,7 +102,7 @@ body {
   margin: 2rem 0;
 }
 #post-question-btn {
-  background: #28a745;
+  background: #43a047; /* mango leaf green */
   color: #fff;
   border: none;
   padding: 0.7rem 1.5rem;
@@ -102,14 +112,14 @@ body {
   transition: background 0.2s;
 }
 #post-question-btn:hover {
-  background: #218838;
+  background: #ff7043; /* ripe mango red */
 }
 #question-form {
   margin-top: 1rem;
   padding: 1rem;
-  border: 1px solid #ddd;
+  border: 1px solid #ffd54f;
   border-radius: 8px;
-  background: #f9f9f9;
+  background: #fffde7;
 }
 #question-form textarea,
 #question-form select,
@@ -118,10 +128,11 @@ body {
   margin-bottom: 1rem;
   padding: 0.5rem;
   border-radius: 5px;
-  border: 1px solid #bbb;
+  border: 1px solid #ffd54f;
+  background: #fffbe6;
 }
 #question-form button {
-  background: #007bff;
+  background: #ffb300;
   color: #fff;
   border: none;
   padding: 0.6rem 1.2rem;
@@ -129,16 +140,16 @@ body {
   cursor: pointer;
 }
 #question-form button:hover {
-  background: #0056b3;
+  background: #43a047;
 }
 
 /* ========== USER LOGIN ========== */
 .user-login {
   margin: 2rem 0;
   padding: 1.5rem;
-  background: #f1f8ff;
+  background: #fff8e1; /* lighter mango yellow */
   border-radius: 8px;
-  border: 1px solid #cce5ff;
+  border: 1px solid #ffd54f;
 }
 .user-login label {
   display: block;
@@ -151,10 +162,11 @@ body {
   padding: 0.5rem;
   margin-bottom: 1rem;
   border-radius: 5px;
-  border: 1px solid #bbb;
+  border: 1px solid #ffd54f;
+  background: #fffde7;
 }
 .user-login button {
-  background: #007bff;
+  background: #ffb300;
   color: #fff;
   border: none;
   padding: 0.6rem 1.2rem;
@@ -162,7 +174,7 @@ body {
   cursor: pointer;
 }
 .user-login button:hover {
-  background: #0056b3;
+  background: #43a047;
 }
 
 /* ========== FLASH MESSAGES ========== */
@@ -170,9 +182,9 @@ body {
   margin: 1rem 0;
   padding: 1rem;
   border-radius: 5px;
-  background: #fff3cd;
-  color: #856404;
-  border: 1px solid #ffeeba;
+  background: #fff9c4; /* mango yellow */
+  color: #bf360c; /* deep red for warnings */
+  border: 1px solid #ffd54f;
 }
 
 /* ========== QUESTION LISTS ========== */
@@ -181,23 +193,24 @@ body {
   padding: 0;
 }
 .section li {
-  background: #f8f9fa;
+  background: #fffde7;
   margin-bottom: 0.7rem;
   padding: 0.8rem 1rem;
   border-radius: 6px;
-  border: 1px solid #e2e6ea;
+  border: 1px solid #ffd54f;
   transition: background 0.2s;
 }
 .section li:hover {
-  background: #e3f2fd;
+  background: #ffe082; /* mango flesh yellow */
 }
 .section a {
-  color: #007bff;
+  color: #ff7043;
   text-decoration: none;
   font-weight: 500;
 }
 .section a:hover {
   text-decoration: underline;
+  color: #43a047;
 }
 
 /* ========== PAGINATION ========== */
@@ -210,19 +223,19 @@ body {
   margin: 0 0.5rem;
   padding: 0.4rem 0.8rem;
   border-radius: 4px;
-  color: #007bff;
+  color: #ff7043;
   text-decoration: none;
-  border: 1px solid #007bff;
+  border: 1px solid #ffb300;
   background: #fff;
   font-weight: 500;
   transition: background 0.2s, color 0.2s;
 }
 .pagination a:hover {
-  background: #007bff;
+  background: #ffb300;
   color: #fff;
 }
 .pagination span {
-  background: #007bff;
+  background: #ffb300;
   color: #fff;
   border: none;
 }
@@ -231,10 +244,10 @@ body {
 footer {
   text-align: center;
   padding: 1rem 0;
-  background: #f1f1f1;
-  color: #888;
+  background: #fff8e1;
+  color: #bf360c;
   margin-top: 2rem;
-  border-top: 1px solid #e2e2e2;
+  border-top: 1px solid #ffd54f;
 }
 
 /* ========== RESPONSIVE DESIGN ========== */
