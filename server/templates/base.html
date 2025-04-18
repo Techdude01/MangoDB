@@ -10,8 +10,19 @@
 </head>
 
 <body>
-    {% block body %}
-    {% endblock %}
+
+    <body>
+        <nav class="navbar">
+            <ul>
+                <li><a href="{{ url_for('home') }}">Home</a></li>
+                <li><a href="{{ url_for('register_route') }}">Register</a></li>
+                <li><a href="{{ url_for('most_popular') }}">Most Popular</a></li>
+                <li><a href="{{ url_for('most_recent') }}">Most Recent</a></li>
+                <li><a href="{{ url_for('most_controversial') }}">Most Controversial</a></li>
+            </ul>
+        </nav>
+        {% block body %}{% endblock %}
+    </body>
 </body>
 
 </html>
