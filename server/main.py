@@ -65,9 +65,17 @@ def register_user(connection, username, password, role='user'):
 def verify_user(connection, username, password):
     query = "SELECT password, role FROM user WHERE username = %s"
     result = execute_query(connection, query, (username,))
-    print(result)
-    if not result.empty and check_password_hash(result.iloc[0]['password'], password):
-        return True, result.iloc[0]['role']
+    if not result.empty:
+        stored_password = result.iloc[0]['password']
+        # Check if the stored password is already hashed (should start with 'pbkdf2:sha256:' or similar)
+        if stored_password.startswith('pbkdf2:') or stored_password.startswith('sha256:'):
+            # If it's hashed, use check_password_hash
+            result_check = check_password_hash(stored_password, password)
+        else:
+            # If it's not hashed (plain text), do a direct comparison
+            result_check = stored_password == password
+        if result_check:
+            return True, result.iloc[0]['role']
     return False, None
 
 @app.route('/')
@@ -82,23 +90,22 @@ def login():
         password = request.form['password']
         
         conn = connect_db()
-        cursor = conn.cursor(pymysql.cursors.DictCursor)
         authenticated, role = verify_user(conn, username, password)
-        print(authenticated)
-        cursor.execute("SELECT userID, password, role FROM User WHERE userName = %s", (username,))
-        user = cursor.fetchone()
+        
         if authenticated:
+            # Get user information in a single query
             cursor = conn.cursor(pymysql.cursors.DictCursor)
-            cursor.execute("SELECT userID FROM User WHERE userName = %s", (username,))
+            cursor.execute("SELECT userID, role FROM User WHERE userName = %s", (username,))
             user = cursor.fetchone()
+            
+            # Set session variables
             session['username'] = username
-            session['role'] = user['role']
+            session['role'] = role  
             session['user_id'] = user['userID']
             return redirect(url_for('dashboard'))
         else:
             flash('Invalid credentials', 'danger')
             return redirect(url_for('login'))
-
 
     return render_template('user_login.html')
 

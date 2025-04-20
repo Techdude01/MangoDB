@@ -8,15 +8,15 @@ Search Results
 <h1>Search Results for {{ search_type }}: "{{ search_value }}"</h1>
 <ul>
     {% if questions %}
-        {% for question in questions %}
-        <li>
-            <a href="{{ url_for('question_detail', question_id=question['questionID']) }}">
-                {{ question['questionText'] }}
-            </a>
-        </li>
-        {% endfor %}
+    {% for question in questions %}
+    <li>
+        <a href="{{ url_for('question_detail', question_id=question['questionID']) }}">
+            {{ question['questionText'] }}
+        </a>
+    </li>
+    {% endfor %}
     {% else %}
-        <p>No results found for this {{ search_type.lower() }}.</p>
+    <p>No results found for this {{ search_type.lower() }}.</p>
     {% endif %}
 </ul>
 {% endblock %}
