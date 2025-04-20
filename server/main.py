@@ -324,8 +324,14 @@ def most_recent():
     conn = connect_db()
     cursor = conn.cursor(pymysql.cursors.DictCursor)
 
-    # Fetch paginated recent questions
-    cursor.execute("CALL GetRecentQuestionsWithPagination(%s, %s)",(per_page, offset)) 
+    # Fetch paginated recent questions with createdAt
+    cursor.execute("""
+        SELECT q.questionID, q.questionText, q.userID, t.sentDate AS createdAt
+        FROM Question q
+        JOIN TimeStamp t ON q.TimeStampID = t.TimeStampID
+        ORDER BY t.sentDate DESC, t.sentTime DESC
+        LIMIT %s OFFSET %s
+    """, (per_page, offset)) 
     questions = cursor.fetchall()
 
     # Fetch total num of questions for pagination
@@ -335,10 +341,14 @@ def most_recent():
     conn.close()
 
     total_pages = (total_questions + per_page - 1) // per_page
+    has_next = page < total_pages
 
     return render_template(
-        'most_recent.html', questions=questions,
-        page=page, total_pages=total_pages)
+        'most_recent.html', 
+        questions=questions,
+        page=page, 
+        has_next=has_next,
+        total_pages=total_pages)
 
 @app.route('/start_question', methods=['POST'])
 def start_question():
