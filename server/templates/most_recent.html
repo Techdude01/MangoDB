@@ -15,7 +15,7 @@ Most Recent Questions
             {{ question['questionText']|truncate(80, True, '...') }}
           </a>
           <div class="question-meta">
-            Posted on {{ question['createdAt'].strftime('%Y-%m-%d') }} by User #{{ question['userID'] }}
+            Posted on {{ question['createdAt'] }} by User #{{ question['userID'] }}
           </div>
         </li>
       {% endfor %}
