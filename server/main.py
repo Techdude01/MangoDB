@@ -11,7 +11,7 @@ def connect_db(username='root', password=''):
     try:
         conn = pymysql.connect(
             host='localhost',
-            user=username,  # Changed parameter name to be more explicit
+            user=username,
             password=password,
             db='Mango',
             charset='utf8mb4',
@@ -59,11 +59,11 @@ def get_timestamp_id(cursor):
 
 def register_user(connection, username, password, role='user'):
     hashed_password = generate_password_hash(password)
-    query = "INSERT INTO users (username, password, role) VALUES (%s, %s, %s)"
+    query = "INSERT INTO user (username, password, role) VALUES (%s, %s, %s)"
     execute_query(connection, query, (username, hashed_password, role))
 
 def verify_user(connection, username, password):
-    query = "SELECT password, role FROM users WHERE username = %s"
+    query = "SELECT password, role FROM user WHERE username = %s"
     result = execute_query(connection, query, (username,))
 
     if not result.empty and check_password_hash(result.iloc[0]['password'], password):
@@ -80,10 +80,16 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
+        print(f"Attempting login for user: {username}")
 
         conn = connect_db()
         authenticated, role = verify_user(conn, username, password)
         
+<<<<<<< HEAD
+=======
+        cursor.execute("SELECT userID, password, role FROM User WHERE userName = %s", (username,))
+        user = cursor.fetchone()
+>>>>>>> 36f1d485de6a447a8c6be1fd41eb84fa03882390
 
         if authenticated:
             cursor = conn.cursor(pymysql.cursors.DictCursor)

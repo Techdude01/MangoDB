@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block style %}
-<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='./css/home.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='./css/style.css') }}">
 {% endblock %}
 
 {% block title %}
@@ -10,6 +10,9 @@ Mango Homepage
 
 {% block body %}
 <div class="main">
+    <a href="{{ url_for('login') }}" class="button">
+        Go to Login
+    </a>
     <div class="main-query">
         <h1>Search Bar</h1>
         <h3>Query by Username, Keyword in Question Text, or Tag!</h3>
@@ -83,40 +86,7 @@ Mango Homepage
         </div>
     </div>
 
-    <div class="user-login">
-        <h1>User Login</h1>
-        <h3>Enter your login credentials</h3>
-        <form id="login-form" action="{{ url_for('home') }}" method="post">
-            <label for="login-username">
-                Username:
-            </label>
-            <input type="text" id="login-username" name="username" placeholder="Enter your Username" required>
 
-            <label for="login-password">
-                Password:
-            </label>
-            <input type="password" id="login-password" name="password" placeholder="Enter your Password" required>
-            <div class="wrap">
-                <button type="button" onclick="validateLoginForm()">
-                    Login
-                </button>
-            </div>
-            <!-- <p><a href="{{ url_for('login')}}" style="text-decoration:none">User Login</a></p> -->
-        </form>
-
-        <script>
-            function validateLoginForm() {
-                var username = document.getElementById("login-username").value;
-                var password = document.getElementById("login-password").value;
-                if (!username || !password) {
-                    alert("Please enter both Username and Password.");
-                    return false;
-                }
-
-                document.getElementById("login-form").submit();
-            }
-        </script>
-    </div>
     <!-- Section for Most Popular Questions -->
     <div class="section">
         <h2><a href="{{ url_for('most_popular') }}">Most Popular</a></h2>
@@ -198,32 +168,7 @@ Mango Homepage
                 {% endif %}
         </div>
     </div>
-    <div class="post-question">
-        <button id="post-question-btn" onclick="toggleQuestionForm()">Post a Question</button>
 
-        <div id="question-form" style="display: none;">
-            <form action="{{ url_for('publish_question') }}" method="post">
-                <input type="hidden" name="question_id" id="question-id"> <!-- Question ID -->
-
-                <div>
-                    <label for="question-text">Question:</label>
-                    <textarea id="question-text" name="question_text" placeholder="Write your question here..."
-                        required></textarea>
-                </div>
-
-                <div>
-                    <label for="tags">Select Tags:</label>
-                    <select id="tags" name="tags" multiple required>
-                        {% for tag in tags %}
-                        <option value="{{ tag['tagID'] }}">{{ tag['tagName'] }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <button type="submit">Publish Question</button>
-            </form>
-        </div>
-    </div>
     <script>
         function toggleQuestionForm() {
             const form = document.getElementById('question-form');

@@ -1,9 +1,11 @@
+<!-- Update for question_detail.html -->
 {% extends "base.html" %}
 
 {% block title %}
 Question Details
 {% endblock %}
 
+<<<<<<< HEAD
 % block body %}
 <div class="question-detail-container">
   <h1>{{ question.questionText }}</h1>
@@ -66,3 +68,43 @@ Question Details
     .response-item, .comment-item { border-bottom: 1px solid #ccc; padding: 0.5rem 0; }
 </style>
 {% endblock %}
+=======
+{% block body %}
+<div class="main">
+    <!-- Question section -->
+    <div class="question-detail">
+        <h1 class="page-heading">{{ question['questionText'] }}</h1>
+        <!-- <div class="question-metadata">
+            {% if question['userName'] %}
+            <span class="author">Posted by: {{ question['userName'] }}</span>
+            {% endif %}
+            {% if question['datePosted'] %}
+            <span class="date">{{ question['datePosted'] }}</span>
+            {% endif %}
+        </div> -->
+        <!-- <div class="question-description">
+            <p>{{ question['questionDescription'] }}</p>
+        </div> -->
+    </div>
+
+    <!-- Responses section -->
+    <div class="responses-section">
+        <h2 class="section-heading">Responses</h2>
+        {% if responses %}
+        <ul class="response-list">
+            {% for response in responses %}
+            <li class="response-item">
+                <div class="response-content">{{ response['responseText'] }}</div>
+                {% if response['userName'] %}
+                <div class="response-author">- {{ response['userName'] }}</div>
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p class="no-responses">No responses yet.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+>>>>>>> 36f1d485de6a447a8c6be1fd41eb84fa03882390

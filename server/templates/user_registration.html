@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block style %}
-<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='./css/register.css') }}">    
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='./css/style.css') }}">
 {% endblock %}
 
 
@@ -17,13 +17,13 @@ Mango User Registration
 </nav>
 <!-- Flash Messages -->
 {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-      {% for category, message in messages %}
-        <div class="alert alert-{{ category }}">
-          {{ message }}
-        </div>
-      {% endfor %}
-    {% endif %}
+{% if messages %}
+{% for category, message in messages %}
+<div class="alert alert-{{ category }}">
+    {{ message }}
+</div>
+{% endfor %}
+{% endif %}
 {% endwith %}
 
 <div class="user-login">
@@ -33,29 +33,22 @@ Mango User Registration
         <label for="register_username">
             Username:
         </label>
-        <input type="text"
-               id="register_username"
-               name="register_username"
-               placeholder="Enter your Username" required>
+        <input type="text" id="register_username" name="register_username" placeholder="Enter your Username" required>
 
         <label for="register_password">
             Password:
         </label>
-        <input type="password"
-               id="register_password"
-               name="register_password"
-               placeholder="Enter your Password" required>
+        <input type="password" id="register_password" name="register_password" placeholder="Enter your Password"
+            required>
         <label for="confirm_password">
             Confirm Password:
         </label>
-        <input type="password"
-                id="confirm_password"
-                name="confirm_password"
-                placeholder="Confirm your Password" required>
-       
+        <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm your Password"
+            required>
+
         <div class="wrap">
             <button type="submit">Register</button>button>
         </div>
     </form>
-</div>    
+</div>
 {% endblock %}

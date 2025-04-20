@@ -187,59 +187,6 @@ body {
   border: 1px solid #ffd54f;
 }
 
-/* ========== QUESTION LISTS ========== */
-.section ul {
-  list-style: none;
-  padding: 0;
-}
-.section li {
-  background: #fffde7;
-  margin-bottom: 0.7rem;
-  padding: 0.8rem 1rem;
-  border-radius: 6px;
-  border: 1px solid #ffd54f;
-  transition: background 0.2s;
-}
-.section li:hover {
-  background: #ffe082; /* mango flesh yellow */
-}
-.section a {
-  color: #ff7043;
-  text-decoration: none;
-  font-weight: 500;
-}
-.section a:hover {
-  text-decoration: underline;
-  color: #43a047;
-}
-
-/* ========== PAGINATION ========== */
-.pagination {
-  margin: 2rem 0 1rem 0;
-  text-align: center;
-}
-.pagination a,
-.pagination span {
-  margin: 0 0.5rem;
-  padding: 0.4rem 0.8rem;
-  border-radius: 4px;
-  color: #ff7043;
-  text-decoration: none;
-  border: 1px solid #ffb300;
-  background: #fff;
-  font-weight: 500;
-  transition: background 0.2s, color 0.2s;
-}
-.pagination a:hover {
-  background: #ffb300;
-  color: #fff;
-}
-.pagination span {
-  background: #ffb300;
-  color: #fff;
-  border: none;
-}
-
 /* ========== REGISTER ========== */
 .user-registration {
   max-width: 400px;
@@ -325,4 +272,198 @@ footer {
     flex-direction: column;
     gap: 0.5rem;
   }
+}
+
+/* Add this to your style.css file */
+.button {
+  display: inline-block;
+  padding: 0.6rem 1.2rem;
+  background: #ffb300; /* mango orange */
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: 600;
+  transition: background 0.3s, transform 0.1s;
+  margin: 0.5rem 0;
+  text-align: center;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.button:hover {
+  background: #ff9800; /* darker orange */
+}
+
+.button:active {
+  background: #ff7043; /* ripe mango red */
+  transform: translateY(1px);
+}
+
+/* ========== QUESTION LISTS PAGE STYLING ========== */
+.section ul {
+  list-style: none;
+  padding: 0;
+}
+.section li {
+  background: #fffde7;
+  margin-bottom: 0.7rem;
+  padding: 0.8rem 1rem;
+  border-radius: 6px;
+  border: 1px solid #ffd54f;
+  transition: background 0.2s;
+}
+.section li:hover {
+  background: #ffe082;
+}
+.section a {
+  color: #ff7043;
+  text-decoration: none;
+  font-weight: 500;
+}
+.section a:hover {
+  text-decoration: underline;
+  color: #43a047;
+}
+
+/* Main page heading */
+.page-heading {
+  color: #ff7043; /* mango red */
+  margin: 1rem 0 2rem 0;
+  font-size: 2.4rem;
+  text-align: center;
+  letter-spacing: 1px;
+}
+
+/* Question list container */
+.question-list {
+  list-style: none;
+  padding: 0;
+  margin: 2rem 0;
+}
+
+/* Individual question item */
+.question-list li {
+  background: #fffde7; /* very light yellow */
+  margin-bottom: 1rem;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  border-left: 4px solid #ffb300; /* mango orange border */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.question-list li:hover {
+  background: #fff8e1; /* slightly darker on hover */
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Question link styling */
+.question-list li a {
+  color: #3e2723; /* dark brown */
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 1.1rem;
+  display: block;
+}
+
+.question-list li a:hover {
+  color: #ff7043; /* mango red on hover */
+}
+
+/* Pagination improvements */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.pagination a {
+  padding: 0.5rem 1rem;
+  background: #ffb300; /* mango orange */
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+  font-weight: 500;
+  transition: background 0.3s;
+}
+
+.pagination a:hover {
+  background: #ff9800; /* darker orange */
+}
+
+.pagination span {
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  background: #fff8e1; /* light yellow */
+  border: 1px solid #ffd54f;
+}
+
+/* ========== Responses ========== */
+/* Add this CSS to style.css */
+
+/* Question Detail Page Styling */
+.question-detail {
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #ffd54f; /* mango yellow border */
+}
+
+.question-metadata {
+  display: flex;
+  justify-content: space-between;
+  margin: -0.5rem 0 1.5rem;
+  color: #ff7043; /* mango orange-red */
+  font-size: 0.9rem;
+}
+
+.question-description {
+  background: #fff8e1; /* light mango yellow */
+  padding: 1.5rem;
+  border-radius: 8px;
+  border-left: 4px solid #ffb300; /* mango orange */
+  margin: 1rem 0;
+  line-height: 1.6;
+}
+
+/* Response section styling */
+.section-heading {
+  color: #ff7043; /* mango color */
+  margin-bottom: 1.5rem;
+  font-size: 1.6rem;
+}
+
+.response-list {
+  list-style: none;
+  padding: 0;
+}
+
+.response-item {
+  background: #fffde7; /* very light yellow */
+  margin-bottom: 1rem;
+  padding: 1.2rem;
+  border-radius: 8px;
+  border-left: 3px solid #43a047; /* mango leaf green */
+}
+
+.response-content {
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+}
+
+.response-author {
+  text-align: right;
+  font-style: italic;
+  color: #3e2723; /* dark brown */
+  font-size: 0.9rem;
+}
+
+.no-responses {
+  font-style: italic;
+  color: #757575;
+  text-align: center;
+  padding: 1rem;
 }
