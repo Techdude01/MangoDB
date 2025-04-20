@@ -4,7 +4,9 @@ CREATE TABLE `User` (
   userName VARCHAR(16) UNIQUE,
   password VARCHAR(32),
   firstName VARCHAR(32),
-  lastName VARCHAR(32)
+  lastName VARCHAR(32),
+  role VARCHAR(50) NOT NULL DEFAULT 'user',
+  CONSTRAINT CHK_UserRole CHECK (role IN ('user', 'anonymous', 'admin'))
 );
 
 

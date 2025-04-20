@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block style %}
-<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='./css/register.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='./css/style.css') }}">
 {% endblock %}
 
 {% block title %}
@@ -18,7 +18,7 @@ User Login
     <button type="submit">Login</button>
 </form>
 {% endblock %}
-<!-- <nav class="navbar">
+<nav class="navbar">
     <ul>
         <li><a href="/">Home</a></li>
     </ul>
@@ -39,7 +39,7 @@ User Login
         <label for="user_username">
             Username:
         </label>
-        <input type="text" id="user_password" name="user_username" placeholder="Enter your Username" required>
+        <input type="text" id="user_username" name="user_username" placeholder="Enter your Username" required>
 
         <label for="user_password">
             Password:
@@ -54,7 +54,7 @@ User Login
 
     <script>
         function validateLoginForm() {
-            var username = document.getElementById("user_password").value;
+            var username = document.getElementById("user_username").value;
             var password = document.getElementById("user_password").value;
 
             if (!username || !password) {
@@ -66,4 +66,4 @@ User Login
         }
     </script>
 </div>
-{% endblock %} -->
+{% endblock %}
