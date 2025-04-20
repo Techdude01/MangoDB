@@ -5,26 +5,32 @@ Most Recent Questions
 {% endblock %}
 
 {% block body %}
-<h1>Most Recent Questions</h1>
-<ul>
-    {% for question in questions %}
-    <li>
-        <a href="{{ url_for('question_detail', question_id=question['questionID']) }}">
-            {{ question['questionText'] }}
-        </a>
-    </li>
-    {% endfor %}
-</ul>
-<!-- Pagination Controls -->
-<div class="pagination">
-    {% if page > 1 %}
-    <a href="{{ url_for('most_recent', page=page-1) }}">Previous</a>
-    {% endif %}
+<!-- Added container div with main class -->
+<div class="main">
+    <!-- Added page-heading class to h1 -->
+    <h1 class="page-heading">Most Recent Questions</h1>
 
-    <span>Page {{ page }} of {{ total_pages }}</span>
+    <!-- Added question-list class to ul -->
+    <ul class="question-list">
+        {% for question in questions %}
+        <li>
+            <a href="{{ url_for('question_detail', question_id=question['questionID']) }}">
+                {{ question['questionText'] }}
+            </a>
+        </li>
+        {% endfor %}
+    </ul>
 
-    {% if page < total_pages %}
-    <a href="{{ url_for('most_recent', page=page+1) }}">Next</a>
-    {% endif %}
+    <!-- Pagination Controls (structure maintained) -->
+    <div class="pagination">
+        {% if page > 1 %}
+        <a href="{{ url_for('most_recent', page=page-1) }}">Previous</a>
+        {% endif %}
+
+        <span>Page {{ page }} of {{ total_pages }}</span>
+
+        {% if page < total_pages %} <a href="{{ url_for('most_recent', page=page+1) }}">Next</a>
+            {% endif %}
+    </div>
 </div>
 {% endblock %}

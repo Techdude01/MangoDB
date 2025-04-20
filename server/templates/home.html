@@ -10,6 +10,9 @@ Mango Homepage
 
 {% block body %}
 <div class="main">
+    <a href="{{ url_for('login') }}" class="button">
+        Go to Login
+    </a>
     <div class="main-query">
         <h1>Search Bar</h1>
         <h3>Query by Username, Keyword in Question Text, or Tag!</h3>
@@ -83,40 +86,7 @@ Mango Homepage
         </div>
     </div>
 
-    <div class="user-login">
-        <h1>User Login</h1>
-        <h3>Enter your login credentials</h3>
-        <form id="login-form" action="{{ url_for('login') }}" method="post">
-            <label for="login-username">
-                Username:
-            </label>
-            <input type="text" id="login-username" name="username" placeholder="Enter your Username" required>
 
-            <label for="login-password">
-                Password:
-            </label>
-            <input type="password" id="login-password" name="password" placeholder="Enter your Password" required>
-            <div class="wrap">
-                <button type="button" onclick="validateLoginForm()">
-                    Login
-                </button>
-            </div>
-            <!-- <p><a href="{{ url_for('login')}}" style="text-decoration:none">User Login</a></p> -->
-        </form>
-
-        <script>
-            function validateLoginForm() {
-                var username = document.getElementById("login-username").value;
-                var password = document.getElementById("login-password").value;
-                if (!username || !password) {
-                    alert("Please enter both Username and Password.");
-                    return false;
-                }
-
-                document.getElementById("login-form").submit();
-            }
-        </script>
-    </div>
     <!-- Section for Most Popular Questions -->
     <div class="section">
         <h2><a href="{{ url_for('most_popular') }}">Most Popular</a></h2>
