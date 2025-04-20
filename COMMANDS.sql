@@ -147,23 +147,16 @@ CREATE TABLE CommentLog (
  FOREIGN KEY (TimeStampID) REFERENCES TimeStamp(TimeStampID)
 );
 
--- table to track who upvoted, prevents duplicate upvotes
-CREATE TABLE QuestionUpvote (
- userID INT,
- questionID INT,
- PRIMARY KEY (userID, questionID),
- FOREIGN KEY (userID) REFERENCES User(userID),
- FOREIGN KEY (questionID) REFERENCES Question(questionID)
+CREATE TABLE Vote (
+  voteID INT AUTO_INCREMENT PRIMARY KEY,
+  userID INT,
+  questionID INT,
+  vote ENUM('up', 'down'),
+  UNIQUE (userID, questionID),
+  FOREIGN KEY (userID) REFERENCES User(userID),
+  FOREIGN KEY (questionID) REFERENCES Question(questionID)
 );
 
--- table to track who downvoted, prevents duplicate downvotes
-CREATE TABLE QuestionDownvote (
- userID INT,
- questionID INT,
- PRIMARY KEY (userID, questionID),
- FOREIGN KEY (userID) REFERENCES User(userID),
- FOREIGN KEY (questionID) REFERENCES Question(questionID)
-);
 
 
 
@@ -550,13 +543,11 @@ BEGIN
 
     DELETE FROM ChatLog WHERE userID = OLD.userID;
 
-	DELETE FROM ResponseLog WHERE userID = OLD.userID;
+  	DELETE FROM ResponseLog WHERE userID = OLD.userID;
 
     DELETE FROM CommentLog WHERE userID = OLD.userID;
 
-    DELETE FROM QuestionUpvote WHERE userID = OLD.userID;
-
-	DELETE FROM QuestionDownvote WHERE userID = OLD.userID;
+    DELETE FROM Vote WHERE userID = OLD.userID;
 
     DELETE FROM ChatRequest WHERE fromUserID = OLD.userID OR toUserID = OLD.userID;
 
@@ -740,22 +731,30 @@ DELIMITER ;
 -- users can upvote a question
 DELIMITER //
 
-CREATE PROCEDURE UpvoteQuestion(IN p_questionID INT, IN p_userID INT)
+CREATE PROCEDURE UpvoteQuestion(IN p_userID INT, IN p_questionID INT)
 BEGIN 
 	-- check if user already upvoted this question
-	IF NOT EXISTS (
-		SELECT 1 FROM QuestionUpvote
-		WHERE userID = p_userID AND questionID = p_questionID
-	)
-	THEN
-		-- log upvote
-		INSERT INTO QuestionUpvote (userID, questionID)
-		VALUES (p_userID, p_questionID);
-		-- increment upvote count
-		UPDATE Question
-		SET upvotes = upvotes + 1
-		WHERE questionID = p_questionID;
-	END IF;
+	IF EXISTS (
+    SELECT 1 FROM Vote
+    WHERE userID = p_userID AND questionID = p_questionID
+  ) THEN
+    -- Update the vote to 'up' if it already exists
+    UPDATE Vote
+    SET vote = 'up'
+    WHERE userID = p_userID AND questionID = p_questionID;
+  ELSE
+    -- Insert a new 'up' vote
+    INSERT INTO Vote (userID, questionID, vote)
+    VALUES (p_userID, p_questionID, 'up');
+  END IF;
+
+  -- Update the upvote count in the Question table
+  UPDATE Question
+  SET upvotes = (
+    SELECT COUNT(*) FROM Vote
+    WHERE questionID = p_questionID AND vote = 'up'
+  )
+  WHERE questionID = p_questionID;
 END;
 //
 DELIMITER ;
@@ -765,17 +764,28 @@ DELIMITER ;
 DELIMITER //
 CREATE PROCEDURE DownvoteQuestion(IN p_userID INT, IN p_questionID INT)
 BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM QuestionDownvote
+  -- Check if the user has already voted on this question
+  IF EXISTS (
+    SELECT 1 FROM Vote
     WHERE userID = p_userID AND questionID = p_questionID
   ) THEN
-    INSERT INTO QuestionDownvote (userID, questionID)
-    VALUES (p_userID, p_questionID);
-
-    UPDATE Question
-    SET downvotes = downvotes + 1
-    WHERE questionID = p_questionID;
+    -- Update the vote to 'down' if it already exists
+    UPDATE Vote
+    SET vote = 'down'
+    WHERE userID = p_userID AND questionID = p_questionID;
+  ELSE
+    -- Insert a new 'down' vote
+    INSERT INTO Vote (userID, questionID, vote)
+    VALUES (p_userID, p_questionID, 'down');
   END IF;
+
+  -- Update the downvote count in the Question table
+  UPDATE Question
+  SET downvotes = (
+    SELECT COUNT(*) FROM Vote
+    WHERE questionID = p_questionID AND vote = 'down'
+  )
+  WHERE questionID = p_questionID;
 END;
 //
 DELIMITER ;

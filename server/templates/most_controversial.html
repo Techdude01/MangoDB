@@ -4,28 +4,47 @@
 Most Controversial Questions
 {% endblock %}
 
-{% block body %}
-<h1>Most Controversial Questions</h1>
-<ul>
-    {% for question in questions %}
-    {% if 'questionID' in question %}
-    <li>
-        {# Create a link to the specific question's detail page #}
-        <a href="{{ url_for('question_detail', question_id=question['questionID']) }}">
-            {# Display the text of the question #}
-            {{ question['questionText'] }}
-        </a>
-    </li>
-    {% endif %}
-    {% endfor %}
-</ul>
-<!-- Pagination Controls -->
-<div class="pagination">
-    {% if page > 1 %}
-    <a href="{{ url_for('most_controversial', page=page-1) }}">Previous</a>
-    {% endif %}
-    <span>Page {{ page }} of {{ total_pages }}</span>
-    {% if page < total_pages %} <a href="{{ url_for('most_controversial', page=page+1) }}">Next</a>
-        {% endif %}
+
+{% block content %}
+<div class="question-list">
+  <h2>Most Controversial Questions</h2>
+  {% if questions %}
+    <ul class="questions-ul">
+      {% for question in questions %}
+        <li class="question-item">
+          <a href="{{ url_for('question_detail', question_id=question['questionID']) }}" class="question-link">
+            {{ question['questionText']|truncate(80, True, '...') }}
+          </a>
+          <div class="question-meta">
+            Posted by User #{{ question['userID'] }}
+            <span class="votes">👍 {{ question['controversyScore'] }}</span>
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+
+    <div class="pagination">
+      {% if page > 1 %}
+        <a href="{{ url_for('most_controversial', page=page-1) }}">&laquo; Previous</a>
+      {% endif %}
+      {% if has_next %}
+        <a href="{{ url_for('most_controversial', page=page+1) }}">Next &raquo;</a>
+      {% endif %}
+    </div>
+  {% else %}
+    <p>No controversial questions found.</p>
+  {% endif %}
 </div>
+
+<style>
+    .question-list { margin: 2rem auto; max-width: 800px; }
+    .questions-ul { list-style: none; padding: 0; }
+    .question-item { border-bottom: 1px solid #ddd; padding: 0.75rem 0; }
+    .question-link { color: #f0ad4e; text-decoration: none; font-size: 1.1rem; }
+    .question-link:hover { text-decoration: underline; }
+    .question-meta { font-size: 0.85rem; color: #555; margin-top: 0.25rem; }
+    .votes { margin-left: 1rem; }
+    .pagination { margin-top: 1rem; text-align: center; }
+    .pagination a { margin: 0 0.5rem; font-weight: 500; }
+</style>
 {% endblock %}

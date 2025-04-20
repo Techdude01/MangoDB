@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, session, redirect, url_for, f
 import pymysql
 from werkzeug.security import generate_password_hash, check_password_hash
 import pandas as pd
-
+from datetime import datetime
 app = Flask(__name__)
 app.secret_key = 'mango'
 
@@ -39,6 +39,24 @@ def execute_query(connection, query, params=None):
         connection.commit()
         cursor.close()
         return None
+    
+def get_timestamp_id(cursor):
+    now = datetime.now()
+    sent_time = now.strftime('%H:%M:%S')
+    sent_date = now.strftime('%Y-%m-%d')
+
+    conn = connect_db()
+    cursor = conn.cursor(pymysql.cursors.DictCursor)
+    cursor.execute("""
+        INSERT INTO TimeStamp (sentTime, sentDate)
+        VALUES (%s, %s)
+    """, (sent_time, sent_date))
+
+    # Commit the insert so MySQL registers it
+    conn.commit()
+
+    return cursor.lastrowid  # Return the auto-incremented ID
+
 def register_user(connection, username, password, role='user'):
     hashed_password = generate_password_hash(password)
     query = "INSERT INTO users (username, password, role) VALUES (%s, %s, %s)"
@@ -64,13 +82,13 @@ def login():
         password = request.form['password']
 
         conn = connect_db()
-        cursor = conn.cursor(pymysql.cursors.DictCursor)
         authenticated, role = verify_user(conn, username, password)
         
-        cursor.execute("SELECT userID, passowrd, role FROM User WHERE userName = %s", (username,))
-        user = cursor.fetchone()
 
         if authenticated:
+            cursor = conn.cursor(pymysql.cursors.DictCursor)
+            cursor.execute("SELECT userID FROM User WHERE userName = %s", (username,))
+            user = cursor.fetchone()
             session['username'] = username
             session['role'] = role
             session['user_id'] = user['userID']
@@ -376,13 +394,13 @@ def publish_question():
 
         # Update the TagList table w selected tags
         for tag_id in tag_ids:
-            cursor.execute("INSERT INTO TagList (questionID, tagID) VALUES (%s, %s, %s)", (tag_id, question_id, user_id))
+            cursor.execute("INSERT INTO TagList (tagID, questionID, userID) VALUES (%s, %s, %s)", (tag_id, question_id, user_id))
         
         conn.commit()
-        flash('Question published successfully!')
+        flash('Question published successfully!', 'success')
     except Exception as e:
         conn.rollback()
-        flash(f'Error publishing question: {e}')
+        flash(f'Error publishing question: {e}', 'danger')
     finally:
         conn.close()
 
@@ -408,6 +426,90 @@ def cancel_question():
         conn.close()
 
     return redirect(url_for('home'))
+
+@app.route('/question/<int:question_id>', methods=['GET', 'POST'])
+def question_detail(question_id):
+    if 'userID' not in session:
+        return redirect(url_for('login'))  # Redirect if not logged in
+
+    user_id = session['userID']
+    conn = connect_db()
+    cursor = conn.cursor(pymysql.cursors.DictCursor)
+
+    # Check if the user has already responded to this question
+    cursor.execute("""
+        SELECT responseID FROM Response
+        WHERE questionID = %s AND userID = %s AND status = 'published'
+    """, (question_id, user_id))
+    user_has_responded = cursor.fetchone() is not None
+
+    # Handle new response submission
+    if request.method == 'POST' and not user_has_responded:
+        response_text = request.form['responseText']
+        timestamp_id = get_timestamp_id(cursor)  # You should define this helper
+        cursor.execute("""
+            INSERT INTO Response (userID, questionID, responseText, TimeStampID, status)
+            VALUES (%s, %s, %s, %s, 'published')
+        """, (user_id, question_id, response_text, timestamp_id))
+        db.commit()
+        return redirect(url_for('question_detail', question_id=question_id))
+
+    # Get the question data
+    cursor.execute("SELECT * FROM Question WHERE questionID = %s", (question_id,))
+    question = cursor.fetchone()
+
+    # Get responses and comments only if user has responded
+    responses = []
+    comments = []
+    if user_has_responded:
+        cursor.execute("""
+            SELECT * FROM Response
+            WHERE questionID = %s AND status = 'published'
+        """, (question_id,))
+        responses = cursor.fetchall()
+
+        cursor.execute("""
+            SELECT * FROM Comment
+            WHERE questionID = %s AND status = 'published'
+        """, (question_id,))
+        comments = cursor.fetchall()
+
+    return render_template(
+        'question_detail.html',
+        question=question,
+        responses=responses,
+        comments=comments,
+        user_has_responded=user_has_responded
+    )
+
+@app.route('/vote_question', methods=['POST'])
+def vote_question():
+    user_id = session.get('user_id')  # Assume user is logged in
+    question_id = request.form.get('question_id')
+    vote_type = request.form.get('vote')  # 'up' or 'down'
+
+    if not user_id or not question_id or vote_type not in ['up', 'down']:
+        flash('Invalid voting request.', 'danger')
+        return redirect(url_for('home'))
+
+    conn = connect_db()
+    cursor = conn.cursor()
+
+    try:
+        if vote_type == 'up':
+            cursor.execute("CALL UpvoteQuestion(%s, %s)", (user_id, question_id))
+        elif vote_type == 'down':
+            cursor.execute("CALL DownvoteQuestion(%s, %s)", (user_id, question_id))
+
+        conn.commit()
+        flash('Your vote has been recorded!', 'success')
+    except Exception as e:
+        conn.rollback()
+        flash(f'Error recording your vote: {e}', 'danger')
+    finally:
+        conn.close()
+
+    return redirect(url_for('question_detail', question_id=question_id))
 
 if __name__ == '__main__':
     app.run(debug=True)
