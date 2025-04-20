@@ -8,7 +8,7 @@ Most Controversial Questions
 <h1>Most Controversial Questions</h1>
 <ul>
     {% for question in questions %}
-    {% if 'questionID' in question %}
+        {% if 'questionID' in question %}
     <li>
         {# Create a link to the specific question's detail page #}
         <a href="{{ url_for('question_detail', question_id=question['questionID']) }}">
