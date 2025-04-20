@@ -4,75 +4,37 @@
 Most Recent Questions
 {% endblock %}
 
-<<<<<<< HEAD
-{% block content %}
-<div class="question-list">
-  <h2>Most Recent Questions</h2>
-  {% if questions %}
-    <ul class="questions-ul">
-      {% for question in questions %}
-        <li class="question-item">
-          <a href="{{ url_for('question_detail', question_id=question['questionID']) }}" class="question-link">
-            {{ question['questionText']|truncate(80, True, '...') }}
-          </a>
-          <div class="question-meta">
-            Posted on {{ question['createdAt'].strftime('%Y-%m-%d') }} by User #{{ question['userID'] }}
-          </div>
-        </li>
-      {% endfor %}
-    </ul>
-
-    <div class="pagination">
-      {% if page > 1 %}
-        <a href="{{ url_for('most_recent', page=page-1) }}">&laquo; Previous</a>
-      {% endif %}
-      {% if has_next %}
-        <a href="{{ url_for('most_recent', page=page+1) }}">Next &raquo;</a>
-      {% endif %}
-    </div>
-  {% else %}
-    <p>No recent questions posted.</p>
-  {% endif %}
-=======
 {% block body %}
-<!-- Added container div with main class -->
+<!-- Main container with consistent styling -->
 <div class="main">
-    <!-- Added page-heading class to h1 -->
     <h1 class="page-heading">Most Recent Questions</h1>
 
-    <!-- Added question-list class to ul -->
+    {% if questions %}
     <ul class="question-list">
         {% for question in questions %}
-        <li>
-            <a href="{{ url_for('question_detail', question_id=question['questionID']) }}">
-                {{ question['questionText'] }}
+        <li class="question-item">
+            <a href="{{ url_for('question_detail', question_id=question['questionID']) }}" class="question-link">
+                {{ question['questionText']|truncate(80, True, '...') }}
             </a>
+            <!-- Added metadata display -->
+            <div class="question-meta">
+                Posted on {{ question['createdAt'] }} by User #{{ question['userID'] }}
+            </div>
         </li>
         {% endfor %}
     </ul>
 
-    <!-- Pagination Controls (structure maintained) -->
+    <!-- Improved pagination with directional arrows -->
     <div class="pagination">
         {% if page > 1 %}
-        <a href="{{ url_for('most_recent', page=page-1) }}">Previous</a>
+        <a href="{{ url_for('most_recent', page=page-1) }}">&laquo; Previous</a>
         {% endif %}
-
         <span>Page {{ page }} of {{ total_pages }}</span>
-
-        {% if page < total_pages %} <a href="{{ url_for('most_recent', page=page+1) }}">Next</a>
+        {% if page < total_pages %} <a href="{{ url_for('most_recent', page=page+1) }}">Next &raquo;</a>
             {% endif %}
     </div>
->>>>>>> 36f1d485de6a447a8c6be1fd41eb84fa03882390
+    {% else %}
+    <p>No recent questions posted.</p>
+    {% endif %}
 </div>
-
-<style>
-    .question-list { margin: 2rem auto; max-width: 800px; }
-    .questions-ul { list-style: none; padding: 0; }
-    .question-item { border-bottom: 1px solid #ddd; padding: 0.75rem 0; }
-    .question-link { color: #5bc0de; text-decoration: none; font-size: 1.1rem; }
-    .question-link:hover { text-decoration: underline; }
-    .question-meta { font-size: 0.85rem; color: #555; margin-top: 0.25rem; }
-    .pagination { margin-top: 1rem; text-align: center; }
-    .pagination a { margin: 0 0.5rem; font-weight: 500; }
-</style>
 {% endblock %}

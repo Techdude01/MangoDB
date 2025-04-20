@@ -1,90 +1,54 @@
-<!-- Update for question_detail.html -->
 {% extends "base.html" %}
 
 {% block title %}
 Question Details
 {% endblock %}
 
-<<<<<<< HEAD
-% block body %}
-<div class="question-detail-container">
-  <h1>{{ question.questionText }}</h1>
-
-  {% if not user_has_responded %}
-    <!-- Response submission form -->
-    <form method="POST" action="{{ url_for('question_detail', question_id=question.questionID) }}">
-      <textarea name="responseText" rows="4" cols="60" required placeholder="Submit your response..."></textarea><br>
-      <button type="submit">Submit Response</button>
-    </form>
-    <p class="note">Submit a response to view others' contributions and vote on this question.</p>
-  {% else %}
-    <!-- Voting Controls -->
-    <div class="voting-controls">
-      <!-- Upvote Form -->
-      <form method="POST" action="{{ url_for('vote_question') }}">
-        <input type="hidden" name="question_id" value="{{ question.questionID }}">
-        <input type="hidden" name="vote" value="up">
-        <button type="submit">👍 Upvote</button>
-      </form>
-      <!-- Downvote Form -->
-      <form method="POST" action="{{ url_for('vote_question') }}">
-        <input type="hidden" name="question_id" value="{{ question.questionID }}">
-        <input type="hidden" name="vote" value="down">
-        <button type="submit">👎 Downvote</button>
-      </form>
-      <p>Current Votes: +{{ question.upvotes }} / -{{ question.downvotes }}</p>
-    </div>
-
-    <!-- Responses Section -->
-    <div class="responses">
-      <h3>Other Responses</h3>
-      {% for r in responses %}
-        <div class="response-item">
-          {{ r.responseText }}
-        </div>
-      {% endfor %}
-    </div>
-
-    <!-- Comments Section -->
-    <div class="comments">
-      <h3>Comments</h3>
-      {% for c in comments %}
-        <div class="comment-item">
-          {{ c.commentText }}
-        </div>
-      {% endfor %}
-    </div>
-  {% endif %}
-
-  <a href="{{ url_for('home') }}">🏠 Back to Home</a>
-</div>
-
-<style>
-    .question-detail-container { max-width: 800px; margin: auto; padding: 2rem; }
-    textarea { width: 100%; padding: 0.5rem; }
-    .note { font-size: 0.9rem; color: #555; margin-top: 0.5rem; }
-    .voting-controls form { display: inline-block; margin-right: 1rem; }
-    .responses, .comments { margin-top: 2rem; }
-    .response-item, .comment-item { border-bottom: 1px solid #ccc; padding: 0.5rem 0; }
-</style>
-{% endblock %}
-=======
 {% block body %}
 <div class="main">
     <!-- Question section -->
     <div class="question-detail">
         <h1 class="page-heading">{{ question['questionText'] }}</h1>
-        <!-- <div class="question-metadata">
+        <div class="question-metadata">
             {% if question['userName'] %}
             <span class="author">Posted by: {{ question['userName'] }}</span>
             {% endif %}
             {% if question['datePosted'] %}
             <span class="date">{{ question['datePosted'] }}</span>
             {% endif %}
-        </div> -->
-        <!-- <div class="question-description">
+        </div>
+        {% if question['questionDescription'] %}
+        <div class="question-description">
             <p>{{ question['questionDescription'] }}</p>
-        </div> -->
+        </div>
+        {% endif %}
+    </div>
+
+    {% if not user_has_responded %}
+    <!-- Response submission form -->
+    <form method="POST" action="{{ url_for('question_detail', question_id=question.questionID) }}"
+        class="response-form">
+        <h2 class="section-heading">Submit Your Response</h2>
+        <textarea name="responseText" rows="4" required placeholder="Submit your response..."></textarea>
+        <button type="submit">Submit Response</button>
+    </form>
+    <p class="note">Submit a response to view others' contributions and vote on this question.</p>
+    {% else %}
+    <!-- Voting Controls -->
+    <div class="voting-controls">
+        <!-- Upvote Form -->
+        <form method="POST" action="{{ url_for('vote_question') }}" class="vote-form">
+            <input type="hidden" name="question_id" value="{{ question.questionID }}">
+            <input type="hidden" name="vote" value="up">
+            <button type="submit" class="vote-btn upvote">👍 Upvote</button>
+        </form>
+        <!-- Downvote Form -->
+        <form method="POST" action="{{ url_for('vote_question') }}" class="vote-form">
+            <input type="hidden" name="question_id" value="{{ question.questionID }}">
+            <input type="hidden" name="vote" value="down">
+            <button type="submit" class="vote-btn downvote">👎 Downvote</button>
+        </form>
+        <p class="vote-count">Current Votes: +{{ question.upvotes }} / -{{ question.downvotes }}</p>
     </div>
 
     <!-- Responses section -->
@@ -105,6 +69,22 @@ Question Details
         <p class="no-responses">No responses yet.</p>
         {% endif %}
     </div>
+
+    <!-- Comments Section -->
+    <div class="comments-section">
+        <h2 class="section-heading">Comments</h2>
+        {% if comments %}
+        {% for c in comments %}
+        <div class="comment-item">
+            {{ c.commentText }}
+        </div>
+        {% endfor %}
+        {% else %}
+        <p class="no-comments">No comments yet.</p>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <a href="{{ url_for('home') }}" class="back-link">🏠 Back to Home</a>
 </div>
 {% endblock %}
->>>>>>> 36f1d485de6a447a8c6be1fd41eb84fa03882390

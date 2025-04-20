@@ -65,7 +65,7 @@ def register_user(connection, username, password, role='user'):
 def verify_user(connection, username, password):
     query = "SELECT password, role FROM user WHERE username = %s"
     result = execute_query(connection, query, (username,))
-
+    print(result)
     if not result.empty and check_password_hash(result.iloc[0]['password'], password):
         return True, result.iloc[0]['role']
     return False, None
@@ -84,7 +84,7 @@ def login():
         conn = connect_db()
         cursor = conn.cursor(pymysql.cursors.DictCursor)
         authenticated, role = verify_user(conn, username, password)
-        
+        print(authenticated)
         cursor.execute("SELECT userID, password, role FROM User WHERE userName = %s", (username,))
         user = cursor.fetchone()
         if authenticated:
@@ -223,23 +223,6 @@ def home():
         most_recent_page=1,
         most_recent_total_pages=1
         )
-
-@app.route('/question/<int:question_id>')
-def question_detail(question_id):
-    conn = connect_db()
-    cursor = conn.cursor(pymysql.cursors.DictCursor)
-
-    # Fetch question details
-    cursor.execute("SELECT * FROM Question WHERE questionID = %s", (question_id,))
-    question = cursor.fetchone()
-
-    # Fetch responses/comments for the question
-    cursor.execute("SELECT * FROM Response WHERE questionID = %s", (question_id,))
-    responses = cursor.fetchall()
-
-    conn.close()
-
-    return render_template('question_detail.html', question=question, responses=responses)
 
 @app.route('/search', methods=['GET'])
 def search():
