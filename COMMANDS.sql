@@ -172,17 +172,17 @@ CREATE TABLE QuestionDownvote (
 
 -- user entries
 
-INSERT INTO User (userName, password, firstName, lastName) VALUES 
-('jdoe', 'password123', 'John', 'Doe'),
-('asmith', 'securePass456', 'Alice', 'Smith'),
-('bwayne', 'batman2025', 'Bruce', 'Wayne'),
-('ckent', 'superman2025', 'Clark', 'Kent'),
-('dprince', 'wonderWoman!', 'Diana', 'Prince'),
-('pparker', 'sp1derman', 'Peter', 'Parker'),
-('tstark', 'ironman3000', 'Tony', 'Stark'),
-('ssmith', 'spy123', 'Sam', 'Smith'),
-('nbarton', 'hawkeye!', 'Natasha', 'Barton'),
-('srogers', 'capShield1', 'Steve', 'Rogers');
+INSERT INTO User (userName, password, firstName, lastName, status) VALUES 
+('jdoe', 'password123', 'John', 'Doe', 'base'),
+('asmith', 'securePass456', 'Alice', 'Smith', 'base'),
+('bwayne', 'batman2025', 'Bruce', 'Wayne', 'base'),
+('ckent', 'superman2025', 'Clark', 'Kent', 'base'),
+('dprince', 'wonderWoman!', 'Diana', 'Prince', 'base'),
+('pparker', 'sp1derman', 'Peter', 'Parker', 'base'),
+('tstark', 'ironman3000', 'Tony', 'Stark','admin'),
+('ssmith', 'spy123', 'Sam', 'Smith','base'),
+('nbarton', 'hawkeye!', 'Natasha', 'Barton','base'),
+('srogers', 'capShield1', 'Steve', 'Rogers', 'admin');
  
 -- tag entries
 INSERT INTO Tag (tagName) VALUES 
