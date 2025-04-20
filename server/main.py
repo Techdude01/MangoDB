@@ -80,28 +80,25 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        print(f"Attempting login for user: {username}")
-
+        
         conn = connect_db()
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
         authenticated, role = verify_user(conn, username, password)
         
-<<<<<<< HEAD
-=======
         cursor.execute("SELECT userID, password, role FROM User WHERE userName = %s", (username,))
         user = cursor.fetchone()
->>>>>>> 36f1d485de6a447a8c6be1fd41eb84fa03882390
-
         if authenticated:
             cursor = conn.cursor(pymysql.cursors.DictCursor)
             cursor.execute("SELECT userID FROM User WHERE userName = %s", (username,))
             user = cursor.fetchone()
             session['username'] = username
-            session['role'] = role
+            session['role'] = user['role']
             session['user_id'] = user['userID']
             return redirect(url_for('dashboard'))
         else:
-            flash('Invalid credentials')
+            flash('Invalid credentials', 'danger')
             return redirect(url_for('login'))
+
 
     return render_template('user_login.html')
 

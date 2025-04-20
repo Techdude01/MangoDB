@@ -30,7 +30,16 @@ User Login
                 </button>
             </div>
         </form>
-
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+        <p>Don't have an account? <a href="{{ url_for('register_route') }}">Register here</a></p>
         <script>
             // JavaScript function to validate the login form
             function validateLoginForm() {
@@ -43,7 +52,6 @@ User Login
                     alert("Please enter both Username and Password.");
                     return false;
                 }
-
                 // Submit the form if validation passes
                 document.getElementById("login-form").submit();
             }

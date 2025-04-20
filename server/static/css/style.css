@@ -7,7 +7,7 @@
 
 /* Set a modern, readable font and background for the whole app */
 body {
-  font-family: "Segoe UI", Arial, sans-serif;
+  font-family: "Gill Sans", sans-serif;
   background: #fffbe6; /* light mango yellow */
   color: #3e2723; /* deep brown for contrast */
   min-height: 100vh;
@@ -230,23 +230,37 @@ body {
   background-color: #0056b3;
 }
 
+/* Styling for flash messages */
 .alert {
   padding: 10px;
   margin-bottom: 15px;
   border: 1px solid transparent;
-  border-radius: 5px;
+  border-radius: 4px;
 }
 
 .alert-success {
-  color: #155724;
-  background-color: #d4edda;
-  border-color: #c3e6cb;
+  color: #3c763d;
+  background-color: #dff0d8;
+  border-color: #d6e9c6;
+}
+
+.alert-info {
+  color: #31708f;
+  background-color: #d9edf7;
+  border-color: #bce8f1;
+}
+
+.alert-warning {
+  color: #8a6d3b;
+  background-color: #fcf8e3;
+  border-color: #faebcc;
 }
 
 .alert-danger {
-  color: #721c24;
-  background-color: #f8d7da;
-  border-color: #f5c6cb;
+  margin-top: 10px;
+  color: #a94442;
+  background-color: #f2dede;
+  border-color: #ebccd1;
 }
 
 /* ========== FOOTER ========== */
