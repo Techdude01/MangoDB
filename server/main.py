@@ -101,7 +101,7 @@ def login():
             # Set session variables
             session['username'] = username
             session['role'] = role  
-            session['user_id'] = user['userID']
+            session['userID'] = user['userID']
             return redirect(url_for('dashboard'))
         else:
             flash('Invalid credentials', 'danger')
@@ -359,7 +359,7 @@ def most_recent():
 
 @app.route('/start_question', methods=['POST'])
 def start_question():
-    user_id = request.form.get('user_id')  # Assume user ID is passed from the frontend
+    userID = request.form.get('userID')  # Assume user ID is passed from the frontend
     question_text = request.form.get('question_text', '')  # Default to an empty string
 
     conn = connect_db()
@@ -367,7 +367,7 @@ def start_question():
 
     try:
         # Call StartQuestion() to create a draft question
-        cursor.execute("CALL StartQuestion(%s, %s)", (user_id, question_text))
+        cursor.execute("CALL StartQuestion(%s, %s)", (userID, question_text))
         conn.commit()
         flash('Draft question created successfully!')
     except Exception as e:
@@ -382,9 +382,9 @@ def start_question():
 def publish_question():
     question_id = request.form.get('question_id')  # Assume question ID is passed from the frontend
     tag_ids = request.form.getlist('tags')
-    user_id = session.get('user_id')
+    userID = session.get('userID')
 
-    if not question_id or not tag_ids or not user_id:
+    if not question_id or not tag_ids or not userID:
         flash('Please provide a question and at least one tag.')
         return redirect(url_for('home'))
 
@@ -397,7 +397,7 @@ def publish_question():
 
         # Update the TagList table w selected tags
         for tag_id in tag_ids:
-            cursor.execute("INSERT INTO TagList (tagID, questionID, userID) VALUES (%s, %s, %s)", (tag_id, question_id, user_id))
+            cursor.execute("INSERT INTO TagList (tagID, questionID, userID) VALUES (%s, %s, %s)", (tag_id, question_id, userID))
         
         conn.commit()
         flash('Question published successfully!', 'success')
@@ -432,10 +432,11 @@ def cancel_question():
 
 @app.route('/question/<int:question_id>', methods=['GET', 'POST'])
 def question_detail(question_id):
+    print(session)
     if 'userID' not in session:
         return redirect(url_for('login'))  # Redirect if not logged in
 
-    user_id = session['userID']
+    userID = session['userID']
     conn = connect_db()
     cursor = conn.cursor(pymysql.cursors.DictCursor)
 
@@ -443,7 +444,7 @@ def question_detail(question_id):
     cursor.execute("""
         SELECT responseID FROM Response
         WHERE questionID = %s AND userID = %s AND status = 'published'
-    """, (question_id, user_id))
+    """, (question_id, userID))
     user_has_responded = cursor.fetchone() is not None
 
     # Handle new response submission
@@ -453,8 +454,8 @@ def question_detail(question_id):
         cursor.execute("""
             INSERT INTO Response (userID, questionID, responseText, TimeStampID, status)
             VALUES (%s, %s, %s, %s, 'published')
-        """, (user_id, question_id, response_text, timestamp_id))
-        db.commit()
+        """, (userID, question_id, response_text, timestamp_id))
+        conn.commit()
         return redirect(url_for('question_detail', question_id=question_id))
 
     # Get the question data
@@ -487,11 +488,11 @@ def question_detail(question_id):
 
 @app.route('/vote_question', methods=['POST'])
 def vote_question():
-    user_id = session.get('user_id')  # Assume user is logged in
+    userID = session.get('userID')  # Assume user is logged in
     question_id = request.form.get('question_id')
     vote_type = request.form.get('vote')  # 'up' or 'down'
 
-    if not user_id or not question_id or vote_type not in ['up', 'down']:
+    if not userID or not question_id or vote_type not in ['up', 'down']:
         flash('Invalid voting request.', 'danger')
         return redirect(url_for('home'))
 
@@ -500,9 +501,9 @@ def vote_question():
 
     try:
         if vote_type == 'up':
-            cursor.execute("CALL UpvoteQuestion(%s, %s)", (user_id, question_id))
+            cursor.execute("CALL UpvoteQuestion(%s, %s)", (userID, question_id))
         elif vote_type == 'down':
-            cursor.execute("CALL DownvoteQuestion(%s, %s)", (user_id, question_id))
+            cursor.execute("CALL DownvoteQuestion(%s, %s)", (userID, question_id))
 
         conn.commit()
         flash('Your vote has been recorded!', 'success')
