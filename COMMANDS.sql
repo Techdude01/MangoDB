@@ -5,6 +5,7 @@ CREATE TABLE `User` (
   password VARCHAR(32),
   firstName VARCHAR(32),
   lastName VARCHAR(32)
+  status ENUM('admin','base','anonymous') DEFAULT 'base'
 );
 
 
