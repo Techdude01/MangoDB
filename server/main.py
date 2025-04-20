@@ -85,12 +85,8 @@ def login():
         cursor = conn.cursor(pymysql.cursors.DictCursor)
         authenticated, role = verify_user(conn, username, password)
         
-<<<<<<< HEAD
-=======
         cursor.execute("SELECT userID, password, role FROM User WHERE userName = %s", (username,))
         user = cursor.fetchone()
->>>>>>> 36f1d485de6a447a8c6be1fd41eb84fa03882390
-
         if authenticated:
             cursor = conn.cursor(pymysql.cursors.DictCursor)
             cursor.execute("SELECT userID FROM User WHERE userName = %s", (username,))
