@@ -4,7 +4,6 @@
 Most Recent Questions
 {% endblock %}
 
-<<<<<<< HEAD
 {% block content %}
 <div class="question-list">
   <h2>Most Recent Questions</h2>
@@ -33,36 +32,6 @@ Most Recent Questions
   {% else %}
     <p>No recent questions posted.</p>
   {% endif %}
-=======
-{% block body %}
-<!-- Added container div with main class -->
-<div class="main">
-    <!-- Added page-heading class to h1 -->
-    <h1 class="page-heading">Most Recent Questions</h1>
-
-    <!-- Added question-list class to ul -->
-    <ul class="question-list">
-        {% for question in questions %}
-        <li>
-            <a href="{{ url_for('question_detail', question_id=question['questionID']) }}">
-                {{ question['questionText'] }}
-            </a>
-        </li>
-        {% endfor %}
-    </ul>
-
-    <!-- Pagination Controls (structure maintained) -->
-    <div class="pagination">
-        {% if page > 1 %}
-        <a href="{{ url_for('most_recent', page=page-1) }}">Previous</a>
-        {% endif %}
-
-        <span>Page {{ page }} of {{ total_pages }}</span>
-
-        {% if page < total_pages %} <a href="{{ url_for('most_recent', page=page+1) }}">Next</a>
-            {% endif %}
-    </div>
->>>>>>> 36f1d485de6a447a8c6be1fd41eb84fa03882390
 </div>
 
 <style>

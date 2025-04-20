@@ -4,7 +4,6 @@
 Most Popular Questions
 {% endblock %}
 
-<<<<<<< HEAD
 {% block content %}
 <div class="question-list">
   <h2>Most Popular Questions</h2>
@@ -34,33 +33,6 @@ Most Popular Questions
   {% else %}
     <p>No popular questions found.</p>
   {% endif %}
-=======
-{% block body %}
-<div class="main">
-    <h1 class="page-heading">Most Popular Questions</h1>
-
-    <ul class="question-list">
-        {% for question in questions %}
-        {% if 'questionID' in question %}
-        <li>
-            <a href="{{ url_for('question_detail', question_id=question['questionID']) }}">
-                {{ question['questionText'] }}
-            </a>
-        </li>
-        {% endif %}
-        {% endfor %}
-    </ul>
-
-    <!-- Pagination Controls -->
-    <div class="pagination">
-        {% if page > 1 %}
-        <a href="{{ url_for('most_popular', page=page-1) }}">Previous</a>
-        {% endif %}
-        <span>Page {{ page }} of {{ total_pages }}</span>
-        {% if page < total_pages %} <a href="{{ url_for('most_popular', page=page+1) }}">Next</a>
-            {% endif %}
-    </div>
->>>>>>> 36f1d485de6a447a8c6be1fd41eb84fa03882390
 </div>
 
 <style>
