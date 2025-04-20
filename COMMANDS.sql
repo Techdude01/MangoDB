@@ -354,32 +354,18 @@ INSERT INTO ChatLog (userID, chatID, action, TimeStampID) VALUES
 (4, 5, 'exit', 39),
 (10, 1, 'exit', 40);
 
--- QuestionUpvote entries
-INSERT INTO QuestionUpvote (userID, questionID) VALUES
-(1, 1),
-(2, 2),
-(3, 3),
-(4, 4),
-(5, 5),
-(6, 6),
-(7, 7),
-(8, 8),
-(9, 9),
-(10, 10);
-
--- QuestionDownvote entries
-INSERT INTO QuestionDownvote (userID, questionID) VALUES
-(1, 1),
-(2, 2),
-(3, 3),
-(4, 4),
-(5, 5),
-(6, 6),
-(7, 7),
-(8, 8),
-(9, 9),
-(10, 10);
-
+-- Vote entries
+INSERT INTO Vote (userID, questionID, vote) VALUES
+(1, 1, 'up'),
+(2, 2, 'down'),
+(3, 3, 'up'),
+(4, 4, 'down'),
+(5, 5, 'up'),
+(6, 6, 'up'),
+(7, 7, 'down'),
+(8, 8, 'up'),
+(9, 9, 'down'),
+(10, 10, 'up');
 
 
 
