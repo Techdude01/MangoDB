@@ -62,10 +62,7 @@ Question Details
         <ul class="response-list">
             {% for response in responses %}
             <li class="response-item">
-                <div class="response-link">{{ response['responseText'] }}</div>
-                {% if response['userName'] %}
-                <div class="response-link"><i class="fa fa-user-circle"></i> {{ response['userName'] }}</div>
-                {% endif %}
+                <div class="response-link">{{ response['responseText']}} - {{response['userName'] }}</div>
             </li>
             {% endfor %}
         </ul>

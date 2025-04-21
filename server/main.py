@@ -477,10 +477,7 @@ def question_detail(question_id):
     responses = []
     comments = []
     if user_has_responded:
-        cursor.execute("""
-            SELECT * FROM Response
-            WHERE questionID = %s AND status = 'published'
-        """, (question_id,))
+        cursor.execute("SELECT * FROM Response JOIN User ON Response.userID = User.userID WHERE questionID = %s AND status = 'published'", (question_id,))
         responses = cursor.fetchall()
 
         cursor.execute("""
