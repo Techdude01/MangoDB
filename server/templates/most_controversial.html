@@ -11,17 +11,15 @@ Most Controversial Questions
     {% if questions %}
     <ul class="question-list">
         {% for question in questions %}
-        {% if 'questionID' in question %}
         <li class="question-item">
             <a href="{{ url_for('question_detail', question_id=question['questionID']) }}" class="question-link">
                 {{ question['questionText']|truncate(80, True, '...') }}
             </a>
-            <div class="question-meta">
-                Posted by User #{{ question['userID'] }}
-                <span class="votes">👍 {{ question['controversyScore'] }}</span>
+            <div class="question-metadata">
+                Posted by {{ question['userName'] }}
+                <span class="votes">😠 {{ question['controversyScore'] }}</span>
             </div>
         </li>
-        {% endif %}
         {% endfor %}
     </ul>
 

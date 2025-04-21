@@ -60,8 +60,8 @@ body {
 
 /* ========== MAIN CONTAINER ========== */
 .main {
-  max-width: 900px;
-  margin: 2rem auto;
+  max-width: 2800px;
+  margin: 1rem auto;
   background: rgba(255, 237, 148, 0.85);
   border-radius: 12px;
   box-shadow: 0 4px 24px rgba(255, 183, 77, 0.13);
@@ -76,6 +76,7 @@ body {
   margin-bottom: 1rem;
   font-size: 2rem;
   letter-spacing: 1px;
+  max-width: 1200px;
 }
 
 /* ========== SEARCH BAR ========== */
@@ -352,37 +353,151 @@ footer {
   letter-spacing: 1px;
 }
 
-/* ========== QUESTION LIST ========== */
-.question-list {
-  list-style: none;
-  padding: 0;
-  margin: 2rem 0;
-}
-.question-list li {
+/* ========== QUESTION/RESPONSE LIST ========== */
+.question-item,
+.response-item {
   background: #fffde7;
   margin-bottom: 1rem;
-  padding: 1rem 1.5rem;
+  padding: 0.75rem 0;
   border-radius: 8px;
-  border-left: 4px solid #ffb300;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   transition: all 0.2s ease;
+  list-style: none;
 }
-.question-list li:hover {
+
+.question-item {
+  border-left: 4px solid #ffb300; /* Orange for questions */
+}
+
+.response-item {
+  border-left: 4px solid #43a047; /* Green for responses */
+}
+
+.question-item:hover,
+.response-item:hover {
   background: #fff8e1;
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
-.question-list li a {
+
+.question-link,
+.response-link {
   color: #3e2723;
   text-decoration: none;
   font-weight: 500;
   font-size: 1.1rem;
   display: block;
+  padding-left: 1rem;
 }
-.question-list li a:hover {
+
+.question-link:hover,
+.response-link:hover {
   color: #ff7043;
 }
 
+.question-metadata,
+.response-metadata {
+  font-size: 0.85rem;
+  color: #555;
+  margin-top: 0.25rem;
+  padding-left: 1rem;
+}
+
+/* Question details */
+.card,
+.question-detail {
+  background: #fff8e1;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.question-description {
+  background: rgba(255, 248, 225, 0.5);
+  padding: 1rem;
+  border-left: 4px solid #ffb300;
+  margin-top: 1rem;
+  line-height: 1.6;
+}
+
+/* Responses and comments */
+.response-content {
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+}
+
+.response-author,
+.comment-meta {
+  text-align: right;
+  font-style: italic;
+  color: #7d6608;
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+}
+
+/* Voting */
+.voting-controls {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.vote-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.vote-btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.upvote {
+  background: #43a047;
+  color: white;
+}
+.downvote {
+  background: #e53935;
+  color: white;
+}
+.upvote-count {
+  color: #43a047;
+}
+.downvote-count {
+  color: #e53935;
+}
+
+.vote-count {
+  font-weight: 600;
+  color: #333;
+}
+
+/* Comment styling */
+.comment-item {
+  background: rgba(255, 248, 225, 0.5);
+  padding: 0.75rem;
+  border-radius: 4px;
+  margin-bottom: 0.75rem;
+}
+
+/* Form elements */
+.response-form textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-family: inherit;
+}
+
+.info-text {
+  font-style: italic;
+  color: #7d6608;
+  text-align: center;
+}
 /* ========== PAGINATION ========== */
 .pagination {
   display: flex;
@@ -407,203 +522,5 @@ footer {
   padding: 0.5rem 1rem;
   border-radius: 4px;
   background: #fff8e1;
-  border: 1px solid #ffd54f;
+  border: 1px s;
 }
-
-/* ========== QUESTION DETAIL & RESPONSES ========== */
-.question-detail {
-  margin-bottom: 2rem;
-  padding-bottom: 1.5rem;
-  border-bottom: 1px solid #ffd54f;
-}
-.question-metadata {
-  display: flex;
-  justify-content: space-between;
-  margin: -0.5rem 0 1.5rem;
-  color: #ff7043;
-  font-size: 0.9rem;
-}
-.question-description {
-  background: #fff8e1;
-  padding: 1.5rem;
-  border-radius: 8px;
-  border-left: 4px solid #ffb300;
-  margin: 1rem 0;
-  line-height: 1.6;
-}
-.section-heading {
-  color: #ff7043;
-  margin-bottom: 1.5rem;
-  font-size: 1.6rem;
-}
-.response-list {
-  list-style: none;
-  padding: 0;
-}
-.response-item {
-  background: #fffde7;
-  margin-bottom: 1rem;
-  padding: 1.2rem;
-  border-radius: 8px;
-  border-left: 3px solid #43a047;
-}
-.response-content {
-  margin-bottom: 0.5rem;
-  line-height: 1.5;
-}
-.response-author {
-  text-align: right;
-  font-style: italic;
-  color: #3e2723;
-  font-size: 0.9;
-}
-
-/* ========== CARD STYLING ========== */
-.card {
-  background: #fff8e1; /* Light mango color */
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
-}
-
-/* ========== QUESTION DETAIL & RESPONSES ========== */
-/* Enhanced existing section */
-.question-detail {
-  margin-bottom: 2rem;
-  padding-bottom: 1.5rem;
-  border-bottom: 1px solid #ffd54f;
-}
-
-.question-metadata {
-  display: flex;
-  justify-content: space-between;
-  margin: -0.5rem 0 1.5rem;
-  color: #7d6608; /* Darker mango color */
-  font-size: 0.9rem;
-}
-
-.question-description {
-  background: rgba(255, 248, 225, 0.5);
-  padding: 1rem;
-  border-left: 4px solid #ffb300; /* Mango border */
-  margin-top: 1rem;
-  line-height: 1.6;
-}
-
-/* ========== RESPONSE FORM ========== */
-.response-form textarea {
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-family: inherit;
-}
-
-.info-text {
-  font-style: italic;
-  color: #7d6608;
-  text-align: center;
-}
-
-/* ========== VOTING CONTROLS ========== */
-.voting-controls {
-  text-align: center;
-  margin-bottom: 2rem;
-}
-
-.vote-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  margin-bottom: 0.75rem;
-}
-
-.vote-btn {
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: 500;
-}
-
-.upvote {
-  background: #43a047; /* Green for upvote */
-  color: white;
-}
-
-.downvote {
-  background: #e53935; /* Red for downvote */
-  color: white;
-}
-
-.vote-count {
-  font-weight: 600;
-  color: #333;
-}
-
-.upvote-count {
-  color: #43a047; /* Green for upvotes */
-}
-
-.downvote-count {
-  color: #e53935; /* Red for downvotes */
-}
-
-/* ========== RESPONSE LIST ========== */
-/* Enhanced existing section */
-.response-list {
-  list-style: none;
-  padding: 0;
-}
-
-.response-item {
-  background: #fffde7;
-  margin-bottom: 1rem;
-  padding: 1.2rem;
-  border-radius: 8px;
-  border-left: 3px solid #43a047;
-}
-
-.response-content {
-  margin-bottom: 0.5rem;
-  line-height: 1.5;
-}
-
-.response-author {
-  text-align: right;
-  font-style: italic;
-  color: #7d6608;
-  margin-top: 0.5rem;
-}
-
-/* ========== COMMENTS SECTION ========== */
-.comments-section {
-  margin-top: 2rem;
-}
-
-.comment-list {
-  margin-top: 1rem;
-}
-
-.comment-item {
-  background: rgba(255, 248, 225, 0.5);
-  padding: 0.75rem;
-  border-radius: 4px;
-  margin-bottom: 0.75rem;
-}
-
-/* ========== UTILITY CLASSES ========== */
-.text-muted {
-  color: #999;
-}
-
-.mt-3 {
-  margin-top: 1rem;
-}
-
-.mt-4 {
-  margin-top: 1.5rem;
-}
-
-/* Back link already covered by existing button styles */

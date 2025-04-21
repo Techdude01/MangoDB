@@ -206,17 +206,19 @@ def admin_login():
 def home():
     conn = connect_db()
     cursor = conn.cursor(pymysql.cursors.DictCursor)
-
+    qCount = 5
     #Fetch top 5 questions for each category
-    cursor.execute("CALL GetPopularQuestionsWithPagination(5,0)") 
+    cursor.execute("CALL GetPopularQuestionsWithPagination(%s, 0)", (qCount,))
     most_popular = cursor.fetchall()
-    print("most_popular",most_popular)
+    print("most_popular", most_popular)
 
-    cursor.execute("CALL GetControversialQuestionsWithPagination(5,0)")
+    cursor.execute("CALL GetControversialQuestionsWithPagination(%s, 0)", (qCount,))
     most_controversial = cursor.fetchall()
 
-    cursor.execute("CALL GetRecentQuestionsWithPagination(5,0)")
+    cursor.execute("CALL GetRecentQuestionsWithPagination(%s, 0)", (qCount,))
     most_recent = cursor.fetchall()
+    cursor.execute("SELECT COUNT(*) AS total FROM Question")
+    total_questions = cursor.fetchone()['total']
     print("most_recent", most_recent)
     cursor.execute("SELECT tagID, tagName FROM Tag")
     tags = cursor.fetchall()
@@ -230,11 +232,11 @@ def home():
         most_recent=most_recent,
         tags=tags,
         most_popular_page=1,
-        most_popular_total_pages=1,
+        most_popular_total_pages=2,
         most_controversial_page=1,
-        most_controversial_total_pages=1,
+        most_controversial_total_pages=2,
         most_recent_page=1,
-        most_recent_total_pages=1
+        most_recent_total_pages=2
         )
 
 @app.route('/search', methods=['GET'])
@@ -338,13 +340,7 @@ def most_recent():
     cursor = conn.cursor(pymysql.cursors.DictCursor)
 
     # Fetch paginated recent questions with createdAt
-    cursor.execute("""
-        SELECT q.questionID, q.questionText, q.userID, t.sentDate AS createdAt
-        FROM Question q
-        JOIN TimeStamp t ON q.TimeStampID = t.TimeStampID
-        ORDER BY t.sentDate DESC, t.sentTime DESC
-        LIMIT %s OFFSET %s
-    """, (per_page, offset)) 
+    cursor.execute("CALL GetRecentQuestionsWithPagination(%s,%s)", (per_page, offset)) 
     questions = cursor.fetchall()
 
     # Fetch total num of questions for pagination

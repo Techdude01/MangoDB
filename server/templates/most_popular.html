@@ -11,17 +11,15 @@ Most Popular Questions
     {% if questions %}
     <ul class="question-list">
         {% for question in questions %}
-        {% if 'questionID' in question %}
         <li class="question-item">
             <a href="{{ url_for('question_detail', question_id=question['questionID']) }}" class="question-link">
                 {{ question['questionText']|truncate(80, True, '...') }}
             </a>
-            <div class="question-meta">
-                Posted by User #{{ question['userID'] }}
+            <div class="question-metadata">
+                Posted by {{ question['userName'] }}
                 <span class="votes">👍 {{ question['upvotes'] }} | 👎 {{ question['downvotes'] }}</span>
             </div>
         </li>
-        {% endif %}
         {% endfor %}
     </ul>
 
@@ -38,31 +36,4 @@ Most Popular Questions
     <p>No popular questions found.</p>
     {% endif %}
 </div>
-
-<style>
-    .question-item {
-        border-bottom: 1px solid #ddd;
-        padding: 0.75rem 0;
-    }
-
-    .question-link {
-        color: #d9534f;
-        text-decoration: none;
-        font-size: 1.1rem;
-    }
-
-    .question-link:hover {
-        text-decoration: underline;
-    }
-
-    .question-meta {
-        font-size: 0.85rem;
-        color: #555;
-        margin-top: 0.25rem;
-    }
-
-    .votes {
-        margin-left: 1rem;
-    }
-</style>
 {% endblock %}
