@@ -9,14 +9,11 @@
 body {
   font-family: "JetBrains Mono", "Geist Mono", "SFMono-Regular", Consolas,
     "Liberation Mono", Menlo, monospace;
-  background: #fffbe6;
+  background: #fffbe6 url("/static/img/mango.jpg") no-repeat center center /
+    cover; /* Combined background properties */
   color: #3e2723;
   min-height: 100vh;
-  background-image: url("/static/img/mango.jpg");
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: center;
-  display: flex;
+  display: flex; /* Use flexbox for footer sticking */
   flex-direction: column;
 }
 
@@ -24,16 +21,14 @@ body {
 .app-container {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  min-height: 100vh; /* Ensure container takes full height */
 }
 
 .main-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
+  flex: 1; /* Allow content to grow and push footer down */
   padding: 2rem;
-  max-width: 1200px;
-  margin: 0 auto;
+  max-width: 1200px; /* Limit content width */
+  margin: 0 auto; /* Center content */
 }
 
 /* ========== NAVIGATION BAR ========== */
@@ -46,7 +41,7 @@ body {
   list-style: none;
   display: flex;
   gap: 2rem;
-  flex-wrap: wrap;
+  flex-wrap: wrap; /* Allow wrapping on smaller screens */
 }
 .navbar li a {
   color: #fffde7;
@@ -55,28 +50,225 @@ body {
   transition: color 0.2s;
 }
 .navbar li a:hover {
-  color: #43a047;
+  color: #43a047; /* Consider a theme-consistent hover color */
 }
 
 /* ========== MAIN CONTAINER ========== */
 .main {
-  max-width: 2800px;
+  max-width: 2800px; /* Increased max-width */
   margin: 1rem auto;
-  background: rgba(255, 237, 148, 0.85);
+  background: rgba(255, 237, 148, 0.85); /* Semi-transparent background */
   border-radius: 12px;
   box-shadow: 0 4px 24px rgba(255, 183, 77, 0.13);
   padding: 2rem;
 }
 
-/* ========== SECTION HEADINGS ========== */
-.section h2,
-.main-query h1,
-.user-login h1 {
-  color: #ff7043;
-  margin-bottom: 1rem;
-  font-size: 2rem;
+/* ========== HEADINGS ========== */
+/* Group common heading styles */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.page-heading,
+.section-heading,
+.subsection-heading {
+  color: #ff7043; /* Base heading color */
+  margin-bottom: 1rem; /* Consistent bottom margin */
+}
+
+.page-heading {
+  color: #ff7043; /* Specific color for main page headings */
+  margin: 1rem 0 2rem 0;
+  font-size: 2.4rem;
+  text-align: center;
   letter-spacing: 1px;
-  max-width: 1200px;
+}
+
+.section-heading {
+  border-bottom: 2px solid #ffd54f;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1.5rem;
+  text-decoration: none;
+}
+
+.section-heading a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.section-heading a:hover {
+  text-decoration: underline;
+  color: #ff7043;
+}
+
+.subsection-heading {
+  font-size: 1.1rem;
+  margin: 1.5rem 0 1rem; /* Override default margin */
+}
+
+/* ========== CARD / SECTION STYLING ========== */
+/* Base card style for sections */
+.card,
+.dashboard-header,
+.dashboard-section,
+.settings-section,
+.user-login,
+.question-detail {
+  background: #fff8e1;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem; /* Consistent spacing */
+  border: 1px solid #ffd54f; /* Consistent border */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); /* Subtle shadow */
+}
+
+/* ========== FORM ELEMENTS ========== */
+/* Base input style */
+.form-input,
+.main-query input[type="text"],
+#question-form textarea,
+#question-form select,
+#question-form input[type="text"],
+.user-login input[type="text"],
+.user-login input[type="password"],
+.user-registration input,
+.form-group input,
+.response-form textarea {
+  width: 100%;
+  padding: 0.6rem; /* Consistent padding */
+  margin-bottom: 1rem; /* Consistent spacing */
+  border: 1px solid #ffd54f; /* Theme border */
+  border-radius: 5px; /* Consistent radius */
+  background: #fffde7; /* Light background */
+  font-family: inherit; /* Inherit body font */
+}
+
+.form-group label,
+.main-query label,
+.user-login label,
+.user-registration label {
+  display: block;
+  margin-bottom: 0.5rem; /* Consistent spacing */
+  font-weight: 500;
+}
+
+.form-group input:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+
+.help-text {
+  display: block;
+  font-size: 0.8rem;
+  color: #7d6608;
+  margin-top: 0.3rem;
+}
+
+/* ========== BUTTONS ========== */
+/* Base button style */
+.btn,
+.main-query button,
+#post-question-btn,
+#question-form button,
+.user-login button,
+.user-registration button,
+.button, /* Existing generic button class */
+.action-btn,
+.vote-btn,
+.pagination a {
+  display: inline-block; /* Allow margin/padding */
+  padding: 0.6rem 1.2rem; /* Consistent padding */
+  border: none; /* Remove default border */
+  border-radius: 5px; /* Consistent radius */
+  cursor: pointer;
+  font-weight: 500; /* Medium weight */
+  text-decoration: none; /* Remove underline from links styled as buttons */
+  text-align: center;
+  transition: background 0.2s, transform 0.1s; /* Smooth transitions */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  color: white; /* Default text color for colored buttons */
+  background-color: #ffb300; /* Default theme background */
+}
+
+/* Hover state for base button */
+.btn:hover,
+.main-query button:hover,
+#post-question-btn:hover,
+#question-form button:hover,
+.user-login button:hover,
+.user-registration button:hover,
+.button:hover,
+.action-btn:hover,
+.vote-btn:hover,
+.pagination a:hover {
+  background-color: #ff9800; /* Darker shade on hover */
+  transform: translateY(-1px); /* Slight lift effect */
+}
+
+/* Active state for base button */
+.btn:active,
+.button:active {
+  background: #ff7043; /* Different shade on click */
+  transform: translateY(1px); /* Press effect */
+}
+
+/* Specific Button Variations */
+#post-question-btn {
+  background-color: #43a047; /* Green */
+  font-size: 1rem;
+  padding: 0.7rem 1.5rem; /* Slightly larger */
+}
+#post-question-btn:hover {
+  background-color: #ff7043; /* Orange on hover */
+}
+
+.action-btn {
+  background-color: #f0f0f0; /* Light grey for secondary actions */
+  color: #333; /* Dark text */
+}
+.action-btn:hover {
+  background-color: #e0e0e0; /* Darker grey */
+}
+.action-btn.primary {
+  background-color: #ffb300; /* Theme primary */
+  color: white;
+}
+.action-btn.primary:hover {
+  background-color: #ff9800;
+}
+.action-btn.danger {
+  background-color: #f44336; /* Red for danger */
+  color: white;
+}
+.action-btn.danger:hover {
+  background-color: #d32f2f;
+}
+
+.vote-btn {
+  padding: 0.5rem 1rem; /* Smaller padding */
+}
+.upvote {
+  background-color: #43a047; /* Green */
+}
+.downvote {
+  background-color: #e53935; /* Red */
+}
+.vote-btn:hover {
+  /* Override base hover if needed, e.g., just transform */
+  background-color: inherit; /* Keep original color */
+  color: #ff7043; /* Change text color on hover */
+  transform: translateY(-2px);
+}
+
+.pagination span {
+  /* Non-link pagination item */
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  background: #fff8e1;
+  border: 1px solid #ffd54f; /* Added border */
+  color: #3e2723;
 }
 
 /* ========== SEARCH BAR ========== */
@@ -87,47 +279,13 @@ body {
   align-items: flex-end;
   margin-bottom: 2rem;
 }
-.main-query label {
-  font-weight: 500;
-  margin-bottom: 0.3rem;
-}
 .main-query input[type="text"] {
-  padding: 0.5rem;
-  border: 1px solid #ffd54f;
-  border-radius: 5px;
-  width: 200px;
-  background: #fffde7;
-}
-.main-query button {
-  background: #ffb300;
-  color: #fff;
-  border: none;
-  padding: 0.6rem 1.2rem;
-  border-radius: 5px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: background 0.2s;
-}
-.main-query button:hover {
-  background: #43a047;
+  width: 200px; /* Specific width */
 }
 
-/* ========== POST QUESTION ========== */
+/* ========== POST QUESTION FORM ========== */
 .post-question {
   margin: 2rem 0;
-}
-#post-question-btn {
-  background: #43a047;
-  color: #fff;
-  border: none;
-  padding: 0.7rem 1.5rem;
-  border-radius: 5px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-#post-question-btn:hover {
-  background: #ff7043;
 }
 #question-form {
   margin-top: 1rem;
@@ -136,116 +294,28 @@ body {
   border-radius: 8px;
   background: #fffde7;
 }
-#question-form textarea,
-#question-form select,
-#question-form input[type="text"] {
-  width: 100%;
-  margin-bottom: 1rem;
-  padding: 0.5rem;
-  border-radius: 5px;
-  border: 1px solid #ffd54f;
-  background: #fffbe6;
-}
-#question-form button {
-  background: #ffb300;
-  color: #fff;
-  border: none;
-  padding: 0.6rem 1.2rem;
-  border-radius: 5px;
-  cursor: pointer;
-}
-#question-form button:hover {
-  background: #43a047;
-}
 
-/* ========== USER LOGIN ========== */
-.user-login {
-  margin: 2rem 0;
-  padding: 1.5rem;
-  background: #fff8e1;
-  border-radius: 8px;
-  border: 1px solid #ffd54f;
-}
-.user-login label {
-  display: block;
-  margin-bottom: 0.3rem;
-  font-weight: 500;
-}
-.user-login input[type="text"],
-.user-login input[type="password"] {
-  width: 100%;
-  padding: 0.5rem;
-  margin-bottom: 1rem;
-  border-radius: 5px;
-  border: 1px solid #ffd54f;
-  background: #fffde7;
-}
-.user-login button {
-  background: #ffb300;
-  color: #fff;
-  border: none;
-  padding: 0.6rem 1.2rem;
-  border-radius: 5px;
-  cursor: pointer;
-}
-.user-login button:hover {
-  background: #43a047;
-}
-
-/* ========== FLASH MESSAGES ========== */
-.flash-messages {
-  margin: 1rem 0;
-  padding: 1rem;
-  border-radius: 5px;
-  background: #fff9c4;
-  color: #bf360c;
-  border: 1px solid #ffd54f;
-}
-
-/* ========== REGISTER ========== */
+/* ========== USER LOGIN / REGISTRATION ========== */
 .user-registration {
-  max-width: 400px;
-  margin: 0 auto;
+  max-width: 400px; /* Limit width */
+  margin: 2rem auto; /* Center and add margin */
   padding: 20px;
-  border: 1px solid #ccc;
+  border: 1px solid #ccc; /* Standard border */
   border-radius: 5px;
-  background-color: #f9f9f9;
+  background-color: #f9f9f9; /* Light background */
 }
 .user-registration h1 {
   text-align: center;
-  margin-bottom: 20px;
-}
-.user-registration label {
-  display: block;
-  margin-bottom: 5px;
-  font-weight: bold;
-}
-.user-registration input {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 15px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
-.user-registration button {
-  width: 100%;
-  padding: 10px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-.user-registration button:hover {
-  background-color: #0056b3;
 }
 
-/* ========== ALERTS ========== */
-.alert {
-  padding: 10px;
-  margin-bottom: 15px;
+/* ========== FLASH MESSAGES / ALERTS ========== */
+.alert,
+.flash-messages {
+  /* Combine alert and flash message base */
+  padding: 1rem; /* Consistent padding */
+  margin-bottom: 1rem; /* Consistent spacing */
   border: 1px solid transparent;
-  border-radius: 4px;
+  border-radius: 5px; /* Consistent radius */
 }
 .alert-success {
   color: #3c763d;
@@ -262,114 +332,46 @@ body {
   background-color: #fcf8e3;
   border-color: #faebcc;
 }
-.alert-danger {
-  margin-top: 10px;
+.alert-danger,
+.flash-messages {
+  /* Apply danger style to flash messages by default */
   color: #a94442;
   background-color: #f2dede;
   border-color: #ebccd1;
 }
 
-/* ========== FOOTER ========== */
-footer {
-  text-align: center;
-  padding: 1rem 0;
-  background: #fff8e1;
-  color: #bf360c;
-  margin-top: 2rem;
-  border-top: 1px solid #ffd54f;
-}
-
-/* ========== RESPONSIVE DESIGN ========== */
-@media (max-width: 700px) {
-  .main {
-    padding: 1rem;
-  }
-  .navbar ul {
-    flex-direction: column;
-    gap: 1rem;
-  }
-  .main-query form {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-}
-
-/* ========== BUTTON STYLES ========== */
-.button {
-  display: inline-block;
-  padding: 0.6rem 1.2rem;
-  background: #ffb300;
-  color: white;
-  text-decoration: none;
-  border-radius: 6px;
-  font-weight: 600;
-  transition: background 0.3s, transform 0.1s;
-  margin: 0.5rem 0;
-  text-align: center;
-  border: none;
-  cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-.button:hover {
-  background: #ff9800;
-}
-.button:active {
-  background: #ff7043;
-  transform: translateY(1px);
-}
-
-/* ========== QUESTION LISTS ========== */
-.section ul {
+/* ========== LISTS (Questions, Responses, Comments) ========== */
+.question-list,
+.response-list, /* Assuming a class for response lists */
+.comment-list {
+  /* Assuming a class for comment lists */
   list-style: none;
   padding: 0;
 }
-.section li {
-  background: #fffde7;
-  margin-bottom: 0.7rem;
-  padding: 0.8rem 1rem;
-  border-radius: 6px;
-  border: 1px solid #ffd54f;
-  transition: background 0.2s;
-}
-.section li:hover {
-  background: #ffe082;
-}
-.section a {
-  color: #ff7043;
-  text-decoration: none;
-  font-weight: 700;
-}
-.section a:hover {
-  text-decoration: underline;
-  color: #43a047;
-}
 
-/* ========== PAGE HEADING ========== */
-.page-heading {
-  color: #ff7043;
-  margin: 1rem 0 2rem 0;
-  font-size: 2.4rem;
-  text-align: center;
-  letter-spacing: 1px;
-}
-
-/* ========== QUESTION/RESPONSE LIST ========== */
 .question-item,
-.response-item {
+.response-item,
+.comment-item {
   background: #fffde7;
   margin-bottom: 1rem;
-  padding: 0.75rem 0;
-  border-radius: 8px;
+  padding: 0.75rem 1rem; /* Consistent padding */
+  border-radius: 8px; /* Consistent radius */
   transition: all 0.2s ease;
-  list-style: none;
+  border-left: 4px solid transparent; /* Base border */
 }
 
 .question-item {
-  border-left: 4px solid #ffb300; /* Orange for questions */
+  border-left-color: #ffb300; /* Orange for questions */
 }
 
 .response-item {
-  border-left: 4px solid #43a047; /* Green for responses */
+  border-left-color: #43a047; /* Green for responses */
+}
+
+.comment-item {
+  background: rgba(255, 248, 225, 0.7); /* Slightly different background */
+  border-left-color: #ccc; /* Grey for comments */
+  padding: 0.75rem;
 }
 
 .question-item:hover,
@@ -381,12 +383,12 @@ footer {
 
 .question-link,
 .response-link {
+  /* Combine link styles */
   color: #3e2723;
   text-decoration: none;
   font-weight: 500;
   font-size: 1.1rem;
   display: block;
-  padding-left: 1rem;
 }
 
 .question-link:hover,
@@ -395,23 +397,22 @@ footer {
 }
 
 .question-metadata,
-.response-metadata {
+.response-metadata,
+.comment-meta {
+  /* Combine metadata styles */
   font-size: 0.85rem;
-  color: #555;
+  color: #7d6608; /* Theme color */
   margin-top: 0.25rem;
-  padding-left: 1rem;
 }
 
-/* Question details */
-.card,
-.question-detail {
-  background: #fff8e1;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
+.response-author,
+.comment-meta {
+  /* Specific alignment/style for author/comment meta */
+  text-align: right;
+  font-style: italic;
 }
 
+/* ========== QUESTION DETAILS ========== */
 .question-description {
   background: rgba(255, 248, 225, 0.5);
   padding: 1rem;
@@ -420,54 +421,25 @@ footer {
   line-height: 1.6;
 }
 
-/* Responses and comments */
 .response-content {
   margin-bottom: 0.5rem;
   line-height: 1.5;
 }
 
-.response-author,
-.comment-meta {
-  text-align: right;
-  font-style: italic;
-  color: #7d6608;
-  margin-top: 0.5rem;
-  font-size: 0.9rem;
-}
-
-/* Voting */
+/* ========== VOTING ========== */
 .voting-controls {
   text-align: center;
   margin-bottom: 2rem;
 }
-
 .vote-buttons {
   display: flex;
   justify-content: center;
   gap: 1rem;
   margin-bottom: 0.75rem;
 }
-
-.vote-btn {
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: 500;
-}
-
-.upvote {
-  background: #43a047;
-  color: white;
-}
-
-.downvote {
-  background: #e53935;
-  color: white;
-}
-.vote-btn:hover {
-  color: #ff7043;
-  transform: translateY(-2px);
+.vote-count {
+  font-weight: 600;
+  color: #333;
 }
 .upvote-count {
   color: #43a047;
@@ -476,33 +448,13 @@ footer {
   color: #e53935;
 }
 
-.vote-count {
-  font-weight: 600;
-  color: #333;
-}
-
-/* Comment styling */
-.comment-item {
-  background: rgba(255, 248, 225, 0.5);
-  padding: 0.75rem;
-  border-radius: 4px;
-  margin-bottom: 0.75rem;
-}
-
-/* Form elements */
-.response-form textarea {
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-family: inherit;
-}
-
+/* ========== MISC UTILITIES ========== */
 .info-text {
   font-style: italic;
   color: #7d6608;
   text-align: center;
 }
+
 /* ========== PAGINATION ========== */
 .pagination {
   display: flex;
@@ -511,21 +463,133 @@ footer {
   gap: 1rem;
   margin: 2rem 0;
 }
-.pagination a {
-  padding: 0.5rem 1rem;
+
+/* ========== DASHBOARD ========== */
+.user-stats {
+  color: #7d6608;
+  font-size: 1.1rem;
+  margin-top: 0.5rem;
+}
+
+.tag-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.tag {
+  background: #ffd54f;
+  color: #3e2723;
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px; /* Pill shape */
+  font-size: 0.9rem;
+  display: inline-block;
+  transition: transform 0.2s, background 0.2s;
+}
+
+.tag:hover {
   background: #ffb300;
-  color: white;
-  text-decoration: none;
-  border-radius: 4px;
-  font-weight: 500;
-  transition: background 0.3s;
+  transform: translateY(-2px);
 }
-.pagination a:hover {
-  background: #ff9800;
+
+.dashboard-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 2rem;
+  flex-wrap: wrap;
 }
-.pagination span {
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
+
+/* ========== ACCOUNT SETTINGS ========== */
+.preference-option {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+/* Toggle switch styling */
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 24px;
+  margin-right: 10px;
+}
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.4s;
+  border-radius: 24px;
+}
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+}
+input:checked + .toggle-slider {
+  background-color: #ffb300; /* Match the mango theme */
+}
+input:checked + .toggle-slider:before {
+  transform: translateX(26px);
+}
+
+/* ========== FOOTER ========== */
+footer {
+  text-align: center;
+  padding: 1rem 0;
   background: #fff8e1;
-  border: 1px s;
+  color: #bf360c; /* Consider theme color #7d6608 */
+  margin-top: auto; /* Push footer to bottom with flexbox */
+  border-top: 1px solid #ffd54f;
+  width: 100%; /* Ensure footer spans width */
+}
+
+/* ========== RESPONSIVE DESIGN ========== */
+@media (max-width: 700px) {
+  .main {
+    padding: 1rem; /* Reduce padding on small screens */
+  }
+  .navbar {
+    padding: 1rem; /* Reduce navbar padding */
+  }
+  .navbar ul {
+    flex-direction: column; /* Stack nav items */
+    gap: 1rem;
+  }
+  .main-query form {
+    flex-direction: column; /* Stack search inputs */
+    align-items: stretch; /* Stretch inputs */
+  }
+  .main-query input[type="text"] {
+    width: 100%; /* Full width inputs */
+  }
+  .dashboard-actions,
+  .vote-buttons {
+    flex-direction: column; /* Stack buttons */
+    align-items: stretch; /* Stretch buttons */
+  }
+  .btn,
+  .action-btn,
+  .vote-btn,
+  .pagination a {
+    width: 100%; /* Full width buttons */
+    margin-bottom: 0.5rem; /* Add spacing between stacked buttons */
+  }
 }

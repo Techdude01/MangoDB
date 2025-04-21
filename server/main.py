@@ -524,6 +524,65 @@ def vote_question():
         conn.close()
     
     return redirect(url_for('question_detail', question_id=question_id))
+
+@app.route('/account_settings', methods=['GET', 'POST'])
+def account_settings():
+    # Only allow access if user is logged in
+    if 'username' not in session:
+        flash('Please login to access account settings', 'login-error')
+        return redirect(url_for('login'))
+    
+    # Get current user info
+    username = session['username']
+    conn = connect_db()
+    cursor = conn.cursor()
+    
+    # Handle form submission (POST)
+    if request.method == 'POST':
+        # Get form data
+        new_password = request.form.get('new_password')
+        confirm_password = request.form.get('confirm_password')
+        new_first_name = request.form.get('first_name')
+        new_last_name = request.form.get('last_name')
+        
+        # Validate and update password if provided
+        if new_password and new_password == confirm_password:
+            # In production, use password hashing here
+            cursor.execute("UPDATE User SET password = %s WHERE userName = %s", 
+                          (new_password, username))
+            flash('Password updated successfully!', 'success')
+        elif new_password:  # Passwords don't match
+            flash('Passwords do not match!', 'danger')
+        
+        # Update name fields if provided
+        if new_first_name or new_last_name:
+            update_fields = []
+            params = []
+            
+            if new_first_name:
+                update_fields.append("firstName = %s")
+                params.append(new_first_name)
+            
+            if new_last_name:
+                update_fields.append("lastName = %s")
+                params.append(new_last_name)
+                
+            params.append(username)  # For the WHERE clause
+            
+            cursor.execute(f"UPDATE User SET {', '.join(update_fields)} WHERE userName = %s", tuple(params))
+            flash('Profile information updated!', 'success')
+            
+        conn.commit()
+    
+    # Get current user data to display
+    cursor.execute("SELECT firstName, lastName, role FROM User WHERE userName = %s", (username,))
+    user_data = cursor.fetchone()
+    
+    cursor.close()
+    conn.close()
+    
+    return render_template('account_settings.html', username=username, user_data=user_data)
+
 @app.context_processor
 def inject_user_data():
     """

@@ -61,16 +61,22 @@ Mango Homepage
         </div>
     </div>
 
+    <!-- ... existing code ... -->
+
     <!-- Most Popular Questions Section -->
-    <div class="section">
-        <h2><a href="{{ url_for('most_popular') }}">Most Popular</a></h2>
-        <ul>
+    <div>
+        <h2 class=" section-heading"><a href="{{ url_for('most_popular') }}">Most Popular</a></h2>
+        <ul class="question-list">
             {% for question in most_popular %}
             {% if question['questionID'] is defined and question['questionText'] is defined %}
-            <li>
-                <a href="{{ url_for('question_detail', question_id=question['questionID']) }}">
+            <li class="question-item">
+                <a href="{{ url_for('question_detail', question_id=question['questionID']) }}" class="question-link">
                     {{ question['questionText'] }}
                 </a>
+                <!-- Optional: Add metadata if available/desired -->
+                <!-- <div class="question-metadata">
+                    <span>👍 {{ question.get('upvotes', 0) }} | 👎 {{ question.get('downvotes', 0) }}</span>
+                </div> -->
             </li>
             {% endif %}
             {% endfor %}
@@ -87,13 +93,13 @@ Mango Homepage
     </div>
 
     <!-- Most Controversial Questions Section -->
-    <div class="section">
-        <h2><a href="{{ url_for('most_controversial') }}">Most Controversial</a></h2>
-        <ul>
+    <div>
+        <h2 class="section-heading"><a href="{{ url_for('most_controversial') }}">Most Controversial</a></h2>
+        <ul class="question-list">
             {% for question in most_controversial %}
             {% if question['questionID'] is defined and question['questionText'] is defined %}
-            <li>
-                <a href="{{ url_for('question_detail', question_id=question['questionID']) }}">
+            <li class="question-item">
+                <a href="{{ url_for('question_detail', question_id=question['questionID']) }}" class="question-link">
                     {{ question['questionText'] }}
                 </a>
             </li>
@@ -112,13 +118,13 @@ Mango Homepage
     </div>
 
     <!-- Most Recent Questions Section -->
-    <div class="section">
-        <h2><a href="{{ url_for('most_recent') }}">Most Recent</a></h2>
-        <ul>
+    <div>
+        <h2 class="section-heading"><a href="{{ url_for('most_recent') }}">Most Recent</a></h2>
+        <ul class="question-list">
             {% for question in most_recent %}
             {% if question['questionID'] is defined and question['questionText'] is defined %}
-            <li>
-                <a href="{{ url_for('question_detail', question_id=question['questionID']) }}">
+            <li class="question-item">
+                <a href="{{ url_for('question_detail', question_id=question['questionID']) }}" class="question-link">
                     {{ question['questionText'] }}
                 </a>
             </li>
@@ -135,6 +141,8 @@ Mango Homepage
                 {% endif %}
         </div>
     </div>
+
+    <!-- ... rest of the file ... -->
 </div>
 
 <!-- JavaScript -->

@@ -48,84 +48,10 @@ Dashboard
     <!-- Quick Actions -->
     <div class="dashboard-actions">
         <a href="{{ url_for('home') }}" class="action-btn primary">Ask New Question</a>
-        <a href="#" class="action-btn">Browse Questions</a>
-        <a href="#" class="action-btn">Account Settings</a>
+        <a href="{{ url_for('most_popular') }}" class="action-btn">Browse Questions</a>
+        <a href="{{ url_for('account_settings') }}" class="action-btn">Account Settings</a>
     </div>
 </div>
 
-<style>
-    /* Dashboard specific styles */
-    .dashboard-header {
-        margin-bottom: 2rem;
-        text-align: center;
-        background: #fff8e1;
-    }
 
-    .user-stats {
-        color: #7d6608;
-        font-size: 1.1rem;
-        margin-top: 0.5rem;
-    }
-
-    .dashboard-section {
-        margin-bottom: 2rem;
-    }
-
-    .section-heading {
-        color: #3e2723;
-        border-bottom: 2px solid #ffd54f;
-        padding-bottom: 0.5rem;
-        margin-bottom: 1.5rem;
-    }
-
-    /* Tag cloud */
-    .tag-cloud {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.5rem;
-        margin-top: 1rem;
-    }
-
-    .tag {
-        background: #ffd54f;
-        color: #3e2723;
-        padding: 0.3rem 0.8rem;
-        border-radius: 20px;
-        font-size: 0.9rem;
-        display: inline-block;
-    }
-
-    /* Action buttons */
-    .dashboard-actions {
-        display: flex;
-        justify-content: center;
-        gap: 1rem;
-        margin-top: 2rem;
-    }
-
-    .action-btn {
-        display: inline-block;
-        padding: 0.6rem 1.2rem;
-        background: #f0f0f0;
-        color: #333;
-        text-decoration: none;
-        border-radius: 4px;
-        font-weight: 500;
-        transition: all 0.2s;
-    }
-
-    .action-btn:hover {
-        background: #e0e0e0;
-        transform: translateY(-2px);
-    }
-
-    .action-btn.primary {
-        background: #ffb300;
-        color: white;
-    }
-
-    .action-btn.primary:hover {
-        background: #ff9800;
-    }
-</style>
 {% endblock %}

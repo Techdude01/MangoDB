@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}
+Account Settings
+{% endblock %}
+
+{% block body %}
+<div class="main">
+    <!-- Header Section -->
+    <div class="section-header card">
+        <h1 class="page-heading">Account Settings</h1>
+        <p class="info-text">Manage your profile and preferences</p>
+    </div>
+
+    <!-- Display flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }}">
+        {{ message }}
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    <!-- Profile Information Section -->
+    <div class="settings-section card">
+        <h2 class="section-heading">Profile Information</h2>
+
+        <form action="{{ url_for('account_settings') }}" method="post">
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" value="{{ username }}" disabled>
+                <span class="help-text">Username cannot be changed</span>
+            </div>
+
+            <div class="form-group">
+                <label for="first_name">First Name:</label>
+                <input type="text" id="first_name" name="first_name" value="{{ user_data.firstName }}">
+            </div>
+
+            <div class="form-group">
+                <label for="last_name">Last Name:</label>
+                <input type="text" id="last_name" name="last_name" value="{{ user_data.lastName }}">
+            </div>
+
+            <h3 class="subsection-heading">Change Password</h3>
+
+            <div class="form-group">
+                <label for="new_password">New Password:</label>
+                <input type="password" id="new_password" name="new_password">
+            </div>
+
+            <div class="form-group">
+                <label for="confirm_password">Confirm Password:</label>
+                <input type="password" id="confirm_password" name="confirm_password">
+            </div>
+
+            <div class="action-buttons">
+                <button type="submit" class="action-btn primary">Save Changes</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Preferences Section -->
+    <div class="settings-section card">
+        <h2 class="section-heading">Preferences</h2>
+
+        <div class="preference-option">
+            <label class="toggle-switch">
+                <input type="checkbox" id="email_notifications">
+                <span class="toggle-slider"></span>
+            </label>
+            <span>Receive email notifications</span>
+        </div>
+
+        <div class="preference-option">
+            <label class="toggle-switch">
+                <input type="checkbox" id="public_profile" checked>
+                <span class="toggle-slider"></span>
+            </label>
+            <span>Make my profile public</span>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="dashboard-actions">
+        <a href="{{ url_for('dashboard') }}" class="action-btn">Back to Dashboard</a>
+        <button id="delete-account" class="action-btn danger">Delete Account</button>
+    </div>
+</div>
+
+{% endblock %}
