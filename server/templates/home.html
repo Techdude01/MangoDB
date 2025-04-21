@@ -10,62 +10,37 @@ Mango Homepage
 
 {% block body %}
 <div class="main">
+    <!-- Login Button -->
     {% if show_login_button %}
-    <a href="{{ url_for('login') }}" class="button">
-        Go to Login
-    </a>
+    <a href="{{ url_for('login') }}" class="button">Go to Login</a>
     {% endif %}
+
+    <!-- Search Section -->
     <div class="main-query">
         <h1>Search Bar</h1>
         <h3>Query by Username, Keyword in Question Text, or Tag!</h3>
-        <form id="search-form" action="{{ url_for('home') }}" method="get">
-            <!-- Search by Username -->
+        <form id="search-form" action="{{ url_for('search') }}" method="get">
             <div>
-                <label for="username">
-                    Username:
-                </label>
+                <label for="username">Username:</label>
                 <input type="text" id="username" name="username" placeholder="Enter username">
             </div>
-            <!-- Search by Keyword in Question Text -->
             <div>
-                <label for="keyword">
-                    Keyword:
-                </label>
+                <label for="keyword">Keyword:</label>
                 <input type="text" id="keyword" name="keyword" placeholder="Enter keyword in question text">
             </div>
-            <!-- Search by Tag -->
             <div>
                 <label for="tag">Tag:</label>
-                <input type="text" id="tag" placeholder="Enter tag name">
+                <input type="text" id="tag" name="tag" placeholder="Enter tag name">
             </div>
-
-            <!-- Submit Button -->
             <div class="wrap">
-                <button type="button" onclick="validateSearchForm()">
-                    Search
-                </button>
+                <button type="button" onclick="validateSearchForm()">Search</button>
             </div>
         </form>
-
-        <script>
-            function validateSearchForm() {
-                var username = document.getElementById("username").value;
-                var keyword = document.getElementById("keyword").value;
-
-                if (!username && !keyword) {
-                    alert("Please enter either a Username or a Keyword to search.");
-                    return false;
-                }
-
-                document.getElementById("search-form").submit();
-            }
-        </script>
     </div>
 
     <!-- Post Question Section -->
     <div class="post-question">
         <button id="post-question-btn" onclick="toggleQuestionForm()">Post a Question</button>
-
         <div id="question-form" style="display: none;">
             <form action="{{ url_for('publish_question') }}" method="post">
                 <div>
@@ -73,7 +48,6 @@ Mango Homepage
                     <textarea id="question-text" name="question_text" placeholder="Write your question here..."
                         required></textarea>
                 </div>
-
                 <div>
                     <label for="tags">Tags:</label>
                     <select id="tags" name="tags" multiple required>
@@ -82,14 +56,12 @@ Mango Homepage
                         {% endfor %}
                     </select>
                 </div>
-
                 <button type="submit">Post Question</button>
             </form>
         </div>
     </div>
 
-
-    <!-- Section for Most Popular Questions -->
+    <!-- Most Popular Questions Section -->
     <div class="section">
         <h2><a href="{{ url_for('most_popular') }}">Most Popular</a></h2>
         <ul>
@@ -101,22 +73,20 @@ Mango Homepage
                 </a>
             </li>
             {% endif %}
-
             {% endfor %}
         </ul>
         <div class="pagination">
             {% if most_popular_page > 1 %}
             <a href="{{ url_for('most_popular', page=most_popular_page-1) }}">Previous</a>
             {% endif %}
-
-            <span>Page {{ most_popular_page }} of {{ most_popular_total_pages }}</span>
-
-            {% if most_popular_page < most_popular_total_pages %} <a
-                href="{{ url_for('most_popular', page=most_popular_page+1) }}">Next</a>
+            <span>Page {{ most_popular_page }} of {{ total_pages }}</span>
+            {% if most_popular_page < total_pages %} <a href="{{ url_for('most_popular', page=most_popular_page+1) }}">
+                Next</a>
                 {% endif %}
         </div>
     </div>
-    <!-- Section for Most Controversial Questions -->
+
+    <!-- Most Controversial Questions Section -->
     <div class="section">
         <h2><a href="{{ url_for('most_controversial') }}">Most Controversial</a></h2>
         <ul>
@@ -128,22 +98,20 @@ Mango Homepage
                 </a>
             </li>
             {% endif %}
-
             {% endfor %}
         </ul>
         <div class="pagination">
             {% if most_controversial_page > 1 %}
             <a href="{{ url_for('most_controversial', page=most_controversial_page-1) }}">Previous</a>
             {% endif %}
-
-            <span>Page {{ most_controversial_page }} of {{ most_controversial_total_pages }}</span>
-
-            {% if most_controversial_page < most_controversial_total_pages %} <a
+            <span>Page {{ most_controversial_page }} of {{ total_pages }}</span>
+            {% if most_controversial_page < total_pages %} <a
                 href="{{ url_for('most_controversial', page=most_controversial_page+1) }}">Next</a>
                 {% endif %}
         </div>
     </div>
-    <!-- Section for Most Recent Questions -->
+
+    <!-- Most Recent Questions Section -->
     <div class="section">
         <h2><a href="{{ url_for('most_recent') }}">Most Recent</a></h2>
         <ul>
@@ -155,31 +123,42 @@ Mango Homepage
                 </a>
             </li>
             {% endif %}
-
             {% endfor %}
         </ul>
         <div class="pagination">
             {% if most_recent_page > 1 %}
             <a href="{{ url_for('most_recent', page=most_recent_page-1) }}">Previous</a>
             {% endif %}
-
-            <span>Page {{ most_recent_page }} of {{ most_recent_total_pages }}</span>
-
-            {% if most_recent_page < most_recent_total_pages %} <a
-                href="{{ url_for('most_recent', page=most_recent_page+1) }}">Next</a>
+            <span>Page {{ most_recent_page }} of {{ total_pages }}</span>
+            {% if most_recent_page < total_pages %} <a href="{{ url_for('most_recent', page=most_recent_page+1) }}">
+                Next</a>
                 {% endif %}
         </div>
     </div>
+</div>
 
-    <script>
-        function toggleQuestionForm() {
-            const form = document.getElementById('question-form');
-            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+<!-- JavaScript -->
+<script>
+    function validateSearchForm() {
+        var username = document.getElementById("username").value;
+        var keyword = document.getElementById("keyword").value;
+        var tag = document.getElementById("tag").value;
+        if (!username && !keyword && !tag) {
+            alert("Please enter either a Username, Keyword, or Tag to search.");
+            return false;
         }
-        function startDraft() {
-            document.getElementById('start-question-form').submit();
-            document.getElementById('publish-question-form').style.display = 'block';
-            document.getElementById('cancel-question-form').style.display = 'block';
-        }
-    </script>
-    {% endblock %}
+        document.getElementById("search-form").submit();
+    }
+
+    function toggleQuestionForm() {
+        const form = document.getElementById('question-form');
+        form.style.display = form.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function startDraft() {
+        document.getElementById('start-question-form').submit();
+        document.getElementById('publish-question-form').style.display = 'block';
+        document.getElementById('cancel-question-form').style.display = 'block';
+    }
+</script>
+{% endblock %}

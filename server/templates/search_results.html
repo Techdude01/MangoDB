@@ -5,18 +5,35 @@ Search Results
 {% endblock %}
 
 {% block body %}
-<h1>Search Results for {{ search_type }}: "{{ search_value }}"</h1>
-<ul>
-    {% if questions %}
-    {% for question in questions %}
-    <li>
-        <a href="{{ url_for('question_detail', question_id=question['questionID']) }}">
-            {{ question['questionText'] }}
-        </a>
-    </li>
-    {% endfor %}
-    {% else %}
-    <p>No results found for this {{ search_type.lower() }}.</p>
-    {% endif %}
-</ul>
-{% endblock %}
+<div class="main">
+    <!-- Header with styled heading -->
+    <div class="section-header card">
+        <h1 class="page-heading">Search Results</h1>
+        <p class="info-text">Showing results for {{ search_type }}: "{{ search_value }}"</p>
+    </div>
+
+    <!-- Results using consistent question styling -->
+    <div class="section">
+        {% if questions %}
+        <div class="question-list">
+            {% for question in questions %}
+            <div class="question-item">
+                <a href="#" class="question-link">{{ question['questionText'] }}</a>
+                <div class="question-metadata">
+                    <span class="date">Posted: {{ question['sentDate'] }}</span>
+                    <span class="votes">👍 {{ question['upvotes'] }} | 👎 {{ question['downvotes'] }}</span>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <p class="info-text">No results found for this {{ search_type.lower() }}.</p>
+            {% endif %}
+            </ul>
+        </div>
+
+        <!-- Back button -->
+        <div>
+            <a href="{{ url_for('home') }}" class="button">Back to Home</a>
+        </div>
+    </div>
+    {% endblock %}
