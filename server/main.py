@@ -68,7 +68,7 @@ def verify_user(connection, username, password):
     if not result.empty:
         stored_password = result.iloc[0]['password']
         # Check if the stored password is already hashed (should start with 'pbkdf2:sha256:' or similar)
-        if stored_password.startswith('pbkdf2:') or stored_password.startswith('sha256:'):
+        if stored_password.startswith('pbkdf2:') or stored_password.startswith('scrypt:'):
             # If it's hashed, use check_password_hash
             result_check = check_password_hash(stored_password, password)
         else:
@@ -135,16 +135,16 @@ def register_route():
         # Get form data
         username = request.form.get('username')
         password = request.form.get('password')
-        confirm_password = request.form.get('confirm_password')
-        
+        # confirm_password = request.form.get('confirm_password')
+        # print(f"Username: {username}, Password: {password}, Confirm Password: {confirm_password}")
         # Basic validation
-        if not username or not password or not confirm_password:
+        if not username or not password:
             flash('All fields are required', 'danger')
             return redirect(url_for('register_route'))
         
-        if password != confirm_password:
-            flash('Passwords do not match')
-            return redirect(url_for('register_route'))
+        # if password != confirm_password:
+        #     flash('Passwords do not match')
+        #     return redirect(url_for('register_route'))
         
         # Check if user already exists
         # Add your database logic here

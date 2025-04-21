@@ -2,7 +2,7 @@
 CREATE TABLE `User` (
   userID INT AUTO_INCREMENT PRIMARY KEY,
   userName VARCHAR(16) UNIQUE,
-  password VARCHAR(32),
+  password VARCHAR(255) NOT NULL,
   firstName VARCHAR(32),
   lastName VARCHAR(32),
   role VARCHAR(50) NOT NULL DEFAULT 'user',
