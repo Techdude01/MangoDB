@@ -6,15 +6,15 @@ Question Details
 
 {% block body %}
 <div class="main">
-    <!-- Question section -->
-    <div class="question-detail">
+    <!-- Question section with improved classes -->
+    <div class="question-detail card">
         <h1 class="page-heading">{{ question['questionText'] }}</h1>
         <div class="question-metadata">
             {% if question['userName'] %}
-            <span class="author">Posted by: {{ question['userName'] }}</span>
+            <span class="author"><i class="fa fa-user"></i> Posted by: {{ question['userName'] }}</span>
             {% endif %}
             {% if question['datePosted'] %}
-            <span class="date">{{ question['datePosted'] }}</span>
+            <span class="date"><i class="fa fa-calendar"></i> {{ question['datePosted'] }}</span>
             {% endif %}
         </div>
         {% if question['questionDescription'] %}
@@ -25,34 +25,38 @@ Question Details
     </div>
 
     {% if not user_has_responded %}
-    <!-- Response submission form -->
+    <!-- Response submission form with better styling -->
     <form method="POST" action="{{ url_for('question_detail', question_id=question.questionID) }}"
-        class="response-form">
+        class="response-form card">
         <h2 class="section-heading">Submit Your Response</h2>
-        <textarea name="responseText" rows="4" required placeholder="Submit your response..."></textarea>
-        <button type="submit">Submit Response</button>
+        <textarea name="responseText" class="form-control" rows="4" required
+            placeholder="Submit your response..."></textarea>
+        <button type="submit" class="button">Submit Response</button>
     </form>
-    <p class="note">Submit a response to view others' contributions and vote on this question.</p>
+    <p class="note info-text">Submit a response to view others' contributions and vote on this question.</p>
     {% else %}
-    <!-- Voting Controls -->
-    <div class="voting-controls">
-        <!-- Upvote Form -->
-        <form method="POST" action="{{ url_for('vote_question') }}" class="vote-form">
-            <input type="hidden" name="question_id" value="{{ question.questionID }}">
-            <input type="hidden" name="vote" value="up">
-            <button type="submit" class="vote-btn upvote">👍 Upvote</button>
-        </form>
-        <!-- Downvote Form -->
-        <form method="POST" action="{{ url_for('vote_question') }}" class="vote-form">
-            <input type="hidden" name="question_id" value="{{ question.questionID }}">
-            <input type="hidden" name="vote" value="down">
-            <button type="submit" class="vote-btn downvote">👎 Downvote</button>
-        </form>
-        <p class="vote-count">Current Votes: +{{ question.upvotes }} / -{{ question.downvotes }}</p>
+    <!-- Enhanced voting controls with flex layout -->
+    <div class="voting-controls card">
+        <div class="vote-buttons">
+            <!-- Upvote Form -->
+            <form method="POST" action="{{ url_for('vote_question') }}" class="vote-form">
+                <input type="hidden" name="question_id" value="{{ question.questionID }}">
+                <input type="hidden" name="vote" value="up">
+                <button type="submit" class="vote-btn upvote"><i class="fa fa-thumbs-up"></i> Upvote</button>
+            </form>
+            <!-- Downvote Form -->
+            <form method="POST" action="{{ url_for('vote_question') }}" class="vote-form">
+                <input type="hidden" name="question_id" value="{{ question.questionID }}">
+                <input type="hidden" name="vote" value="down">
+                <button type="submit" class="vote-btn downvote"><i class="fa fa-thumbs-down"></i> Downvote</button>
+            </form>
+        </div>
+        <p class="vote-count badge">Current Votes: <span class="upvote-count">+{{ question.upvotes }}</span> / <span
+                class="downvote-count">-{{ question.downvotes }}</span></p>
     </div>
 
-    <!-- Responses section -->
-    <div class="responses-section">
+    <!-- Responses section with card-based layout -->
+    <div class="responses-section card">
         <h2 class="section-heading">Responses</h2>
         {% if responses %}
         <ul class="response-list">
@@ -60,31 +64,39 @@ Question Details
             <li class="response-item">
                 <div class="response-content">{{ response['responseText'] }}</div>
                 {% if response['userName'] %}
-                <div class="response-author">- {{ response['userName'] }}</div>
+                <div class="response-author"><i class="fa fa-user-circle"></i> {{ response['userName'] }}</div>
                 {% endif %}
             </li>
             {% endfor %}
         </ul>
         {% else %}
-        <p class="no-responses">No responses yet.</p>
+        <p class="no-responses text-muted">No responses yet.</p>
         {% endif %}
     </div>
 
-    <!-- Comments Section -->
-    <div class="comments-section">
+    <!-- Comments section with consistent styling -->
+    <div class="comments-section card">
         <h2 class="section-heading">Comments</h2>
         {% if comments %}
-        {% for c in comments %}
-        <div class="comment-item">
-            {{ c.commentText }}
+        <div class="comment-list">
+            {% for c in comments %}
+            <div class="comment-item">
+                <p>{{ c.commentText }}</p>
+                <div class="comment-meta text-muted">
+                    {% if c.userName %}
+                    <small>- {{ c.userName }}</small>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
         </div>
-        {% endfor %}
         {% else %}
-        <p class="no-comments">No comments yet.</p>
+        <p class="no-comments text-muted">No comments yet.</p>
         {% endif %}
     </div>
     {% endif %}
 
-    <a href="{{ url_for('home') }}" class="back-link">🏠 Back to Home</a>
+    <a href="{{ url_for('home') }}" class="button"><i class="fa fa-home"></i> Back to Home</a>
 </div>
+
 {% endblock %}

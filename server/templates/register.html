@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block style %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='./css/style.css') }}">
+{% endblock %}
+
+{% block title %}
+User Registration
+{% endblock %}
+
+{% block body %}
+<!-- Container with "main" and "user-login" classes for card styling -->
+<div class="main">
+    <div class="user-login">
+        <h1>Create Account</h1>
+        <h3>Enter your information to register</h3>
+
+        <form id="register-form" action="{{ url_for('register_route') }}" method="post">
+            <!-- First Name field -->
+            <label for="register-firstname">
+                First Name:
+            </label>
+            <input type="text" id="register-firstname" name="firstName" placeholder="Enter your First Name" required>
+
+            <!-- Last Name field -->
+            <label for="register-lastname">
+                Last Name:
+            </label>
+            <input type="text" id="register-lastname" name="lastName" placeholder="Enter your Last Name" required>
+
+            <!-- Username field -->
+            <label for="register-username">
+                Username:
+            </label>
+            <input type="text" id="register-username" name="username" placeholder="Choose a Username" required>
+
+            <!-- Password field -->
+            <label for="register-password">
+                Password:
+            </label>
+            <input type="password" id="register-password" name="password" placeholder="Create a Password" required>
+
+            <div class="wrap">
+                <button type="button" onclick="validateRegisterForm()">
+                    Register
+                </button>
+            </div>
+        </form>
+
+        <!-- Flash message display -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <p>Already have an account? <a href="{{ url_for('login') }}">Login here</a></p>
+
+        <script>
+            // JavaScript function to validate the registration form
+            function validateRegisterForm() {
+                // Get form field values
+                var firstName = document.getElementById("register-firstname").value;
+                var lastName = document.getElementById("register-lastname").value;
+                var username = document.getElementById("register-username").value;
+                var password = document.getElementById("register-password").value;
+
+                // Check if all fields are filled
+                if (!firstName || !lastName || !username || !password) {
+                    alert("Please fill in all fields.");
+                    return false;
+                }
+
+                // Basic password strength check
+                if (password.length < 8) {
+                    alert("Password must be at least 8 characters long.");
+                    return false;
+                }
+
+                // Submit the form if validation passes
+                document.getElementById("register-form").submit();
+            }
+        </script>
+    </div>
+</div>
+{% endblock %}

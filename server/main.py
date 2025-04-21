@@ -113,6 +113,7 @@ def login():
 def logout():
     session.pop('username', None)
     session.pop('role', None)
+    session.pop('userID', None)
     return redirect(url_for('home'))
 
 @app.route('/dashboard')
@@ -216,7 +217,7 @@ def home():
     tags = cursor.fetchall()
 
     conn.close()
-
+    
     return render_template(
         'home.html', 
         most_popular=most_popular, 
@@ -432,7 +433,6 @@ def cancel_question():
 
 @app.route('/question/<int:question_id>', methods=['GET', 'POST'])
 def question_detail(question_id):
-    print(session)
     if 'userID' not in session:
         return redirect(url_for('login'))  # Redirect if not logged in
 
@@ -488,23 +488,24 @@ def question_detail(question_id):
 
 @app.route('/vote_question', methods=['POST'])
 def vote_question():
-    userID = session.get('userID')  # Assume user is logged in
+    userID = session.get('userID')
     question_id = request.form.get('question_id')
-    vote_type = request.form.get('vote')  # 'up' or 'down'
-
+    vote_type = request.form.get('vote')
     if not userID or not question_id or vote_type not in ['up', 'down']:
         flash('Invalid voting request.', 'danger')
         return redirect(url_for('home'))
-
     conn = connect_db()
     cursor = conn.cursor()
-
     try:
+        print(f"Attempting to {vote_type}vote question {question_id} by user {userID}")
+        
         if vote_type == 'up':
+            print("Calling UpvoteQuestion stored procedure")
             cursor.execute("CALL UpvoteQuestion(%s, %s)", (userID, question_id))
+            print("UpvoteQuestion procedure call completed")
         elif vote_type == 'down':
             cursor.execute("CALL DownvoteQuestion(%s, %s)", (userID, question_id))
-
+            
         conn.commit()
         flash('Your vote has been recorded!', 'success')
     except Exception as e:
@@ -512,8 +513,22 @@ def vote_question():
         flash(f'Error recording your vote: {e}', 'danger')
     finally:
         conn.close()
-
+    
     return redirect(url_for('question_detail', question_id=question_id))
+@app.context_processor
+def inject_user_data():
+    """
+    Make user data available to all templates including base.html
+    This eliminates the need to pass these variables in every route
+    """
+    show_login_button = True
+    if 'userID' in session:
+        show_login_button = False
+    return {
+        'show_login_button': show_login_button,
+        'username': session.get('username', None),
+        'user_role': session.get('role', None)
+    }
 
 if __name__ == '__main__':
     app.run(debug=True)

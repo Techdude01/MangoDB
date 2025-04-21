@@ -10,9 +10,11 @@ Mango Homepage
 
 {% block body %}
 <div class="main">
+    {% if show_login_button %}
     <a href="{{ url_for('login') }}" class="button">
         Go to Login
     </a>
+    {% endif %}
     <div class="main-query">
         <h1>Search Bar</h1>
         <h3>Query by Username, Keyword in Question Text, or Tag!</h3>

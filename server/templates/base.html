@@ -15,11 +15,15 @@
         <nav class="navbar">
             <ul>
                 <li><a href="{{ url_for('home') }}">Home</a></li>
-                <li><a href="{{ url_for('register_route') }}">Register</a></li>
                 <li><a href="{{ url_for('most_popular') }}">Most Popular</a></li>
                 <li><a href="{{ url_for('most_recent') }}">Most Recent</a></li>
                 <li><a href="{{ url_for('most_controversial') }}">Most Controversial</a></li>
+                {% if show_login_button %}
+                <li><a href="{{ url_for('login') }}">Login</a></li>
+                {% else %}
                 <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                {% endif %}
                 <li style="margin-left: auto;"><span>Mango</span></li>
 
             </ul>

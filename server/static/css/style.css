@@ -5,52 +5,66 @@
   box-sizing: border-box;
 }
 
-/* Set a modern, readable font and background for the whole app */
+/* ========== BASE STYLES ========== */
 body {
-  font-family: "Gill Sans", sans-serif;
-  background: #fffbe6; /* light mango yellow */
-  color: #3e2723; /* deep brown for contrast */
+  font-family: "JetBrains Mono", "Geist Mono", "SFMono-Regular", Consolas,
+    "Liberation Mono", Menlo, monospace;
+  background: #fffbe6;
+  color: #3e2723;
   min-height: 100vh;
   background-image: url("/static/img/mango.jpg");
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ========== APP LAYOUT ========== */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 /* ========== NAVIGATION BAR ========== */
 .navbar {
-  background: linear-gradient(
-    90deg,
-    #ffb300 60%,
-    #ff7043 100%
-  ); /* mango orange to ripe red */
+  background: linear-gradient(90deg, #ffb300 60%, #ff7043 100%);
   padding: 1rem 2rem;
-  box-shadow: 0 2px 8px rgba(255, 167, 38, 0.08); /* soft orange shadow */
+  box-shadow: 0 2px 8px rgba(255, 167, 38, 0.08);
 }
 .navbar ul {
   list-style: none;
   display: flex;
   gap: 2rem;
+  flex-wrap: wrap;
 }
 .navbar li a {
-  color: #fffde7; /* pale yellow */
+  color: #fffde7;
   text-decoration: none;
   font-weight: 500;
   transition: color 0.2s;
 }
 .navbar li a:hover {
-  color: #43a047; /* mango leaf green */
+  color: #43a047;
 }
 
 /* ========== MAIN CONTAINER ========== */
 .main {
   max-width: 900px;
   margin: 2rem auto;
-  /*background: #fffde7; /* pale mango yellow */
-  background: rgba(255, 237, 148, 0.85); /* semi-transparent white */
-
+  background: rgba(255, 237, 148, 0.85);
   border-radius: 12px;
-  box-shadow: 0 4px 24px rgba(255, 183, 77, 0.13); /* orange shadow */
+  box-shadow: 0 4px 24px rgba(255, 183, 77, 0.13);
   padding: 2rem;
 }
 
@@ -58,7 +72,7 @@ body {
 .section h2,
 .main-query h1,
 .user-login h1 {
-  color: #ff7043; /* ripe mango red */
+  color: #ff7043;
   margin-bottom: 1rem;
   font-size: 2rem;
   letter-spacing: 1px;
@@ -78,13 +92,13 @@ body {
 }
 .main-query input[type="text"] {
   padding: 0.5rem;
-  border: 1px solid #ffd54f; /* mango yellow border */
+  border: 1px solid #ffd54f;
   border-radius: 5px;
   width: 200px;
   background: #fffde7;
 }
 .main-query button {
-  background: #ffb300; /* mango orange */
+  background: #ffb300;
   color: #fff;
   border: none;
   padding: 0.6rem 1.2rem;
@@ -94,7 +108,7 @@ body {
   transition: background 0.2s;
 }
 .main-query button:hover {
-  background: #43a047; /* mango leaf green */
+  background: #43a047;
 }
 
 /* ========== POST QUESTION ========== */
@@ -102,7 +116,7 @@ body {
   margin: 2rem 0;
 }
 #post-question-btn {
-  background: #43a047; /* mango leaf green */
+  background: #43a047;
   color: #fff;
   border: none;
   padding: 0.7rem 1.5rem;
@@ -112,7 +126,7 @@ body {
   transition: background 0.2s;
 }
 #post-question-btn:hover {
-  background: #ff7043; /* ripe mango red */
+  background: #ff7043;
 }
 #question-form {
   margin-top: 1rem;
@@ -147,7 +161,7 @@ body {
 .user-login {
   margin: 2rem 0;
   padding: 1.5rem;
-  background: #fff8e1; /* lighter mango yellow */
+  background: #fff8e1;
   border-radius: 8px;
   border: 1px solid #ffd54f;
 }
@@ -182,8 +196,8 @@ body {
   margin: 1rem 0;
   padding: 1rem;
   border-radius: 5px;
-  background: #fff9c4; /* mango yellow */
-  color: #bf360c; /* deep red for warnings */
+  background: #fff9c4;
+  color: #bf360c;
   border: 1px solid #ffd54f;
 }
 
@@ -196,18 +210,15 @@ body {
   border-radius: 5px;
   background-color: #f9f9f9;
 }
-
 .user-registration h1 {
   text-align: center;
   margin-bottom: 20px;
 }
-
 .user-registration label {
   display: block;
   margin-bottom: 5px;
   font-weight: bold;
 }
-
 .user-registration input {
   width: 100%;
   padding: 10px;
@@ -215,7 +226,6 @@ body {
   border: 1px solid #ccc;
   border-radius: 5px;
 }
-
 .user-registration button {
   width: 100%;
   padding: 10px;
@@ -225,37 +235,32 @@ body {
   border-radius: 5px;
   cursor: pointer;
 }
-
 .user-registration button:hover {
   background-color: #0056b3;
 }
 
-/* Styling for flash messages */
+/* ========== ALERTS ========== */
 .alert {
   padding: 10px;
   margin-bottom: 15px;
   border: 1px solid transparent;
   border-radius: 4px;
 }
-
 .alert-success {
   color: #3c763d;
   background-color: #dff0d8;
   border-color: #d6e9c6;
 }
-
 .alert-info {
   color: #31708f;
   background-color: #d9edf7;
   border-color: #bce8f1;
 }
-
 .alert-warning {
   color: #8a6d3b;
   background-color: #fcf8e3;
   border-color: #faebcc;
 }
-
 .alert-danger {
   margin-top: 10px;
   color: #a94442;
@@ -288,11 +293,11 @@ footer {
   }
 }
 
-/* Add this to your style.css file */
+/* ========== BUTTON STYLES ========== */
 .button {
   display: inline-block;
   padding: 0.6rem 1.2rem;
-  background: #ffb300; /* mango orange */
+  background: #ffb300;
   color: white;
   text-decoration: none;
   border-radius: 6px;
@@ -304,17 +309,15 @@ footer {
   cursor: pointer;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
-
 .button:hover {
-  background: #ff9800; /* darker orange */
+  background: #ff9800;
 }
-
 .button:active {
-  background: #ff7043; /* ripe mango red */
+  background: #ff7043;
   transform: translateY(1px);
 }
 
-/* ========== QUESTION LISTS PAGE STYLING ========== */
+/* ========== QUESTION LISTS ========== */
 .section ul {
   list-style: none;
   padding: 0;
@@ -340,53 +343,47 @@ footer {
   color: #43a047;
 }
 
-/* Main page heading */
+/* ========== PAGE HEADING ========== */
 .page-heading {
-  color: #ff7043; /* mango red */
+  color: #ff7043;
   margin: 1rem 0 2rem 0;
   font-size: 2.4rem;
   text-align: center;
   letter-spacing: 1px;
 }
 
-/* Question list container */
+/* ========== QUESTION LIST ========== */
 .question-list {
   list-style: none;
   padding: 0;
   margin: 2rem 0;
 }
-
-/* Individual question item */
 .question-list li {
-  background: #fffde7; /* very light yellow */
+  background: #fffde7;
   margin-bottom: 1rem;
   padding: 1rem 1.5rem;
   border-radius: 8px;
-  border-left: 4px solid #ffb300; /* mango orange border */
+  border-left: 4px solid #ffb300;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   transition: all 0.2s ease;
 }
-
 .question-list li:hover {
-  background: #fff8e1; /* slightly darker on hover */
+  background: #fff8e1;
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
-
-/* Question link styling */
 .question-list li a {
-  color: #3e2723; /* dark brown */
+  color: #3e2723;
   text-decoration: none;
   font-weight: 500;
   font-size: 1.1rem;
   display: block;
 }
-
 .question-list li a:hover {
-  color: #ff7043; /* mango red on hover */
+  color: #ff7043;
 }
 
-/* Pagination improvements */
+/* ========== PAGINATION ========== */
 .pagination {
   display: flex;
   justify-content: center;
@@ -394,73 +391,178 @@ footer {
   gap: 1rem;
   margin: 2rem 0;
 }
-
 .pagination a {
   padding: 0.5rem 1rem;
-  background: #ffb300; /* mango orange */
+  background: #ffb300;
   color: white;
   text-decoration: none;
   border-radius: 4px;
   font-weight: 500;
   transition: background 0.3s;
 }
-
 .pagination a:hover {
-  background: #ff9800; /* darker orange */
+  background: #ff9800;
 }
-
 .pagination span {
   padding: 0.5rem 1rem;
   border-radius: 4px;
-  background: #fff8e1; /* light yellow */
+  background: #fff8e1;
   border: 1px solid #ffd54f;
 }
 
-/* ========== Responses ========== */
-/* Add this CSS to style.css */
-
-/* Question Detail Page Styling */
+/* ========== QUESTION DETAIL & RESPONSES ========== */
 .question-detail {
   margin-bottom: 2rem;
   padding-bottom: 1.5rem;
-  border-bottom: 1px solid #ffd54f; /* mango yellow border */
+  border-bottom: 1px solid #ffd54f;
+}
+.question-metadata {
+  display: flex;
+  justify-content: space-between;
+  margin: -0.5rem 0 1.5rem;
+  color: #ff7043;
+  font-size: 0.9rem;
+}
+.question-description {
+  background: #fff8e1;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border-left: 4px solid #ffb300;
+  margin: 1rem 0;
+  line-height: 1.6;
+}
+.section-heading {
+  color: #ff7043;
+  margin-bottom: 1.5rem;
+  font-size: 1.6rem;
+}
+.response-list {
+  list-style: none;
+  padding: 0;
+}
+.response-item {
+  background: #fffde7;
+  margin-bottom: 1rem;
+  padding: 1.2rem;
+  border-radius: 8px;
+  border-left: 3px solid #43a047;
+}
+.response-content {
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+}
+.response-author {
+  text-align: right;
+  font-style: italic;
+  color: #3e2723;
+  font-size: 0.9;
+}
+
+/* ========== CARD STYLING ========== */
+.card {
+  background: #fff8e1; /* Light mango color */
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+/* ========== QUESTION DETAIL & RESPONSES ========== */
+/* Enhanced existing section */
+.question-detail {
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #ffd54f;
 }
 
 .question-metadata {
   display: flex;
   justify-content: space-between;
   margin: -0.5rem 0 1.5rem;
-  color: #ff7043; /* mango orange-red */
+  color: #7d6608; /* Darker mango color */
   font-size: 0.9rem;
 }
 
 .question-description {
-  background: #fff8e1; /* light mango yellow */
-  padding: 1.5rem;
-  border-radius: 8px;
-  border-left: 4px solid #ffb300; /* mango orange */
-  margin: 1rem 0;
+  background: rgba(255, 248, 225, 0.5);
+  padding: 1rem;
+  border-left: 4px solid #ffb300; /* Mango border */
+  margin-top: 1rem;
   line-height: 1.6;
 }
 
-/* Response section styling */
-.section-heading {
-  color: #ff7043; /* mango color */
-  margin-bottom: 1.5rem;
-  font-size: 1.6rem;
+/* ========== RESPONSE FORM ========== */
+.response-form textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-family: inherit;
 }
 
+.info-text {
+  font-style: italic;
+  color: #7d6608;
+  text-align: center;
+}
+
+/* ========== VOTING CONTROLS ========== */
+.voting-controls {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.vote-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.vote-btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.upvote {
+  background: #43a047; /* Green for upvote */
+  color: white;
+}
+
+.downvote {
+  background: #e53935; /* Red for downvote */
+  color: white;
+}
+
+.vote-count {
+  font-weight: 600;
+  color: #333;
+}
+
+.upvote-count {
+  color: #43a047; /* Green for upvotes */
+}
+
+.downvote-count {
+  color: #e53935; /* Red for downvotes */
+}
+
+/* ========== RESPONSE LIST ========== */
+/* Enhanced existing section */
 .response-list {
   list-style: none;
   padding: 0;
 }
 
 .response-item {
-  background: #fffde7; /* very light yellow */
+  background: #fffde7;
   margin-bottom: 1rem;
   padding: 1.2rem;
   border-radius: 8px;
-  border-left: 3px solid #43a047; /* mango leaf green */
+  border-left: 3px solid #43a047;
 }
 
 .response-content {
@@ -471,13 +573,37 @@ footer {
 .response-author {
   text-align: right;
   font-style: italic;
-  color: #3e2723; /* dark brown */
-  font-size: 0.9rem;
+  color: #7d6608;
+  margin-top: 0.5rem;
 }
 
-.no-responses {
-  font-style: italic;
-  color: #757575;
-  text-align: center;
-  padding: 1rem;
+/* ========== COMMENTS SECTION ========== */
+.comments-section {
+  margin-top: 2rem;
 }
+
+.comment-list {
+  margin-top: 1rem;
+}
+
+.comment-item {
+  background: rgba(255, 248, 225, 0.5);
+  padding: 0.75rem;
+  border-radius: 4px;
+  margin-bottom: 0.75rem;
+}
+
+/* ========== UTILITY CLASSES ========== */
+.text-muted {
+  color: #999;
+}
+
+.mt-3 {
+  margin-top: 1rem;
+}
+
+.mt-4 {
+  margin-top: 1.5rem;
+}
+
+/* Back link already covered by existing button styles */
