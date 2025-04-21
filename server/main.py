@@ -210,16 +210,17 @@ def home():
     #Fetch top 5 questions for each category
     cursor.execute("CALL GetPopularQuestionsWithPagination(5,0)") 
     most_popular = cursor.fetchall()
+    print("most_popular",most_popular)
 
     cursor.execute("CALL GetControversialQuestionsWithPagination(5,0)")
     most_controversial = cursor.fetchall()
 
     cursor.execute("CALL GetRecentQuestionsWithPagination(5,0)")
     most_recent = cursor.fetchall()
-
+    print("most_recent", most_recent)
     cursor.execute("SELECT tagID, tagName FROM Tag")
     tags = cursor.fetchall()
-
+    print("tags", tags)
     conn.close()
     
     return render_template(

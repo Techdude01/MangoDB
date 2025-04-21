@@ -633,20 +633,21 @@ DELIMITER ;
 
 -- Get Popular Questions
 DELIMITER //
+
 CREATE PROCEDURE GetPopularQuestionsWithPagination (
-	IN lim INT, IN offset INT
+    IN lim INT, 
+    IN offset INT
 )
 BEGIN
-    SELECT q.questionText, t.sentTime, t.sentDate,
-		   q.upvotes, COUNT(c.commentID) AS commentCount
+    SELECT q.questionID, q.questionText, t.sentTime, t.sentDate, q.upvotes, COUNT(c.commentID) AS commentCount
     FROM Question q
-    JOIN TimeStamp t ON q.TimestampID = t.TimeStampID
+    JOIN TimeStamp t ON q.TimeStampID = t.TimeStampID
     LEFT JOIN Comment c ON c.questionID = q.questionID
     GROUP BY q.questionID, q.questionText, t.sentTime, t.sentDate, q.upvotes
     ORDER BY q.upvotes DESC, commentCount DESC, t.sentDate DESC, t.sentTime DESC
     LIMIT lim OFFSET offset;
-END;
-//
+END //
+
 DELIMITER ;
 
 
@@ -656,7 +657,7 @@ CREATE PROCEDURE GetControversialQuestionswithPagination (
 	IN lim INT, IN offset INT
 )
 BEGIN
-    SELECT q.questionText, t.sentTime, t.sentDate, 
+    SELECT q.questionID, q.questionText, t.sentTime, t.sentDate, 
 		   q.downvotes, COUNT(c.commentID) AS commentCount,
 		   (q.downvotes + COUNT(c.commentID)) AS controversyScore
     FROM Question q
