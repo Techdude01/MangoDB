@@ -1,6 +1,6 @@
 -- Safe MySQL database creation script for MangoDB
 -- This script creates tables, populates them with data, and creates stored procedures
--- use mysql -u root Mango < COMMANDSv2.sql, where
+-- use mysql -u root Mango < COMMANDSv2.sql
 -- Create User table
 CREATE TABLE `User` (
   userID INT AUTO_INCREMENT PRIMARY KEY,

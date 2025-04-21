@@ -337,7 +337,7 @@ footer {
 .section a {
   color: #ff7043;
   text-decoration: none;
-  font-weight: 500;
+  font-weight: 700;
 }
 .section a:hover {
   text-decoration: underline;
@@ -460,9 +460,14 @@ footer {
   background: #43a047;
   color: white;
 }
+
 .downvote {
   background: #e53935;
   color: white;
+}
+.vote-btn:hover {
+  color: #ff7043;
+  transform: translateY(-2px);
 }
 .upvote-count {
   color: #43a047;
