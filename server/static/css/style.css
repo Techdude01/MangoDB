@@ -39,7 +39,7 @@ body {
 /* ========== NAVIGATION BAR ========== */
 .navbar {
   background: linear-gradient(90deg, #ffb300 60%, #ff7043 100%);
-  padding: 1rem 2rem;
+  padding: 1rem 4rem;
   box-shadow: 0 2px 8px rgba(255, 167, 38, 0.08);
 }
 .navbar ul {

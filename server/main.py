@@ -57,17 +57,17 @@ def get_timestamp_id(cursor):
 
     return cursor.lastrowid  # Return the auto-incremented ID
 
-def register_user(connection, username, password, role='user'):
+def register_user(connection, username, password, role='user',firstName='', lastName=''):
     hashed_password = generate_password_hash(password)
-    query = "INSERT INTO user (username, password, role) VALUES (%s, %s, %s)"
-    execute_query(connection, query, (username, hashed_password, role))
+    query = "INSERT INTO user (username, password, role, firstName,lastName) VALUES (%s, %s, %s,%s,%s)"
+    execute_query(connection, query, (username, hashed_password, role,firstName,lastName))
 
 def verify_user(connection, username, password):
     query = "SELECT password, role FROM user WHERE username = %s"
     result = execute_query(connection, query, (username,))
     if not result.empty:
         stored_password = result.iloc[0]['password']
-        # Check if the stored password is already hashed (should start with 'pbkdf2:sha256:' or similar)
+        # Check if the stored password is already hashed
         if stored_password.startswith('pbkdf2:') or stored_password.startswith('scrypt:'):
             # If it's hashed, use check_password_hash
             result_check = check_password_hash(stored_password, password)
@@ -122,7 +122,7 @@ def dashboard():
         return redirect(url_for('login'))
 
     # Get user-specific data here
-    return render_template('dashboard.html', username=session['username'])
+    return render_template('dashboard.html')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register_route():
@@ -135,6 +135,8 @@ def register_route():
         # Get form data
         username = request.form.get('username')
         password = request.form.get('password')
+        firstName = request.form.get('firstName')
+        lastName = request.form.get('lastName')
         # confirm_password = request.form.get('confirm_password')
         # print(f"Username: {username}, Password: {password}, Confirm Password: {confirm_password}")
         # Basic validation
@@ -147,15 +149,20 @@ def register_route():
         #     return redirect(url_for('register_route'))
         
         # Check if user already exists
-        # Add your database logic here
         conn = connect_db()
         cursor = conn.cursor()
 
+        # Check if the username already exists in the User table
+        cursor.execute("SELECT COUNT(*) AS count FROM User WHERE username = %s", (username,))
+        user_exists = cursor.fetchone()['count'] > 0
+
+        if user_exists:
+            flash('Username already exists. Please choose a different username.', 'danger')
+            return redirect(url_for('register_route'))
+        
         try:
             # Insert the new user into the database
-            hashed_password = generate_password_hash(password)
-            cursor.execute("INSERT INTO User (userName, password, role) VALUES (%s, %s, %s)", (username, hashed_password, 'user'))
-            conn.commit()
+            register_user(conn, username, password, 'user', firstName, lastName)
             flash('Registration successful! You can now log in.', 'success')
             return redirect(url_for('login'))
         except Exception as e:
@@ -163,9 +170,6 @@ def register_route():
             flash(f'Error during registration: {e}', 'danger')
         finally:
             conn.close()
-        
-        # Create new user
-        # Add your database logic here
         
         flash('Registration successful! Please log in.')
         return redirect(url_for('home'))
