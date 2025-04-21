@@ -118,11 +118,28 @@ def logout():
 
 @app.route('/dashboard')
 def dashboard():
+    """
+    Display the user's dashboard with their questions and tags.
+    Requires user to be logged in with a valid session.
+    """
+    # Redirect to login if user is not authenticated
     if 'username' not in session:
         return redirect(url_for('login'))
-
-    # Get user-specific data here
-    return render_template('dashboard.html')
+    
+    # Connect to database and get user's questions and tags
+    conn = connect_db()
+    cursor = conn.cursor(pymysql.cursors.DictCursor)
+    
+    # Get questions created by the current user
+    cursor.execute("CALL GetQuestionsByUserID(%s)", (session['userID'],))
+    questions = cursor.fetchall()
+    
+    # Get tags used by the current user
+    cursor.execute("CALL GetTagsByUserID(%s)", (session['userID'],))
+    tags = cursor.fetchall()
+    
+    # Render the dashboard template with the user's data
+    return render_template('dashboard.html', tags=tags, questions=questions,numQuestions=len(questions), numTags=len(tags))
 
 @app.route('/register', methods=['GET', 'POST'])
 def register_route():
@@ -137,17 +154,10 @@ def register_route():
         password = request.form.get('password')
         firstName = request.form.get('firstName')
         lastName = request.form.get('lastName')
-        # confirm_password = request.form.get('confirm_password')
-        # print(f"Username: {username}, Password: {password}, Confirm Password: {confirm_password}")
         # Basic validation
         if not username or not password:
             flash('All fields are required', 'danger')
             return redirect(url_for('register_route'))
-        
-        # if password != confirm_password:
-        #     flash('Passwords do not match')
-        #     return redirect(url_for('register_route'))
-        
         # Check if user already exists
         conn = connect_db()
         cursor = conn.cursor()

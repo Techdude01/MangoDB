@@ -821,6 +821,33 @@ BEGIN
 END;
 //
 DELIMITER;
+-- Get Tags by User ID
+DELIMITER //
+CREATE PROCEDURE GetTagsByUserID(IN p_userID INT)
+BEGIN
+    SELECT t.tagID, t.tagName
+    FROM Tag t
+    JOIN TagList tl ON t.tagID = tl.tagID
+    WHERE tl.userID = p_userID
+    GROUP BY t.tagID, t.tagName;
+END;
+//
+DELIMITER ;
+
+-- Get Questions by User ID
+DELIMITER //
+CREATE PROCEDURE GetQuestionsByUserID(IN p_userID INT)
+BEGIN
+    SELECT q.questionID, q.questionText, q.upvotes, q.downvotes,
+           t.sentDate, t.sentTime, 
+           (SELECT COUNT(*) FROM Response r WHERE r.questionID = q.questionID) AS responseCount
+    FROM Question q
+    JOIN TimeStamp t ON q.TimeStampID = t.TimeStampID
+    WHERE q.userID = p_userID
+    ORDER BY t.sentDate DESC, t.sentTime DESC;
+END;
+//
+DELIMITER ;
 
 
 --                       RESPONSE BASED PROCEDURES

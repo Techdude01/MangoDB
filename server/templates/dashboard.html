@@ -5,6 +5,127 @@ Dashboard
 {% endblock %}
 
 {% block body %}
-<h1>Welcome, {{ username }}!</h1>
-<p>This is your dashboard.</p>
+<div class="main">
+    <!-- Header Section -->
+    <div class="dashboard-header card">
+        <h1 class="page-heading">Welcome, {{ username }}!</h1>
+        <p class="user-stats">You've posted {{numQuestions}} question{% if numQuestions != 1 %}s{% endif %} and used
+            {{numTags}} different tag{% if numTags != 1 %}s{% endif %}.</p>
+    </div>
+
+    <!-- User Questions Section -->
+    <div class="dashboard-section card">
+        <h2 class="section-heading">Your Questions</h2>
+
+        <!-- User's Questions List -->
+        <div class="question-list">
+            {% for question in questions %}
+            <div class="question-item">
+                <a href="#" class="question-link">{{ question['questionText'] }}</a>
+                <div class="question-metadata">
+                    <span class="date">Posted: {{ question['sentDate'] }}</span>
+                    <span class="votes">👍 {{ question['upvotes'] }} | 👎 {{ question['downvotes'] }}</span>
+                    <!-- <span class="responses">{{ question['responses'] }} responses</span> -->
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- <a href="#" class="action-btn">View All Your Questions</a> -->
+    </div>
+
+    <!-- User Tags Section -->
+    <div class="dashboard-section card">
+        <h2 class="section-heading">Your Tags</h2>
+
+        <div class="tag-cloud">
+            {% for tag in tags %}
+            <span class="tag">{{ tag.tagName }}</span>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="dashboard-actions">
+        <a href="#" class="action-btn primary">Ask New Question</a>
+        <a href="#" class="action-btn">Browse Questions</a>
+        <a href="#" class="action-btn">Account Settings</a>
+    </div>
+</div>
+
+<style>
+    /* Dashboard specific styles */
+    .dashboard-header {
+        margin-bottom: 2rem;
+        text-align: center;
+        background: #fff8e1;
+    }
+
+    .user-stats {
+        color: #7d6608;
+        font-size: 1.1rem;
+        margin-top: 0.5rem;
+    }
+
+    .dashboard-section {
+        margin-bottom: 2rem;
+    }
+
+    .section-heading {
+        color: #3e2723;
+        border-bottom: 2px solid #ffd54f;
+        padding-bottom: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    /* Tag cloud */
+    .tag-cloud {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 1rem;
+    }
+
+    .tag {
+        background: #ffd54f;
+        color: #3e2723;
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        display: inline-block;
+    }
+
+    /* Action buttons */
+    .dashboard-actions {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+
+    .action-btn {
+        display: inline-block;
+        padding: 0.6rem 1.2rem;
+        background: #f0f0f0;
+        color: #333;
+        text-decoration: none;
+        border-radius: 4px;
+        font-weight: 500;
+        transition: all 0.2s;
+    }
+
+    .action-btn:hover {
+        background: #e0e0e0;
+        transform: translateY(-2px);
+    }
+
+    .action-btn.primary {
+        background: #ffb300;
+        color: white;
+    }
+
+    .action-btn.primary:hover {
+        background: #ff9800;
+    }
+</style>
 {% endblock %}
