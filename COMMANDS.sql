@@ -165,7 +165,7 @@ CREATE TABLE Vote (
 
 -- user entries
 
-INSERT INTO User (userName, password, firstName, lastName, status) VALUES 
+INSERT INTO User (userName, password, firstName, lastName, role) VALUES 
 ('jdoe', 'password123', 'John', 'Doe', 'base'),
 ('asmith', 'securePass456', 'Alice', 'Smith', 'base'),
 ('bwayne', 'batman2025', 'Bruce', 'Wayne', 'base'),
