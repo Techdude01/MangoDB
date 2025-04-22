@@ -694,11 +694,13 @@ def create_chat():
                         members.append(creator_id)
                         
                     # Add all members to the chat
-                    member_data = [(chat_id, member_id) for member_id in members]
-                    cursor.executemany(
-                        "INSERT INTO ChatMember (chatID, userID) VALUES (%s, %s)",
-                        member_data
-                    )
+                    for member_id in members:
+                        # Use individual inserts instead of executemany
+                        cursor.execute(
+                            "INSERT INTO ChatMember (chatID, userID) VALUES (%s, %s)",
+                            (chat_id, member_id)
+                        )
+                        print(f"Added member {member_id} to chat {chat_id}")
                     
                     # Create welcome message
                     cursor.execute("INSERT INTO TimeStamp (sentTime, sentDate) VALUES (CURTIME(), CURDATE())")
