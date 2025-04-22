@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}Your Chats{% endblock %}
+
+{% block body %}
+<div class="main">
+    <div class="section-header card">
+        <h1 class="page-heading">Your Chats</h1>
+        <!-- Add a button/link to create a new chat -->
+        <div class="action-buttons" style="margin-bottom: 1rem;">
+            <a href="{{ url_for('create_chat') }}" class="action-btn primary">Start New Chat</a>
+            <!-- Add link to view pending requests if implementing that page -->
+        </div>
+    </div>
+
+    <!-- Display flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }}">
+        {{ message }}
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+
+    <div class="card dashboard-section">
+        <h2 class="section-heading">Chat List</h2>
+        {% if chats %}
+        <ul class="question-list"> <!-- Reusing question-list styling for now -->
+            {% for chat in chats %}
+            <li class="question-item"> <!-- Reusing question-item styling -->
+                <!-- Link to the detail view for this specific chat -->
+                <a href="{{ url_for('view_chat', chat_id=chat.chatID) }}" class="question-link">
+                    {{ chat.chatName }} (ID: {{ chat.chatID }})
+                </a>
+                <!-- Maybe add last message preview here later -->
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p class="info-text">You are not currently in any chats. Start a new one!</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

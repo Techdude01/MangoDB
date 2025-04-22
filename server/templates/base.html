@@ -22,6 +22,7 @@
                 <li style="margin-left: auto;"><a href="{{ url_for('login') }}">Login</a></li>
                 {% else %}
                 <li style="margin-left: auto;"><a href=" {{ url_for('dashboard') }}">Dashboard</a></li>
+                <li style="margin-left: auto;"><a href=" {{ url_for('list_chats') }}">Chats</a></li>
                 <li style="margin-left: 0;"><a href=" {{ url_for('logout') }}">Logout</a></li>
                 {% endif %}
                 <!-- <li style="margin-left: auto;"><span>Mango</span></li> -->

@@ -41,21 +41,18 @@ def execute_query(connection, query, params=None):
         return None
     
 def get_timestamp_id(cursor):
+    # Get current time and date
     now = datetime.now()
     sent_time = now.strftime('%H:%M:%S')
     sent_date = now.strftime('%Y-%m-%d')
 
-    conn = connect_db()
-    cursor = conn.cursor(pymysql.cursors.DictCursor)
+    # Execute insert using the passed cursor
     cursor.execute("""
         INSERT INTO TimeStamp (sentTime, sentDate)
         VALUES (%s, %s)
     """, (sent_time, sent_date))
 
-    # Commit the insert so MySQL registers it
-    conn.commit()
-
-    return cursor.lastrowid  # Return the auto-incremented ID
+    return cursor.lastrowid
 
 def register_user(connection, username, password, role='user',firstName='', lastName=''):
     hashed_password = generate_password_hash(password)
@@ -133,7 +130,7 @@ def dashboard():
     # Get questions created by the current user
     cursor.execute("CALL GetQuestionsByUserID(%s)", (session['userID'],))
     questions = cursor.fetchall()
-    
+    print(questions)
     # Get tags used by the current user
     cursor.execute("CALL GetTagsByUserID(%s)", (session['userID'],))
     tags = cursor.fetchall()
@@ -582,7 +579,259 @@ def account_settings():
     conn.close()
     
     return render_template('account_settings.html', username=username, user_data=user_data)
+@app.route('/chats')
+def list_chats():
+    """
+    Display all chats that the logged-in user is a member of.
+    """
+    # Ensure user is logged in
+    if 'username' not in session:
+        flash('Please login to view your chats.', 'login-error')
+        return redirect(url_for('login'))
 
+    # Use the correct session key - userID with capital ID to match login route
+    user_id = session.get('userID')
+    if not user_id:
+        # Fetch user_id if it's somehow missing from session
+        conn = connect_db()
+        try:
+            cursor = conn.cursor(pymysql.cursors.DictCursor)
+            cursor.execute("SELECT userID FROM User WHERE userName = %s", (session['username'],))
+            user_result = cursor.fetchone()
+            
+            if user_result:
+                user_id = user_result['userID']
+                session['userID'] = user_id  # Store it for future use
+            else:
+                flash('Could not verify user session.', 'danger')
+                return redirect(url_for('logout'))
+        except Exception as e:
+            flash(f"Error verifying user: {e}", "danger")
+            return redirect(url_for('logout'))
+        finally:
+            cursor.close()
+            conn.close()
+
+    # Fetch all chats this user is a member of
+    chats = []
+    conn = connect_db()
+    try:
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
+        cursor.execute("""
+            SELECT c.chatID, c.chatName, 
+                   (SELECT COUNT(*) FROM ChatMember WHERE chatID = c.chatID) as member_count
+            FROM ChatMember cm
+            JOIN Chat c ON cm.chatID = c.chatID
+            WHERE cm.userID = %s
+        """, (user_id,))
+        chats = cursor.fetchall()
+    except pymysql.Error as err:
+        flash(f"Database error fetching chats: {err}", "danger")
+        print(f"Database error: {err}")
+    finally:
+        if conn:
+            conn.close()
+
+    return render_template('chats.html', chats=chats)
+
+@app.route('/create_chat', methods=['GET', 'POST'])
+def create_chat():
+    """
+    Route for creating a new group chat.
+    Handles both 1-on-1 and multi-user chats.
+    """
+    # Ensure user is logged in
+    if 'username' not in session or 'userID' not in session:
+        flash('Please login to create a chat', 'danger')
+        return redirect(url_for('login'))
+
+    creator_id = session['userID']
+    conn = connect_db()
+    
+    try:
+        # Handle POST request
+        if request.method == 'POST':
+            # Get form data
+            chat_name = request.form.get('chat_name')
+            
+            # Get member IDs as integers
+            try:
+                members_str = request.form.getlist('members')
+                members = [int(m_id) for m_id in members_str if m_id.isdigit()]
+            except ValueError:
+                flash('Invalid member selection', 'danger')
+                return redirect(url_for('create_chat'))
+                
+            # Basic validation
+            if not chat_name or not members:
+                flash('Chat name and at least one member are required', 'danger')
+                cursor_get = conn.cursor(pymysql.cursors.DictCursor)
+                cursor_get.execute(
+                    "SELECT userID, userName, firstName, lastName FROM User WHERE userID != %s ORDER BY userName",
+                    (creator_id,)
+                )
+                potential_users = cursor_get.fetchall()
+                cursor_get.close()
+                return render_template('create_chat.html', potential_users=potential_users, chat_name=chat_name)
+
+            cursor = conn.cursor()
+            try:
+                # Start transaction
+                # If only one member selected, use CreateChatAndRequest procedure
+                if len(members) == 1:
+                    cursor.callproc('CreateChatAndRequest', (creator_id, chat_name, members[0]))
+                # Otherwise create multi-user chat directly
+                else:
+                    # Create the chat
+                    cursor.execute(
+                        "INSERT INTO Chat (chatName, userID) VALUES (%s, %s)",
+                        (chat_name, creator_id)
+                    )
+                    chat_id = cursor.lastrowid
+                    
+                    # Include creator in members if not already
+                    if creator_id not in members:
+                        members.append(creator_id)
+                        
+                    # Add all members to the chat
+                    member_data = [(chat_id, member_id) for member_id in members]
+                    cursor.executemany(
+                        "INSERT INTO ChatMember (chatID, userID) VALUES (%s, %s)",
+                        member_data
+                    )
+                    
+                    # Create welcome message
+                    cursor.execute("INSERT INTO TimeStamp (sentTime, sentDate) VALUES (CURTIME(), CURDATE())")
+                    timestamp_id = cursor.lastrowid
+                    cursor.execute(
+                        "INSERT INTO ChatMessage (chatID, userID, messageText, TimeStampID) VALUES (%s, %s, %s, %s)",
+                        (chat_id, creator_id, f"Group chat '{chat_name}' created", timestamp_id)
+                    )
+                    
+                conn.commit()
+                flash("Chat created successfully!", 'success')
+                return redirect(url_for('list_chats'))
+                
+            except Exception as e:
+                conn.rollback()
+                flash(f'Error creating chat: {e}', 'danger')
+                print(f"Error in create_chat: {e}")
+                return redirect(url_for('create_chat'))
+            finally:
+                cursor.close()
+
+        # --- GET Request Logic ---
+        cursor_get = conn.cursor(pymysql.cursors.DictCursor)
+        try:
+            cursor_get.execute(
+                "SELECT userID, userName, firstName, lastName FROM User WHERE userID != %s ORDER BY userName",
+                (creator_id,)
+            )
+            potential_users = cursor_get.fetchall()
+        except Exception as e:
+            flash(f'Error loading users: {e}', 'danger')
+            potential_users = []
+        finally:
+            cursor_get.close()
+
+        return render_template('create_chat.html', potential_users=potential_users)
+        
+    finally:
+        if conn:
+            conn.close()
+
+@app.route('/chat/<int:chat_id>', methods=['GET', 'POST'])
+def view_chat(chat_id):
+    """
+    Display an individual chat and handle sending new messages.
+    Supports both 1-on-1 and group chats.
+    """
+    # Ensure user is logged in
+    if 'username' not in session or 'userID' not in session:
+        flash('Please login to view chats', 'danger')
+        return redirect(url_for('login'))
+
+    user_id = session['userID']
+    conn = connect_db()
+    try:
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
+
+        # Verify the user is a member of this chat
+        cursor.execute(
+            "SELECT COUNT(*) as is_member FROM ChatMember WHERE chatID = %s AND userID = %s",
+            (chat_id, user_id)
+        )
+        result = cursor.fetchone()
+        if not result or result['is_member'] == 0:
+            flash('You are not a member of this chat', 'danger')
+            cursor.close()
+            return redirect(url_for('list_chats'))
+
+        # Get chat details
+        cursor.execute("SELECT chatName FROM Chat WHERE chatID = %s", (chat_id,))
+        chat = cursor.fetchone()
+        
+        # Get chat members (allow any number of members)
+        cursor.execute("""
+            SELECT u.userID, u.userName, u.firstName, u.lastName
+            FROM ChatMember cm
+            JOIN User u ON cm.userID = u.userID
+            WHERE cm.chatID = %s
+        """, (chat_id,))
+        members = cursor.fetchall()
+        
+        # Removed check for exactly 2 members to allow group chats
+
+        # Handle new message submission
+        if request.method == 'POST':
+            message_text = request.form.get('message')
+            if message_text and message_text.strip():
+                try:
+                    # Create timestamp
+                    cursor.execute("INSERT INTO TimeStamp (sentTime, sentDate) VALUES (CURTIME(), CURDATE())")
+                    timestamp_id = cursor.lastrowid
+                    
+                    # Insert message
+                    cursor.execute(
+                        "INSERT INTO ChatMessage (chatID, userID, messageText, TimeStampID) VALUES (%s, %s, %s, %s)",
+                        (chat_id, user_id, message_text, timestamp_id)
+                    )
+                    conn.commit()
+                    return redirect(url_for('view_chat', chat_id=chat_id))
+                except Exception as e:
+                    conn.rollback()
+                    flash(f'Error sending message: {e}', 'danger')
+
+        # Get chat messages
+        cursor.execute("""
+            SELECT cm.chatMessageID as messageID, cm.messageText, u.userID,
+                   u.userName, u.firstName, u.lastName,
+                   ts.sentTime, ts.sentDate
+            FROM ChatMessage cm
+            JOIN User u ON cm.userID = u.userID
+            JOIN TimeStamp ts ON cm.TimeStampID = ts.TimeStampID
+            WHERE cm.chatID = %s
+            ORDER BY ts.sentDate ASC, ts.sentTime ASC
+        """, (chat_id,))
+        messages = cursor.fetchall()
+        cursor.close()
+
+    except Exception as e:
+        if conn:
+            conn.rollback()
+        flash(f'Error accessing chat: {e}', 'danger')
+        print(f"Error in view_chat: {e}")
+        return redirect(url_for('list_chats'))
+    finally:
+        if conn:
+            conn.close()
+
+    return render_template('view_chat.html',
+                           chat=chat,
+                           chat_id=chat_id,
+                           members=members,
+                           messages=messages,
+                           current_user_id=user_id)
 @app.context_processor
 def inject_user_data():
     """
