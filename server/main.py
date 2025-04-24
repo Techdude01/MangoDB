@@ -974,7 +974,7 @@ def add_tag():
     
     try:
         # Call the AddTag stored procedure
-        cursor.execute("CALL AddTag(%s, %s)", (user_id, tag_id))
+        cursor.execute("CALL UserAddTag(%s, %s)", (user_id, tag_id))
         conn.commit()
         flash('Tag added successfully!', 'success')
     except pymysql.Error as e:

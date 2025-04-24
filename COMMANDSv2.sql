@@ -25,7 +25,7 @@ CREATE TABLE TimeStamp(
   sentDate DATE
 );
 
--- Create Question table before TagList (referenced by foreign key)
+-- Create Question table before UserTag (referenced by foreign key)
 CREATE TABLE Question (
   questionID INT AUTO_INCREMENT PRIMARY KEY,
   userID INT,
@@ -40,16 +40,23 @@ CREATE TABLE Question (
   FOREIGN KEY (tagID) REFERENCES Tag(tagID)
 );
 
--- Create TagList junction table
-CREATE TABLE TagList(
+-- Create UserTag junction table
+CREATE TABLE UserTag(
   tagID INT,
-  questionID INT,
   userID INT,
   FOREIGN KEY (tagID) REFERENCES Tag(tagID),
-  FOREIGN KEY (questionID) REFERENCES Question(questionID),
   FOREIGN KEY (userID) REFERENCES User(userID),
-  PRIMARY KEY (tagID, questionID, userID)  
+  PRIMARY KEY (tagID, userID)  
 );
+
+CREATE TABLE QuestionTag(
+  tagID INT,
+  questionID INT,
+  FOREIGN KEY (tagID) REFERENCES Tag(tagID),
+  FOREIGN KEY (questionID) REFERENCES Question(questionID),
+  PRIMARY KEY (tagID, questionID)  
+);
+
 
 -- Create Chat table
 CREATE TABLE Chat(
@@ -245,32 +252,60 @@ INSERT INTO Question (userID, questionText, TimeStampID, upvotes, downvotes, sta
 (19,'Can Chuck Norris divide by zero?', 49, 100, 0, 'published'),
 (20,'Why does Skynet send Terminators back?', 50, 12, 6, 'published');
 
--- Insert taglist data
-INSERT INTO TagList (tagID, questionID, userID) VALUES
-(1,1,1), (2,2,2), (3,3,3), (4,4,4), (5,5,5), (3,6,6), (7,7,5), (4,8,8), (7,9,7), (8,10,9),
-(11, 2, 1), (12, 7, 1), (18, 1, 1), (10, 9, 1),
-(11, 2, 2), (14, 4, 2), (7, 7, 2), (17, 3, 2),
-(13, 5, 3), (9, 8, 3), (20, 3, 3), (8, 10, 3),
-(13, 5, 4), (18, 1, 4), (14, 4, 4), (9, 9, 4),
-(13, 5, 5), (19, 3, 5), (14, 6, 5),
-(13, 5, 6), (1, 1, 6), (18, 1, 6), (5, 5, 6),
-(1, 2, 7), (11, 2, 7), (16, 16, 7), (10, 10, 7),
-(15, 12, 8), (9, 8, 8), (2, 4, 8), (17, 9, 8),
-(14, 6, 9), (19, 19, 9), (6, 8, 9), (11, 9, 9),
-(19, 17, 10), (14, 4, 10), (13, 14, 10), (4, 8, 10),
-(18, 11, 11), (13, 11, 11), (16, 13, 11), (9, 3, 11), (3, 11, 11),
-(15, 12, 12), (6, 12, 12), (2, 2, 12), (10, 12, 12), (3, 6, 12),
-(3, 13, 13), (18, 13, 13), (11, 7, 13), (12, 7, 13), (19, 17, 13),
-(13, 14, 2), (18, 14, 14), (7, 15, 14), (9, 14, 13), (5, 15, 14),
-(7, 15, 15), (10, 15, 15), (13, 14, 15), (1, 15, 15), (17, 5, 15),
-(1, 16, 16), (11, 16, 16), (12, 16, 16), (18, 16, 16), (7, 17, 16),
-(7, 17, 17), (18, 17, 17), (12, 7, 17), (19, 17, 17), (8, 10, 17),
-(7, 18, 18), (18, 18, 18), (1, 16, 18), (15, 12, 18), (10, 18, 18),
-(13, 19, 19), (9, 19, 19), (14, 19, 19), (4, 4, 19), (8, 8, 19),
-(1, 20, 20), (11, 20, 20), (18, 20, 20), (16, 20, 20), (10, 15, 20),
-(6, 1, 1), (17, 2, 3), (15, 3, 5), (16, 4, 8), (14, 5, 12),
-(11, 6, 11), (12, 7, 9), (13, 8, 15), (10, 9, 17), (9, 10, 19),
-(20, 1, 2), (20, 2, 4), (20, 4, 6), (20, 5, 8), (20, 6, 10);
+-- Insert UserTag data
+-- Insert into UserTag table (connects users with tags they're interested in)
+INSERT INTO UserTag (tagID, userID) VALUES
+(1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (3, 6), (7, 5), (4, 8), (7, 7), (8, 9),
+(11, 1), (12, 1), (18, 1), (10, 1),
+(11, 2), (14, 2), (7, 2), (17, 2),
+(13, 3), (9, 3), (20, 3), (8, 3),
+(13, 4), (18, 4), (14, 4), (9, 4),
+(13, 5), (19, 5), (14, 5),
+(13, 6), (1, 6), (18, 6), (5, 6),
+(1, 7), (11, 7), (16, 7), (10, 7),
+(15, 8), (9, 8), (2, 8), (17, 8),
+(14, 9), (19, 9), (6, 9), (11, 9),
+(19, 10), (14, 10), (13, 10), (4, 10),
+(18, 11), (13, 11), (16, 11), (9, 11), (3, 11),
+(15, 12), (6, 12), (2, 12), (10, 12), (3, 12),
+(3, 13), (18, 13), (11, 13), (12, 13), (19, 13),
+(13, 2), (18, 14), (7, 14), (9, 13), (5, 14),
+(7, 15), (10, 15), (13, 15), (1, 15), (17, 15),
+(1, 16), (11, 16), (12, 16), (18, 16), (7, 16),
+(7, 17), (18, 17), (12, 17), (19, 17), (8, 17),
+(7, 18), (18, 18), (1, 18), (15, 18), (10, 18),
+(13, 19), (9, 19), (14, 19), (4, 19), (8, 19),
+(1, 20), (11, 20), (18, 20), (16, 20), (10, 20),
+(6, 1), (17, 3), (15, 5), (16, 8), (14, 12),
+(11, 11), (12, 9), (13, 15), (10, 17), (9, 19),
+(20, 2), (20, 4), (20, 6), (20, 8), (20, 10);
+
+-- Insert into QuestionTag table (connects questions with relevant tags)
+INSERT INTO QuestionTag (tagID, questionID) VALUES
+(1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (3, 6), (7, 7), (4, 8), (7, 9), (8, 10),
+(11, 2), (12, 7), (18, 1), (10, 9),
+(11, 2), (14, 4), (7, 7), (17, 3),
+(13, 5), (9, 8), (20, 3), (8, 10),
+(13, 5), (18, 1), (14, 4), (9, 9),
+(13, 5), (19, 3), (14, 6),
+(13, 5), (1, 1), (18, 1), (5, 5),
+(1, 2), (11, 2), (16, 16), (10, 10),
+(15, 12), (9, 8), (2, 4), (17, 9),
+(14, 6), (19, 19), (6, 8), (11, 9),
+(19, 17), (14, 4), (13, 14), (4, 8),
+(18, 11), (13, 11), (16, 13), (9, 3), (3, 11),
+(15, 12), (6, 12), (2, 2), (10, 12), (3, 6),
+(3, 13), (18, 13), (11, 7), (12, 7), (19, 17),
+(13, 14), (18, 14), (7, 15), (9, 14), (5, 15),
+(7, 15), (10, 15), (13, 14), (1, 15), (17, 5),
+(1, 16), (11, 16), (12, 16), (18, 16), (7, 17),
+(7, 17), (18, 17), (12, 7), (19, 17), (8, 10),
+(7, 18), (18, 18), (1, 16), (15, 12), (10, 18),
+(13, 19), (9, 19), (14, 19), (4, 4), (8, 8),
+(1, 20), (11, 20), (18, 20), (16, 20), (10, 15),
+(6, 1), (17, 2), (15, 3), (16, 4), (14, 5),
+(11, 6), (12, 7), (13, 8), (10, 9), (9, 10),
+(20, 1), (20, 2), (20, 4), (20, 5), (20, 6);
 
 -- Insert chat data
 INSERT INTO Chat (userID, chatName) VALUES
@@ -608,8 +643,8 @@ BEGIN
     SELECT q.questionText, t.sentTime, t.sentDate
     FROM Question q
     JOIN TimeStamp t ON q.TimeStampID = t.TimeStampID
-    JOIN TagList l ON q.questionID = l.questionID 
-    WHERE l.tagID IN (SELECT tl.tagID FROM TagList tl JOIN User u ON tl.userID = u.userID WHERE u.userName = p_username) AND q.status = "published"
+    JOIN UserTag l ON q.questionID = l.questionID 
+    WHERE l.tagID IN (SELECT tl.tagID FROM UserTag tl JOIN User u ON tl.userID = u.userID WHERE u.userName = p_username) AND q.status = "published"
     GROUP BY q.questionID, q.questionText, t.sentTime, t.sentDate
     ORDER BY count(*) DESC, t.sentDate DESC, t.sentTime DESC
     LIMIT 10;
@@ -620,7 +655,7 @@ CREATE PROCEDURE GetQuestionsByTag(IN p_tagName VARCHAR(16))
 BEGIN
     SELECT DISTINCT q.questionID, q.questionText
     FROM Question q
-    JOIN TagList t1 ON q.userID = t1.userID
+    JOIN UserTag t1 ON q.userID = t1.userID
     JOIN Tag t ON t1.tagID = t.tagID
     WHERE t.tagName = p_tagName AND q.status = 'published';
 END//
@@ -695,11 +730,11 @@ CREATE PROCEDURE GetSimilarUsersByTags (
 BEGIN
     SELECT u.firstName, u.lastName, COUNT(*) as sharedTags
     FROM User u
-    JOIN TagList t ON t.userID = u.userID
+    JOIN UserTag t ON t.userID = u.userID
     WHERE u.userID <> target_userID 
         AND t.tagID IN (
             SELECT tagID
-            FROM TagList
+            FROM UserTag
             WHERE userID = target_userID
         )
     GROUP BY u.userID, u.firstName, u.lastName
@@ -707,11 +742,12 @@ BEGIN
     LIMIT 4;
 END//
 
-CREATE PROCEDURE AddTag(IN target_userID INT, IN targ_tag_id INT)
+CREATE PROCEDURE UserAddTag(IN target_userID INT, IN targ_tag_id INT)
 BEGIN
-    INSERT INTO TagList (tagID, userID)
+    INSERT INTO UserTag (tagID, userID)
     VALUES (targ_tag_id, target_userID);
 END//
+
 
 -- Get chat IDs for user procedure
 CREATE PROCEDURE GetChatIDsForUser (
@@ -730,7 +766,7 @@ CREATE PROCEDURE GetTagsByUserID(IN p_userID INT)
 BEGIN
     SELECT t.tagID, t.tagName
     FROM Tag t
-    JOIN TagList tl ON t.tagID = tl.tagID
+    JOIN UserTag tl ON t.tagID = tl.tagID
     WHERE tl.userID = p_userID
     GROUP BY t.tagID, t.tagName;
 END//
