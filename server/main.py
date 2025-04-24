@@ -130,6 +130,7 @@ def dashboard():
     # Get questions created by the current user
     cursor.execute("CALL GetQuestionsByUserID(%s)", (session['userID'],))
     questions = cursor.fetchall()
+
     print(questions)
     # Get tags used by the current user
     cursor.execute("CALL GetTagsByUserID(%s)", (session['userID'],))
@@ -215,7 +216,7 @@ def home():
     cursor = conn.cursor(pymysql.cursors.DictCursor)
     qCount = 5
     # Fetch total questions
-    cursor.execute("SELECT COUNT(*) AS total FROM Question")
+    cursor.execute("SELECT COUNT(*) AS total FROM Question WHERE status = 'published'")
     total_questions = cursor.fetchone()['total']
     qPage= total_questions // qCount + (total_questions % qCount > 0)
     #Fetch top 5 questions for each category
@@ -225,7 +226,7 @@ def home():
     most_controversial = cursor.fetchall()
     cursor.execute("CALL GetRecentQuestionsWithPagination(%s, 0)", (qCount,))
     most_recent = cursor.fetchall()
-    cursor.execute("SELECT COUNT(*) AS total FROM Question")
+    cursor.execute("SELECT COUNT(*) AS total FROM Question WHERE status = 'published'")
     total_questions = cursor.fetchone()['total']
     cursor.execute("SELECT tagID, tagName FROM Tag")
     tags = cursor.fetchall()
@@ -298,7 +299,7 @@ def most_popular():
     questions = cursor.fetchall()
 
     # Fetch total num of questions for pagination
-    cursor.execute("SELECT COUNT(*) AS total FROM Question")
+    cursor.execute("SELECT COUNT(*) AS total FROM Question WHERE status = 'published'")
     total_questions = cursor.fetchone()['total']
 
     conn.close()
@@ -325,7 +326,7 @@ def most_controversial():
     questions = cursor.fetchall()
     
     # Fetch total num of questions for pagination
-    cursor.execute("SELECT COUNT(*) AS total FROM Question")
+    cursor.execute("SELECT COUNT(*) AS total FROM Question WHERE status = 'published'")
     total_questions = cursor.fetchone()['total']
     
     conn.close()
@@ -352,7 +353,7 @@ def most_recent():
     questions = cursor.fetchall()
 
     # Fetch total num of questions for pagination
-    cursor.execute("SELECT COUNT(*) AS total FROM Question")
+    cursor.execute("SELECT COUNT(*) AS total FROM Question WHERE status = 'published'")
     total_questions = cursor.fetchone()['total']
     
     conn.close()
