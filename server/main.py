@@ -215,34 +215,47 @@ def home():
     conn = connect_db()
     cursor = conn.cursor(pymysql.cursors.DictCursor)
     qCount = 5
-    # Fetch total questions
-    cursor.execute("SELECT COUNT(*) AS total FROM Question WHERE status = 'published'")
-    total_questions = cursor.fetchone()['total']
-    qPage= total_questions // qCount + (total_questions % qCount > 0)
-    #Fetch top 5 questions for each category
-    cursor.execute("CALL GetPopularQuestionsWithPagination(%s, 0)", (qCount,))
-    most_popular = cursor.fetchall()
-    cursor.execute("CALL GetControversialQuestionsWithPagination(%s, 0)", (qCount,))
-    most_controversial = cursor.fetchall()
-    cursor.execute("CALL GetRecentQuestionsWithPagination(%s, 0)", (qCount,))
-    most_recent = cursor.fetchall()
-    cursor.execute("SELECT COUNT(*) AS total FROM Question WHERE status = 'published'")
-    total_questions = cursor.fetchone()['total']
-    cursor.execute("SELECT tagID, tagName FROM Tag")
-    tags = cursor.fetchall()
-    conn.close()
-    
-    return render_template(
-        'home.html', 
-        tags=tags,
-        most_popular=most_popular, 
-        most_controversial=most_controversial, 
-        most_recent=most_recent,
-        most_popular_page=1,
-        total_pages=qPage,
-        most_controversial_page=1,
-        most_recent_page=1,
+
+    try:
+        # Fetch total questions
+        cursor.execute("SELECT COUNT(*) AS total FROM Question WHERE status = 'published'")
+        total_questions = cursor.fetchone()['total']
+        qPage= total_questions // qCount + (total_questions % qCount > 0)
+
+        #Fetch top 5 questions for each category
+        cursor.execute("CALL GetPopularQuestionsWithPagination(%s, 0)", (qCount,))
+        most_popular = cursor.fetchall()
+
+        cursor.execute("CALL GetControversialQuestionsWithPagination(%s, 0)", (qCount,))
+        most_controversial = cursor.fetchall()
+
+        cursor.execute("CALL GetRecentQuestionsWithPagination(%s, 0)", (qCount,))
+        most_recent = cursor.fetchall()
+
+        cursor.execute("SELECT tagID, tagName FROM Tag")
+        tags = cursor.fetchall()
+        
+        # Fetch a specific question (example: the first question)
+        cursor.execute("SELECT * FROM Question WHERE status = 'published' LIMIT 1")
+        question = cursor.fetchone()
+        
+        return render_template(
+            'home.html', 
+            tags=tags,
+            most_popular=most_popular, 
+            most_controversial=most_controversial, 
+            most_recent=most_recent,
+            question=question,
+            most_popular_page=1,
+            total_pages=qPage,
+            most_controversial_page=1,
+            most_recent_page=1,
         )
+    except Exception as e: 
+        flash(f"Error loading homepage: {e}", "danger")
+        return render_template('home.html', tags=[], most_popular=[], most_controversial=[], most_recent=[])
+    finally:
+        conn.close()
 
 @app.route('/search', methods=['GET'])
 def search():
