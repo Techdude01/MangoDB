@@ -89,8 +89,8 @@ Question Details - {{ question.questionText | truncate(30) }}
         <p class="no-items info-text">No responses yet.</p>
         {% endif %}
     </div>
-    
-        <!-- Comment Submission Form -->
+        
+    <!-- Comment Submission Form -->
     {% if not user_has_commented %}
         <div class="comment-form-container"> <!-- Added container for better structure -->
             <h3 class="sub-heading">Leave a Comment</h3> <!-- Use h3 for sub-section -->
@@ -112,11 +112,12 @@ Question Details - {{ question.questionText | truncate(30) }}
         <div class="comment-form-container">
             <h3 class="sub-heading">Your Comment</h3>
             <div class="form-group">
+                <!-- Display the user's comment in a readonly textarea -->
                 <textarea class="form-input" rows="3" readonly>{{ user_comment_text }}</textarea>
             </div>
         </div>
     {% endif %}
-    
+
     <!-- Display Comments -->
     {% if comments %}
         <ul class="item-list comment-list">
@@ -138,6 +139,7 @@ Question Details - {{ question.questionText | truncate(30) }}
     {% else %}
         <p class="no-items info-text">No comments yet.</p>
     {% endif %}
+
 
         <!-- Back Button -->
         <div class="action-buttons page-actions">
