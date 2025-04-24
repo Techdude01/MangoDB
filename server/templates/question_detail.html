@@ -17,6 +17,15 @@ Question Details - {{ question.questionText | truncate(30) }}
             {% if question.datePosted %}
             <span class="date"><i class="fa fa-calendar"></i> {{ question.datePosted }}</span>
             {% endif %}
+            <!-- Display Tags if available -->
+            {% if question.tags %}
+            <div class="tags info-text">
+                <i class="fa fa-tags"></i> Tags:
+                {% for tag in question.tags %}
+                <span class="tag badge">{{ tag }}</span>{% if not loop.last %}, {% endif %}
+                {% endfor %}
+            </div>
+            {% endif %}
         </div>
         {% if question.questionDescription %}
         <div class="question-description">
@@ -32,8 +41,7 @@ Question Details - {{ question.questionText | truncate(30) }}
         <h2 class="section-heading">Submit Your Response</h2>
         <form method="POST" action="{{ url_for('question_detail', question_id=question.questionID) }}"
             class="response-form">
-            <!-- Hidden userID is often unnecessary if handled server-side via session -->
-            <!-- <input type="hidden" name="userID" value="{{ session['userID']}}"> -->
+            <!-- Hidden userID is unnecessary if handled server-side via session -->
             <div class="form-group">
                 <textarea name="responseText" class="form-input" rows="4" required
                     placeholder="Submit your response..."></textarea>
@@ -48,25 +56,26 @@ Question Details - {{ question.questionText | truncate(30) }}
     <!-- Voting Controls -->
     <div class="card voting-controls-card">
         <h2 class="section-heading">Vote</h2>
-        <div class="voting-controls card">
+        <div class="vote-container"> <!-- Removed redundant 'card' class here -->
             <div class="vote-buttons">
                 <!-- Upvote Form -->
                 <form method="POST" action="{{ url_for('vote_question') }}" class="vote-form">
                     <input type="hidden" name="question_id" value="{{ question.questionID }}">
-                    <input type="hidden" name="vote" value="up">
-                    <input type="hidden" name="userID" value="{{ session['userID'] }}">
-                    <button type="submit" class="vote-btn upvote"><i class="fa fa-thumbs-up"></i> Upvote</button>
+                    <input type="hidden" name="vote_type" value="up"> <!-- Standardized name -->
+                    <!-- Hidden userID is unnecessary if handled server-side via session -->
+                    <button type="submit" class="btn vote-btn upvote"><i class="fa fa-thumbs-up"></i> Upvote</button>
                 </form>
                 <!-- Downvote Form -->
                 <form method="POST" action="{{ url_for('vote_question') }}" class="vote-form">
                     <input type="hidden" name="question_id" value="{{ question.questionID }}">
-                    <input type="hidden" name="vote" value="down">
-                    <input type="hidden" name="userID" value="{{ session['userID'] }}">
-                    <button type="submit" class="vote-btn downvote"><i class="fa fa-thumbs-down"></i> Downvote</button>
+                    <input type="hidden" name="vote_type" value="down"> <!-- Standardized name -->
+                    <!-- Hidden userID is unnecessary if handled server-side via session -->
+                    <button type="submit" class="btn vote-btn downvote"><i class="fa fa-thumbs-down"></i>
+                        Downvote</button>
                 </form>
             </div>
-            <p class="vote-count badge">Current Votes: <span class="upvote-count">+{{ question.upvotes }}</span> / <span
-                    class="downvote-count">-{{ question.downvotes }}</span></p>
+            <p class="vote-count badge info-text">Current Votes: <span class="upvote-count">+{{ question.upvotes
+                    }}</span> / <span class="downvote-count">-{{ question.downvotes }}</span></p>
         </div>
     </div>
 
@@ -80,7 +89,9 @@ Question Details - {{ question.questionText | truncate(30) }}
                 <p class="item-text">{{ response.responseText }}</p>
                 <div class="metadata info-text">
                     <span class="author"><i class="fa fa-user"></i> {{ response.userName }}</span>
-                    <!-- Add date/time if available -->
+                    {% if response.timestamp %} {# Assuming timestamp is available #}
+                    <span class="timestamp"><i class="fa fa-clock"></i> {{ response.timestamp }}</span>
+                    {% endif %}
                 </div>
             </li>
             {% endfor %}
@@ -90,64 +101,61 @@ Question Details - {{ question.questionText | truncate(30) }}
         {% endif %}
     </div>
 
-    <!-- Comment Submission Form -->
-    <div class="card voting-controls-card">
+    <!-- Comments Section (Combined Form and List) -->
+    <div class="card comments-card">
+        <h2 class="section-heading">Comments</h2>
+
+        <!-- Comment Submission Form (Conditional) -->
         {% if not user_has_commented %}
-        <div class="comment-form-container"> <!-- Added container for better structure -->
-            <h3 class="sub-heading">Leave a Comment</h3> <!-- Use h3 for sub-section -->
+        <div class="comment-form-container">
+            <h3 class="sub-heading">Leave a Comment</h3>
             <form method="POST" action="{{ url_for('question_detail', question_id=question.questionID) }}"
                 class="comment-form">
-                <!-- Hidden userID is often unnecessary if handled server-side via session -->
-                <!-- <input type="hidden" name="userID" value="{{ session['userID']}}"> -->
+                <!-- Hidden userID is unnecessary if handled server-side via session -->
                 <div class="form-group">
                     <textarea name="commentText" class="form-input" rows="3" required
                         placeholder="Write your comment..."></textarea>
                 </div>
                 <div class="action-buttons">
-                    <button type="submit" class="btn primary">Submit Comment</button>
+                    <button type="submit" class="btn primary" style="float: right; margin-top: -40px;">Submit
+                        Comment</button>
                 </div>
             </form>
         </div>
         {% else %}
-        <p class="info-text">You have already commented on this question. You cannot leave another response.</p>
-        <div class="comment-form-container">
-            <h3 class="sub-heading">Your Comment</h3>
-            <div class="form-group">
-                <!-- Display the user's comment in a readonly textarea -->
-                <textarea class="form-input" rows="3" readonly>{{ user_comment_text }}</textarea>
-            </div>
-        </div>
+        <p class="info-text">You have already commented on this question.</p> {# Simplified message #}
         {% endif %}
 
         <!-- Display Comments -->
-        <div class="card voting-controls-card">
-            <h2 class="section-heading">Comments</h2>
+        <div class="item-list comment-list"> {# Moved list inside comments-card #}
             {% if comments %}
-            <ul class="item-list comment-list">
-                {% for c in comments %}
-                <li class="item comment-item">
-                    <p class="item-text">{{ c.commentText }}</p>
-                    <div class="metadata info-text">
-                        {% if c.userName %}
-                        <span class="author"><i class="fa fa-user"></i> {{ c.userName }}</span>
-                        {% endif %}
-                        <!-- Add date/time if available -->
-                        {% if c.timestamp %}
-                        <span class="timestamp"><i class="fa fa-clock"></i> {{ c.timestamp }}</span>
-                        {% endif %}
-                    </div>
-                </li>
-                {% endfor %}
-            </ul>
+            {% for c in comments %}
+            <div class="item comment-item"> {# Changed to div for consistency #}
+                <p class="item-text">{{ c.commentText }}</p>
+                <div class="metadata info-text">
+                    {% if c.userName %}
+                    <span class="author"><i class="fa fa-user"></i> {{ c.userName }}</span>
+                    {% endif %}
+                    {% if c.timestamp %} {# Assuming timestamp is available #}
+                    <span class="timestamp"><i class="fa fa-clock"></i> {{ c.timestamp }}</span>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
             {% else %}
+            {% if user_has_commented %} {# Only show 'No comments yet' if the user hasn't just been told they already
+            commented #}
             <p class="no-items info-text">No comments yet.</p>
             {% endif %}
-
-        </div>
-        <!-- Back Button -->
-        <div class="action-buttons page-actions">
-            <a href="{{ url_for('home') }}" class="btn secondary"><i class="fa fa-arrow-left"></i> Back to Home</a>
+            {% endif %}
         </div>
     </div>
-    {% endif %}
-    {% endblock %}
+    {% endif %} {# End of the main conditional block for user_has_responded #}
+
+    <!-- Back Button (Outside the conditional block) -->
+    <div class="action-buttons page-actions">
+        <a href="{{ url_for('home') }}" class="btn secondary"><i class="fa fa-arrow-left"></i> Back to Home</a>
+    </div>
+
+</div> {# End of .main div #}
+{% endblock %}

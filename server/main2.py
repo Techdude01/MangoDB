@@ -549,7 +549,8 @@ def question_detail(question_id):
         question=question,
         responses=responses,
         comments=comments,
-        user_has_responded=user_has_responded
+        user_has_responded=user_has_responded,
+        user_has_commented=user_has_commented,
     )
 @app.route('/submit_comment', methods=['POST'])
 def submit_comment():

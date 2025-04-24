@@ -55,13 +55,13 @@ body {
 
 /* ========== MAIN CONTAINER ========== */
 .main {
-  min-width: 1000px;
-  max-width: 100%; /* Increased max-width */
   margin: 1rem auto;
   background: rgba(255, 237, 148, 0.85); /* Semi-transparent background */
   border-radius: 12px;
   box-shadow: 0 4px 24px rgba(255, 183, 77, 0.13);
   padding: 2rem;
+  max-width: 1200px; /* Limit width to prevent full page expansion */
+  width: 95%; /* Allow some margin on the sides */
 }
 
 /* ========== HEADINGS ========== */
@@ -136,7 +136,8 @@ h6,
 .user-registration input,
 .form-group input,
 .response-form textarea {
-  width: 200px; /* Adjust width as needed */
+  min-width: 725px; /* Ensure minimum width */
+  /* width: 100%; Allow full width responsiveness */
   padding: 0.6rem;
   border: 1px solid #ffd54f; /* Theme border */
   border-radius: 5px;
@@ -144,14 +145,18 @@ h6,
   font-family: inherit; /* Inherit font from body */
   color: #3e2723; /* Theme text color */
   transition: border-color 0.2s, box-shadow 0.2s;
+  margin-bottom: 1rem; /* Add spacing between form elements */
+}
+.main-form textarea {
+  min-width: 425px; /* Ensure minimum width */
 }
 
 /* Hover and focus effects for the dropdown */
 .form-input:hover,
 .form-input:focus {
-    border-color: #ffb300; /* Highlight border on hover/focus */
-    box-shadow: 0 0 4px rgba(255, 179, 0, 0.5); /* Subtle glow */
-    outline: none; /* Remove default outline */
+  border-color: #ffb300; /* Highlight border on hover/focus */
+  box-shadow: 0 0 4px rgba(255, 179, 0, 0.5); /* Subtle glow */
+  outline: none; /* Remove default outline */
 }
 
 .form-group label,
