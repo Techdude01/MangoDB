@@ -12,93 +12,83 @@ Mango Homepage
 <div class="main">
     <!-- Login Button -->
     {% if show_login_button %}
-    <a href="{{ url_for('login') }}" class="button">Go to Login</a>
+    <div class="action-buttons page-actions" style="margin-bottom: 1rem;"> {# Added container for spacing #}
+        <a href="{{ url_for('login') }}" class="btn primary">Go to Login</a> {# Use btn class #}
+    </div>
     {% endif %}
 
     <!-- Search Section -->
-    <div class="main-query">
-        <h1>Search Bar</h1>
-        <h3>Query by Username, Keyword in Question Text, or Tag!</h3>
+    <div class="card main-query"> {# Added card class #}
+        <h1 class="section-heading">Search Questions</h1> {# Use section-heading #}
+        <h3 class="sub-heading">Query by Username, Keyword in Question Text, or Tag!</h3> {# Use sub-heading #}
         <form id="search-form" action="{{ url_for('search') }}" method="get">
-            <div>
+            <div class="form-group"> {# Wrap in form-group #}
                 <label for="username">Username:</label>
-                <input type="text" id="username" name="username" placeholder="Enter username" style="max-width: 200px;">
+                <input type="text" id="username" name="username" placeholder="Enter username" class="form-input"> {# Use
+                form-input class #}
             </div>
-            <div>
+            <div class="form-group"> {# Wrap in form-group #}
                 <label for="keyword">Keyword:</label>
                 <input type="text" id="keyword" name="keyword" placeholder="Enter keyword in question text"
-                    style="max-width: 200px;">
+                    class="form-input"> {# Use form-input class #}
             </div>
-            <div>
+            <div class="form-group"> {# Wrap in form-group #}
                 <label for="tag">Tag:</label>
-                <select id="tag" name="tag">
+                <select id="tag" name="tag" class="form-input"> {# Use form-input class #}
                     <option value="">-- Select a Tag --</option>
                     {% for tag in tags %}
                     <option value="{{ tag['tagName'] }}">{{ tag['tagName'] }}</option>
                     {% endfor %}
                 </select>
-                <<<<<<< HEAD=======</form>
-                    <p class="note info-text">Submit a response to view others' contributions and vote on this question.
-                    </p>
             </div>
-            {% else %}
-            <!-- Voting Controls -->
-            <div class="card voting-controls-card">
-                <h2 class="section-heading">Vote</h2>
-                <div class="voting-controls card">
-                    <div class="vote-buttons">
-                        <!-- Upvote Form -->
-                        <form method="POST" action="{{ url_for('vote_question') }}" class="vote-form">
-                            <input type="hidden" name="question_id" value="{{ question.questionID }}">
-                            <input type="hidden" name="vote" value="up">
-                            <input type="hidden" name="userID" value="{{ session['userID'] }}">
-                            <button type="submit" class="vote-btn upvote"><i class="fa fa-thumbs-up"></i>
-                                Upvote</button>
-                        </form>
-                        <!-- Downvote Form -->
-                        <form method="POST" action="{{ url_for('vote_question') }}" class="vote-form">
-                            <input type="hidden" name="question_id" value="{{ question.questionID }}">
-                            <input type="hidden" name="vote" value="down">
-                            <input type="hidden" name="userID" value="{{ session['userID'] }}">
-                            <button type="submit" class="vote-btn downvote"><i class="fa fa-thumbs-down"></i>
-                                Downvote</button>
-                        </form>
-                        >>>>>>> 0d8cdf953553ff4dade31d26ffebb9c0b9310fca
-                    </div>
-                    <div>
-                        <button onclick="validateSearchForm()" class="action-btn">Search</button>
-                    </div>
+            <!-- Removed merge conflict markers and misplaced code -->
+            <div class="action-buttons"> {# Wrap button in action-buttons #}
+                <!-- Changed button type to submit, removed onclick JS validation for simplicity -->
+                <button type="submit" class="btn primary">Search</button> {# Use btn class #}
+            </div>
         </form>
     </div>
 
-    <!-- Post Question Section -->
-    <div class="post-question">
-        <button id="post-question-btn" onclick="toggleQuestionForm()">Post a Question</button>
-        <div id="question-form" style="display: none;">
+    <!-- Post Question Section - Only show if logged in -->
+    {% if session.get('userID') %}
+    <div class="card post-question"> {# Added card class #}
+        <h2 class="section-heading">Ask a Question</h2> {# Added heading #}
+        <button id="post-question-btn" onclick="toggleQuestionForm()" class="btn secondary">Post a Question</button> {#
+        Use btn class #}
+        <div id="question-form" style="display: none; margin-top: 1rem;"> {# Added margin #}
             <!-- First form to start a draft question -->
             <form id="start-question-form" action="{{ url_for('start_question') }}" method="post">
-                <input type="hidden" name="userID" value="{{ session.get('userID', '') }}">
-                <div>
+                <!-- Removed hidden userID - should be handled server-side -->
+                <div class="form-group"> {# Wrap in form-group #}
                     <label for="question-text">Question:</label>
                     <textarea id="question-text" name="question_text" placeholder="Write your question here..."
-                        required></textarea>
+                        class="form-input" required></textarea> {# Use form-input class #}
                 </div>
-                <button type="button" onclick="startDraft(event)">Start Draft</button>
+                <div class="action-buttons"> {# Wrap button in action-buttons #}
+                    <!-- Changed button type, kept onclick JS -->
+                    <button type="button" onclick="startDraft(event)" class="btn primary">Start Draft</button> {# Use
+                    btn class #}
+                </div>
             </form>
 
             <!-- Form to publish the question with tags (shows after draft creation) -->
             <form id="publish-question-form" action="{{ url_for('publish_question')}}" method="post"
-                style="display: none;">
-                <div>
+                style="display: none; margin-top: 1rem;"> {# Added margin #}
+                <div class="form-group"> {# Wrap in form-group #}
                     <label for="tags">Tags:</label>
-                    <select id="tags" name="tags" multiple required>
+                    <select id="tags" name="tags" multiple required class="form-input"> {# Use form-input class #}
                         {% for tag in tags %}
                         <option value="{{ tag['tagID'] }}">{{ tag['tagName'] }}</option>
                         {% endfor %}
                     </select>
+                    <small class="info-text">Hold Command (Mac) or Ctrl (Windows) to select multiple tags.</small> {#
+                    Added helper text #}
                 </div>
-                <button type="submit">Publish Question</button>
-                <button type="button" onclick="cancelDraft()" id="cancel-question-btn">Cancel</button>
+                <div class="action-buttons"> {# Wrap buttons in action-buttons #}
+                    <button type="submit" class="btn primary">Publish Question</button> {# Use btn class #}
+                    <button type="button" onclick="cancelDraft()" id="cancel-question-btn"
+                        class="btn secondary">Cancel</button> {# Use btn class #}
+                </div>
             </form>
             <!-- Hidden form to cancel the question draft -->
             <form id="cancel-question-form" action="{{ url_for('cancel_question')}}" method="post"
@@ -107,103 +97,125 @@ Mango Homepage
             </form>
         </div>
     </div>
-    {% endif %}
+    {% endif %} {# End of check for logged-in user #}
 
     <!-- Most Popular Questions Section -->
-    <div>
-        <h2 class=" section-heading"><a href="{{ url_for('most_popular') }}">Most Popular</a></h2>
-        <ul class="question-list">
+    <div class="card question-list-card"> {# Added card class #}
+        <h2 class="section-heading"><a href="{{ url_for('most_popular') }}">Most Popular</a></h2>
+        <ul class="item-list question-list"> {# Use item-list class #}
             {% for question in most_popular %}
             {% if question['questionID'] is defined and question['questionText'] is defined %}
-            <li class="question-item">
+            <li class="item question-item"> {# Use item class #}
                 <a href="{{ url_for('question_detail', question_id=question['questionID']) }}" class="question-link">
                     {{ question['questionText'] }}
                 </a>
-
+                <!-- Optional: Add metadata like author/date here if available -->
             </li>
             {% endif %}
+            {% else %}
+            <li class="no-items info-text">No popular questions found.</li> {# Handle empty list #}
             {% endfor %}
         </ul>
+        {% if most_popular and total_pages > 1 %} {# Check if pagination needed #}
         <div class="pagination">
             {% if most_popular_page > 1 %}
-            <a href="{{ url_for('most_popular', page=most_popular_page-1) }}">Previous</a>
+            <a href="{{ url_for('most_popular', page=most_popular_page-1) }}" class="btn pagination-btn">Previous</a>
             {% endif %}
-            <span>Page {{ most_popular_page }} of {{ total_pages }}</span>
-            {% if most_popular_page < total_pages %} <a href="{{ url_for('most_popular', page=most_popular_page+1) }}">
-                Next</a>
+            <span class="page-info info-text">Page {{ most_popular_page }} of {{ total_pages }}</span>
+            {% if most_popular_page < total_pages %} <a href="{{ url_for('most_popular', page=most_popular_page+1) }}"
+                class="btn pagination-btn">Next</a>
                 {% endif %}
         </div>
+        {% endif %}
     </div>
 
     <!-- Most Controversial Questions Section -->
-    <div>
+    <div class="card question-list-card"> {# Added card class #}
         <h2 class="section-heading"><a href="{{ url_for('most_controversial') }}">Most Controversial</a></h2>
-        <ul class="question-list">
+        <ul class="item-list question-list"> {# Use item-list class #}
             {% for question in most_controversial %}
             {% if question['questionID'] is defined and question['questionText'] is defined %}
-            <li class="question-item">
+            <li class="item question-item"> {# Use item class #}
                 <a href="{{ url_for('question_detail', question_id=question['questionID']) }}" class="question-link">
                     {{ question['questionText'] }}
                 </a>
             </li>
             {% endif %}
+            {% else %}
+            <li class="no-items info-text">No controversial questions found.</li> {# Handle empty list #}
             {% endfor %}
         </ul>
+        {% if most_controversial and total_pages > 1 %} {# Check if pagination needed #}
         <div class="pagination">
             {% if most_controversial_page > 1 %}
-            <a href="{{ url_for('most_controversial', page=most_controversial_page-1) }}">Previous</a>
+            <a href="{{ url_for('most_controversial', page=most_controversial_page-1) }}"
+                class="btn pagination-btn">Previous</a>
             {% endif %}
-            <span>Page {{ most_controversial_page }} of {{ total_pages }}</span>
+            <span class="page-info info-text">Page {{ most_controversial_page }} of {{ total_pages
+                }}</span>
             {% if most_controversial_page < total_pages %} <a
-                href="{{ url_for('most_controversial', page=most_controversial_page+1) }}">Next</a>
-                {% endif %}
-        </div>
-    </div>
-
-    <!-- Most Recent Questions Section -->
-    <div>
-        <h2 class="section-heading"><a href="{{ url_for('most_recent') }}">Most Recent</a></h2>
-        <ul class="question-list">
-            {% for question in most_recent %}
-            {% if question['questionID'] is defined and question['questionText'] is defined %}
-            <li class="question-item">
-                <a href="{{ url_for('question_detail', question_id=question['questionID']) }}" class="question-link">
-                    {{ question['questionText'] }}
-                </a>
-            </li>
-            {% endif %}
-            {% endfor %}
-        </ul>
-        <div class="pagination">
-            {% if most_recent_page > 1 %}
-            <a href="{{ url_for('most_recent', page=most_recent_page-1) }}">Previous</a>
-            {% endif %}
-            <span>Page {{ most_recent_page }} of {{ total_pages }}</span>
-            {% if most_recent_page < total_pages %} <a href="{{ url_for('most_recent', page=most_recent_page+1) }}">
+                href="{{ url_for('most_controversial', page=most_controversial_page+1) }}" class="btn pagination-btn">
                 Next</a>
                 {% endif %}
         </div>
+        {% endif %}
     </div>
 
-    <!-- ... rest of the file ... -->
+    <!-- Most Recent Questions Section -->
+    <div class="card question-list-card"> {# Added card class #}
+        <h2 class="section-heading"><a href="{{ url_for('most_recent') }}">Most Recent</a></h2>
+        <ul class="item-list question-list"> {# Use item-list class #}
+            {% for question in most_recent %}
+            {% if question['questionID'] is defined and question['questionText'] is defined %}
+            <li class="item question-item"> {# Use item class #}
+                <a href="{{ url_for('question_detail', question_id=question['questionID']) }}" class="question-link">
+                    {{ question['questionText'] }}
+                </a>
+            </li>
+            {% endif %}
+            {% else %}
+            <li class="no-items info-text">No recent questions found.</li> {# Handle empty list #}
+            {% endfor %}
+        </ul>
+        {% if most_recent and total_pages > 1 %} {# Check if pagination needed #}
+        <div class="pagination">
+            {% if most_recent_page > 1 %}
+            <a href="{{ url_for('most_recent', page=most_recent_page-1) }}" class="btn pagination-btn">Previous</a>
+            {% endif %}
+            <span class="page-info info-text">Page {{ most_recent_page }} of {{ total_pages }}</span>
+            {% if most_recent_page < total_pages %} <a href="{{ url_for('most_recent', page=most_recent_page+1) }}"
+                class="btn pagination-btn">Next</a>
+                {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
 </div>
 
-<!-- JavaScript -->
+<!-- JavaScript (Keep existing JS, ensure it aligns with updated structure/IDs if necessary) -->
 <script>
-    function validateSearchForm() {
-        var username = document.getElementById("username").value;
-        var keyword = document.getElementById("keyword").value;
-        var tag = document.getElementById("tag").value;
-        if (!username && !keyword && !tag) {
-            alert("Please enter either a Username, Keyword, or Tag to search.");
-            return false;
-        }
-        document.getElementById("search-form").submit();
-    }
+    // validateSearchForm might not be needed if using standard submit
+    // function validateSearchForm() { ... }
 
     function toggleQuestionForm() {
-        const form = document.getElementById('question-form');
-        form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        const formDiv = document.getElementById('question-form');
+        const button = document.getElementById('post-question-btn');
+        if (formDiv.style.display === 'none') {
+            formDiv.style.display = 'block';
+            button.textContent = 'Cancel Posting'; // Change button text
+        } else {
+            formDiv.style.display = 'none';
+            // Reset forms if needed
+            document.getElementById('start-question-form').style.display = 'block'; // Show start form again
+            document.getElementById('publish-question-form').style.display = 'none'; // Hide publish form
+            document.getElementById('question-text').value = ''; // Clear textarea
+            // Remove hidden draft_id input if it exists
+            const hiddenInput = document.querySelector('#publish-question-form input[name="draft_id"]');
+            if (hiddenInput) {
+                hiddenInput.remove();
+            }
+            button.textContent = 'Post a Question'; // Reset button text
+        }
     }
 
     function startDraft(event) {
@@ -211,45 +223,97 @@ Mango Homepage
         const form = document.getElementById('start-question-form');
         const formData = new FormData(form);
 
+        // Basic validation before sending
+        const questionText = formData.get('question_text').trim();
+        if (!questionText) {
+            alert('Please enter your question text.');
+            return;
+        }
+
         fetch(form.action, {
             method: 'POST',
             body: formData,
             headers: {
-                'X-Requested-With': 'XMLHttpRequest'
+                'X-Requested-With': 'XMLHttpRequest' // Important for Flask if checking request.is_xhr
             }
         })
             .then(response => {
-                if (response.ok) {
-                    return response.headers.get('content-type').includes('application/json') ?
-                        response.json() :
-                        { success: true };
+                // Check if response is ok and is JSON (or handle redirects if backend changed)
+                if (!response.ok) {
+                    // Try to get error message from JSON response if possible
+                    return response.json().then(errData => {
+                        throw new Error(errData.error || `HTTP error! status: ${response.status}`);
+                    }).catch(() => {
+                        // Fallback if response is not JSON or doesn't have error field
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    });
                 }
-                throw new Error('Network response was not ok');
+                const contentType = response.headers.get('content-type');
+                if (contentType && contentType.includes('application/json')) {
+                    return response.json();
+                } else {
+                    // Handle cases where backend might redirect on success (if not using JSON)
+                    // Or throw an error if JSON was expected
+                    console.warn("Received non-JSON response, assuming success but draftId might be missing.");
+                    return { success: true }; // Assume success, but no draftId
+                }
             })
             .then(data => {
-                // Hide the start draft form
-                document.getElementById('start-question-form').style.display = 'none';
-                // Show the publish form
-                document.getElementById('publish-question-form').style.display = 'block';
-                document.getElementById('cancel-question-form').style.display = 'block';
-                // You might want to store the draft ID if returned from backend
-                if (data && data.draftId) {
-                    const hiddenInput = document.createElement('input');
-                    hiddenInput.type = 'hidden';
-                    hiddenInput.name = 'draft_id';
-                    hiddenInput.value = data.draftId;
-                    document.getElementById('publish-question-form').appendChild(hiddenInput);
-                    document.getElementById('cancel-draft-id').value = data.draftId;
+                if (data && data.success) {
+                    // Hide the start draft form
+                    document.getElementById('start-question-form').style.display = 'none';
+                    // Show the publish form
+                    document.getElementById('publish-question-form').style.display = 'block';
+                    // document.getElementById('cancel-question-form').style.display = 'block'; // Show cancel button too (handled within publish form now)
+
+                    // Remove any existing hidden input first
+                    const existingHiddenInput = document.querySelector('#publish-question-form input[name="draft_id"]');
+                    if (existingHiddenInput) {
+                        existingHiddenInput.remove();
+                    }
+
+                    // Add the draft ID as a hidden input if available
+                    if (data.draftId) {
+                        const hiddenInput = document.createElement('input');
+                        hiddenInput.type = 'hidden';
+                        hiddenInput.name = 'draft_id'; // Ensure backend expects 'draft_id'
+                        hiddenInput.value = data.draftId;
+                        document.getElementById('publish-question-form').appendChild(hiddenInput);
+                        // Set ID for cancel form if using separate form (now integrated)
+                        // document.getElementById('cancel-draft-id').value = data.draftId;
+                    } else {
+                        console.warn("Draft created, but no draftId received from backend.");
+                        // Optionally disable cancel button or handle differently
+                    }
+
+                } else {
+                    // Handle case where success is false
+                    alert('Failed to create draft: ' + (data.error || 'Unknown error'));
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Failed to create draft. Please try again.');
+                alert('Failed to create draft. ' + error.message);
             });
     }
 
     function cancelDraft() {
-        document.getElementById('cancel-question-form').submit();
+        // Reset the form display instead of submitting a separate form
+        document.getElementById('publish-question-form').style.display = 'none';
+        document.getElementById('start-question-form').style.display = 'block';
+        document.getElementById('question-text').value = ''; // Clear textarea
+
+        // Remove the hidden input if it exists
+        const hiddenInput = document.querySelector('#publish-question-form input[name="draft_id"]');
+        if (hiddenInput) {
+            hiddenInput.remove();
+        }
+        // Optionally, trigger the toggle function to reset the main button text
+        // toggleQuestionForm(); // This might reopen the form immediately, adjust logic if needed
+        const button = document.getElementById('post-question-btn');
+        button.textContent = 'Post a Question'; // Manually reset button text
+        document.getElementById('question-form').style.display = 'none'; // Ensure main container is hidden
+
     }
 </script>
 {% endblock %}

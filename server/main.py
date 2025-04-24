@@ -234,7 +234,8 @@ def home():
 
         cursor.execute("SELECT tagID, tagName FROM Tag")
         tags = cursor.fetchall()
-        
+        print(most_recent)
+        print('g')
         # Fetch a specific question (example: the first question)
         cursor.execute("SELECT * FROM Question WHERE status = 'published' LIMIT 1")
         question = cursor.fetchone()
