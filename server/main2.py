@@ -551,6 +551,34 @@ def question_detail(question_id):
         comments=comments,
         user_has_responded=user_has_responded
     )
+@app.route('/submit_comment', methods=['POST'])
+def submit_comment():
+    question_id = request.form.get('question_id')
+    comment_text = request.form.get('commentText')
+    userID = session.get('userID')
+
+    if not question_id or not comment_text or not userID:
+        flash('Invalid comment submission.', 'danger')
+        return redirect(url_for('home'))
+
+    conn = connect_db()
+    cursor = conn.cursor()
+
+    try:
+        timestamp_id = get_timestamp_id(cursor)  # Helper function to create a timestamp
+        cursor.execute("""
+            INSERT INTO Comment (userID, questionID, commentText, TimeStampID, status)
+            VALUES (%s, %s, %s, %s, 'published')
+        """, (userID, question_id, comment_text, timestamp_id))
+        conn.commit()
+        flash('Comment submitted successfully!', 'success')
+    except Exception as e:
+        conn.rollback()
+        flash(f'Error submitting comment: {e}', 'danger')
+    finally:
+        conn.close()
+
+    return redirect(url_for('question_detail', question_id=question_id))
 
 @app.route('/vote_question', methods=['POST'])
 def vote_question():

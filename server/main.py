@@ -6,14 +6,14 @@ from datetime import datetime
 app = Flask(__name__)
 app.secret_key = 'mango'
 
-def connect_db(username='mango_user', password='arfaouiRocks123'):
+def connect_db(username='root', password=''):
     print(f"Connecting as user: '{username}'")
     try:
         conn = pymysql.connect(
             host='localhost',
             user=username,
             password=password,
-            db='Mango',
+            db='mango',
             charset='utf8mb4',
             cursorclass=pymysql.cursors.DictCursor
         )
@@ -558,6 +558,12 @@ def question_detail(question_id):
             WHERE questionID = %s AND status = 'published'
         """, (question_id,))
         comments = cursor.fetchall()
+
+    conn.close()
+
+    if not question:
+        flash('Question not found.', 'danger')
+        return redirect(url_for('home'))
 
     return render_template(
         'question_detail.html',
