@@ -632,7 +632,7 @@ def account_settings():
     cursor = conn.cursor()
 
     # Get user ID (for tag handling)
-    cursor.execute("SELECT userID FROM User WHERE userName = %s", (username,))
+    cursor.execute("SELECT userID FROM TagList WHERE userName = %s", (username,))
     user_id_row = cursor.fetchone()
     if not user_id_row:
         flash("User not found", "danger")
@@ -647,7 +647,7 @@ def account_settings():
         confirm_password = request.form.get('confirm_password')
         new_first_name = request.form.get('first_name')
         new_last_name = request.form.get('last_name')
-        selected_tag_ids = request.form.getlist('user_tags')  # List of selected tag IDs
+        selected_tag_ids = request.form.getlist('TagList')  # List of selected tag IDs
 
         
         # Validate and update password if provided
@@ -675,9 +675,9 @@ def account_settings():
             params.append(username)  # For the WHERE clause
             
             # Update tags
-            cursor.execute("DELETE FROM UserTags WHERE userID = %s", (user_id,))
+            cursor.execute("DELETE FROM TagList WHERE userID = %s", (user_id,))
             for tag_id in selected_tag_ids:
-                cursor.execute("INSERT INTO UserTags (userID, tagID) VALUES (%s, %s)", (user_id, tag_id))
+                cursor.execute("INSERT INTO TagList (userID, tagID) VALUES (%s, %s)", (user_id, tag_id))
 
             cursor.execute(f"UPDATE User SET {', '.join(update_fields)} WHERE userName = %s", tuple(params))
             flash('Profile information updated!', 'success')
@@ -689,7 +689,7 @@ def account_settings():
     all_tags = [{'id': row['tagID'], 'tagName': row['tagName']} for row in cursor.fetchall()]
 
     # Fetch user's selected tags
-    cursor.execute("SELECT tagID FROM UserTags WHERE userID = %s", (user_id,))
+    cursor.execute("SELECT tagID FROM TagList WHERE userID = %s", (user_id,))
     user_tag_ids = [row['tagID'] for row in cursor.fetchall()]  
     
     # Get current user data to display
