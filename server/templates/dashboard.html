@@ -43,14 +43,31 @@ Dashboard
             <span class="tag">{{ tag.tagName }}</span>
             {% endfor %}
         </div>
+        <!-- Add Tag Form -->
+        <div class="add-tag-form">
+            <h3>Add a New Tag</h3>
+            <form action="{{ url_for('add_tag') }}" method="POST">
+                <div class="form-group"></div>
+                <label for="tag_id">Tag:</label>
+                <select id="tag_id" name="tag_id" class="form-input" required>
+                    <option value="">-- Select a Tag --</option>
+                    {% for available_tag in available_tags %}
+                    <option value="{{ available_tag.tagID }}">{{ available_tag.tagName }}</option>
+                    {% endfor %}
+                </select>
+        </div>
+        <button type="submit" class="btn">Add Tag</button>
+        </form>
     </div>
+</div>
+</div>
 
-    <!-- Quick Actions -->
-    <div class="dashboard-actions">
-        <a href="{{ url_for('home') }}" class="action-btn primary">Ask New Question</a>
-        <a href="{{ url_for('most_popular') }}" class="action-btn">Browse Questions</a>
-        <a href="{{ url_for('account_settings') }}" class="action-btn">Account Settings</a>
-    </div>
+<!-- Quick Actions -->
+<div class="dashboard-actions">
+    <a href="{{ url_for('home') }}" class="action-btn primary">Ask New Question</a>
+    <a href="{{ url_for('most_popular') }}" class="action-btn">Browse Questions</a>
+    <a href="{{ url_for('account_settings') }}" class="action-btn">Account Settings</a>
+</div>
 </div>
 
 

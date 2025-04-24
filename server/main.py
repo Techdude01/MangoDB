@@ -953,6 +953,41 @@ def view_chat(chat_id):
                            members=members,
                            messages=messages,
                            current_user_id=user_id)
+@app.route('/add_tag', methods=['POST'])
+def add_tag():
+    if 'userID' not in session:
+        flash('You must be logged in to add tags.', 'danger')
+        return redirect(url_for('login'))
+    
+    user_id = session.get('userID')
+    tag_id = request.form.get('tag_id')
+    
+    # Validate the tag_id
+    if not tag_id or not tag_id.isdigit():
+        flash('Invalid tag selected.', 'danger')
+        return redirect(url_for('dashboard'))
+    
+    conn = connect_db()
+    cursor = conn.cursor()
+    
+    try:
+        # Call the AddTag stored procedure
+        cursor.execute("CALL AddTag(%s, %s)", (user_id, tag_id))
+        conn.commit()
+        flash('Tag added successfully!', 'success')
+    except pymysql.Error as e:
+        conn.rollback()
+        # Check if it's a duplicate entry error
+        if e.args[0] == 1062:  # MySQL duplicate entry error code
+            flash('You already have this tag.', 'warning')
+        else:
+            flash(f'Error adding tag: {e}', 'danger')
+    finally:
+        cursor.close()
+        conn.close()
+    
+    # Redirect back to dashboard or another appropriate page
+    return redirect(url_for('dashboard'))
 @app.context_processor
 def inject_user_data():
     """

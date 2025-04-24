@@ -625,6 +625,7 @@ BEGIN
     WHERE t.tagName = p_tagName AND q.status = 'published';
 END//
 
+
 -- Search questions procedure
 CREATE PROCEDURE SearchQuestions (IN p_keyword VARCHAR(100))
 BEGIN
@@ -704,6 +705,12 @@ BEGIN
     GROUP BY u.userID, u.firstName, u.lastName
     ORDER BY sharedTags DESC
     LIMIT 4;
+END//
+
+CREATE PROCEDURE AddTag(IN target_userID INT, IN targ_tag_id INT)
+BEGIN
+    INSERT INTO TagList (tagID, userID)
+    VALUES (targ_tag_id, target_userID);
 END//
 
 -- Get chat IDs for user procedure
