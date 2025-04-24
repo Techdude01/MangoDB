@@ -389,9 +389,30 @@ def start_question():
 
     return redirect(url_for('home'))
 
+
 @app.route('/publish_question', methods=['POST'])
 def publish_question():
-    question_id = request.form.get('question_id')  # Assume question ID is passed from the frontend
+    conn = connect_db()
+    cursor = conn.cursor(pymysql.cursors.DictCursor)
+    try:
+        # Get the latest draft question for this user
+        userID = session.get('userID')
+        cursor.execute("""
+            SELECT questionID FROM Question 
+            WHERE userID = %s AND status = 'draft'
+            ORDER BY questionID DESC LIMIT 1
+        """, (userID,))
+        result = cursor.fetchone()
+        if result:
+            question_id = result['questionID']
+        else:
+            flash('No draft question found to publish.', 'danger')
+            return redirect(url_for('home'))
+    except Exception as e:
+        flash(f'Error retrieving draft question: {e}', 'danger')
+        return redirect(url_for('home'))
+    finally:
+        cursor.close()
     tag_ids = request.form.getlist('tags')
     userID = session.get('userID')
     print(f"Publishing question {question_id} with tags {tag_ids} for user {userID}")
@@ -424,7 +445,28 @@ def publish_question():
 
 @app.route('/cancel_question', methods=['POST'])
 def cancel_question():
-    question_id = request.form.get('question_id')  # Assume question ID is passed from the frontend
+    print('g')
+    conn = connect_db()
+    cursor = conn.cursor(pymysql.cursors.DictCursor)
+    try:
+        # Get the latest draft question for this user
+        userID = session.get('userID')
+        cursor.execute("""
+            SELECT questionID FROM Question 
+            WHERE userID = %s AND status = 'draft'
+            ORDER BY questionID DESC LIMIT 1
+        """, (userID,))
+        result = cursor.fetchone()
+        if result:
+            question_id = result['questionID']
+        else:
+            flash('No draft question found to publish.', 'danger')
+            return redirect(url_for('home'))
+    except Exception as e:
+        flash(f'Error retrieving draft question: {e}', 'danger')
+        return redirect(url_for('home'))
+    finally:
+        cursor.close()
 
     conn = connect_db()
     cursor = conn.cursor()

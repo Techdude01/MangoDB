@@ -370,28 +370,61 @@ def most_recent():
 
 @app.route('/start_question', methods=['POST'])
 def start_question():
-    userID = request.form.get('userID')  # Assume user ID is passed from the frontend
-    question_text = request.form.get('question_text', '')  # Default to an empty string
+    user_id = session.get('userID') # Get userID from session
+    question_text = request.form.get('question_text', '')
+
+    if not user_id:
+        # Handle case where user is not logged in
+        flash('You must be logged in to ask a question.', 'danger')
+        return redirect(url_for('login')) # Redirect to login
+    if not question_text:
+        flash('Question text cannot be empty.', 'danger')
+        return redirect(url_for('home')) # Redirect back home or wherever the form is
 
     conn = connect_db()
     cursor = conn.cursor()
-
+    # draft_id = None # No longer needed if not returning JSON
     try:
-        # Call StartQuestion() to create a draft question
-        cursor.execute("CALL StartQuestion(%s, %s)", (userID, question_text))
+        # Call StartQuestion procedure
+        cursor.execute("CALL StartQuestion(%s, %s)", (user_id, question_text))
+        # No need to fetch LAST_INSERT_ID() if not returning JSON
         conn.commit()
-        flash('Draft question created successfully!')
+        flash('Draft question started successfully! Now add tags and publish.', 'success') # Updated flash message
+        # Redirect back to home, potentially with info to show the publish form
+        # Simple redirect for now, frontend JS needs adjustment if it relied on draftId
+        return redirect(url_for('home'))
     except Exception as e:
         conn.rollback()
-        flash(f'Error starting question: {e}')
+        print(f"Error starting question draft: {e}")
+        flash(f'Error starting question: {e}', 'danger') # Flash error message
+        return redirect(url_for('home')) # Redirect on error
     finally:
+        cursor.close()
         conn.close()
-
-    return redirect(url_for('home'))
 
 @app.route('/publish_question', methods=['POST'])
 def publish_question():
-    question_id = request.form.get('question_id')  # Assume question ID is passed from the frontend
+    conn = connect_db()
+    cursor = conn.cursor(pymysql.cursors.DictCursor)
+    try:
+        # Get the latest draft question for this user
+        userID = session.get('userID')
+        cursor.execute("""
+            SELECT questionID FROM Question 
+            WHERE userID = %s AND status = 'draft'
+            ORDER BY questionID DESC LIMIT 1
+        """, (userID,))
+        result = cursor.fetchone()
+        if result:
+            question_id = result['questionID']
+        else:
+            flash('No draft question found to publish.', 'danger')
+            return redirect(url_for('home'))
+    except Exception as e:
+        flash(f'Error retrieving draft question: {e}', 'danger')
+        return redirect(url_for('home'))
+    finally:
+        cursor.close()
     tag_ids = request.form.getlist('tags')
     userID = session.get('userID')
     print(f"Publishing question {question_id} with tags {tag_ids} for user {userID}")
@@ -424,7 +457,28 @@ def publish_question():
 
 @app.route('/cancel_question', methods=['POST'])
 def cancel_question():
-    question_id = request.form.get('question_id')  # Assume question ID is passed from the frontend
+    print('g')
+    conn = connect_db()
+    cursor = conn.cursor(pymysql.cursors.DictCursor)
+    try:
+        # Get the latest draft question for this user
+        userID = session.get('userID')
+        cursor.execute("""
+            SELECT questionID FROM Question 
+            WHERE userID = %s AND status = 'draft'
+            ORDER BY questionID DESC LIMIT 1
+        """, (userID,))
+        result = cursor.fetchone()
+        if result:
+            question_id = result['questionID']
+        else:
+            flash('No draft question found to publish.', 'danger')
+            return redirect(url_for('home'))
+    except Exception as e:
+        flash(f'Error retrieving draft question: {e}', 'danger')
+        return redirect(url_for('home'))
+    finally:
+        cursor.close()
 
     conn = connect_db()
     cursor = conn.cursor()

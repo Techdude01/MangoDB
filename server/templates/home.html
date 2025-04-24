@@ -65,8 +65,12 @@ Mango Homepage
                     </select>
                 </div>
                 <button type="submit">Publish Question</button>
-                <button id="cancel-question-form" type="button" onclick="toggleQuestionForm()"
-                    style="display: none;">Cancel</button>
+                <button type="button" onclick="cancelDraft()" id="cancel-question-btn">Cancel</button>
+            </form>
+            <!-- Hidden form to cancel the question draft -->
+            <form id="cancel-question-form" action="{{ url_for('cancel_question')}}" method="post"
+                style="display: none;">
+                <input type="hidden" name="draft_id" id="cancel-draft-id">
             </form>
         </div>
     </div>
@@ -201,12 +205,17 @@ Mango Homepage
                     hiddenInput.name = 'draft_id';
                     hiddenInput.value = data.draftId;
                     document.getElementById('publish-question-form').appendChild(hiddenInput);
+                    document.getElementById('cancel-draft-id').value = data.draftId;
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
                 alert('Failed to create draft. Please try again.');
             });
+    }
+
+    function cancelDraft() {
+        document.getElementById('cancel-question-form').submit();
     }
 </script>
 {% endblock %}
