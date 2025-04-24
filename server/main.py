@@ -628,6 +628,15 @@ def account_settings():
     username = session['username']
     conn = connect_db()
     cursor = conn.cursor()
+
+    # Get user ID (for tag handling)
+    cursor.execute("SELECT userID FROM User WHERE userName = %s", (username,))
+    user_id_row = cursor.fetchone()
+    if not user_id_row:
+        flash("User not found", "danger")
+        return redirect(url_for('login'))
+    user_id = user_id_row[0]
+    
     
     # Handle form submission (POST)
     if request.method == 'POST':
@@ -636,6 +645,8 @@ def account_settings():
         confirm_password = request.form.get('confirm_password')
         new_first_name = request.form.get('first_name')
         new_last_name = request.form.get('last_name')
+        selected_tag_ids = request.form.getlist('user_tags')  # List of selected tag IDs
+
         
         # Validate and update password if provided
         if new_password and new_password == confirm_password:
@@ -661,10 +672,23 @@ def account_settings():
                 
             params.append(username)  # For the WHERE clause
             
+            # Update tags
+            cursor.execute("DELETE FROM UserTags WHERE userID = %s", (user_id,))
+            for tag_id in selected_tag_ids:
+                cursor.execute("INSERT INTO UserTags (userID, tagID) VALUES (%s, %s)", (user_id, tag_id))
+
             cursor.execute(f"UPDATE User SET {', '.join(update_fields)} WHERE userName = %s", tuple(params))
             flash('Profile information updated!', 'success')
             
         conn.commit()
+
+    # Fetch all available tags
+    cursor.execute("SELECT tagID, tagName FROM Tags")
+    all_tags = [{'id': row[0], 'tagName': row[1]} for row in cursor.fetchall()]
+
+    # Fetch user's selected tags
+    cursor.execute("SELECT tagID FROM UserTags WHERE userID = %s", (user_id,))
+    user_tag_ids = [row[0] for row in cursor.fetchall()]
     
     # Get current user data to display
     cursor.execute("SELECT firstName, lastName, role FROM User WHERE userName = %s", (username,))
@@ -673,7 +697,7 @@ def account_settings():
     cursor.close()
     conn.close()
     
-    return render_template('account_settings.html', username=username, user_data=user_data)
+    return render_template('account_settings.html', username=username, user_data=user_data, all_tags=all_tags, user_tag_ids=user_tag_ids)
 @app.route('/chats')
 def list_chats():
     """
