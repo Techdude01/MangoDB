@@ -255,7 +255,7 @@ def search():
 
     # Search by Username
     if username:
-        cursor.execute("SELECT * FROM Question WHERE userID = (SELECT userID FROM User WHERE userName = %s) AND status = 'published'", (username,))
+        cursor.execute("SELECT * FROM Question WHERE userID = (SELECT userID FROM User WHERE userName = %s) AND gitstatus = 'published'", (username,))
         questions = cursor.fetchall()
         conn.close()
         print('i')
