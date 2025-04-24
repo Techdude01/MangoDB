@@ -6,14 +6,14 @@ from datetime import datetime
 app = Flask(__name__)
 app.secret_key = 'mango'
 
-def connect_db(username='mango_user', password='arfaouiRocks123'):
+def connect_db(username='root', password=''):
     print(f"Connecting as user: '{username}'")
     try:
         conn = pymysql.connect(
             host='localhost',
             user=username,
             password=password,
-            db='Mango',
+            db='mango',
             charset='utf8mb4',
             cursorclass=pymysql.cursors.DictCursor
         )
@@ -370,6 +370,7 @@ def most_recent():
 @app.route('/start_question', methods=['POST'])
 def start_question():
     userID = request.form.get('userID')  # Assume user ID is passed from the frontend
+    print(f"Received userID: {userID}") # check for userID
     question_text = request.form.get('question_text', '')  # Default to an empty string
 
     conn = connect_db()
