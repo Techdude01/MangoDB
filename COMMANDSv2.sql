@@ -609,7 +609,7 @@ BEGIN
     FROM Question q
     JOIN TimeStamp t ON q.TimeStampID = t.TimeStampID
     JOIN TagList l ON q.questionID = l.questionID 
-    WHERE l.tagID IN (SELECT tl.tagID FROM TagList tl JOIN User u ON tl.userID = u.userID WHERE u.userName = p_username)
+    WHERE l.tagID IN (SELECT tl.tagID FROM TagList tl JOIN User u ON tl.userID = u.userID WHERE u.userName = p_username) AND q.status = "published"
     GROUP BY q.questionID, q.questionText, t.sentTime, t.sentDate
     ORDER BY count(*) DESC, t.sentDate DESC, t.sentTime DESC
     LIMIT 10;
@@ -622,7 +622,7 @@ BEGIN
     FROM Question q
     JOIN TagList t1 ON q.userID = t1.userID
     JOIN Tag t ON t1.tagID = t.tagID
-    WHERE t.tagName = p_tagName;
+    WHERE t.tagName = p_tagName AND q.status = 'published';
 END//
 
 -- Search questions procedure
@@ -630,7 +630,7 @@ CREATE PROCEDURE SearchQuestions (IN p_keyword VARCHAR(100))
 BEGIN
     SELECT questionID, questionText
     FROM Question
-    WHERE questionText LIKE CONCAT ('%', p_keyword, '%');
+    WHERE questionText LIKE CONCAT ('%', p_keyword, '%') AND status = 'published';
 END//
 
 -- Upvote question procedure
