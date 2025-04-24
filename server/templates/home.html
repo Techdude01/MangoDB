@@ -29,8 +29,8 @@ Mango Homepage
                 <input type="text" id="keyword" name="keyword" placeholder="Enter keyword in question text">
             </div>
             <div>
-                <label for="tag">Tag:</label>
-                <select id="tag" name="tag">
+                <label for="tag" class="form-group-label">Tag:</label>
+                <select id="tag" name="tag" class="form-input">
                     <option value="">-- Select a Tag --</option>
                     {% for tag in tags %}
                     <option value="{{ tag['tagName'] }}">{{ tag['tagName'] }}</option>
