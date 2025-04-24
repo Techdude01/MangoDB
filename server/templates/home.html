@@ -1,33 +1,47 @@
 {% extends "base.html" %}
 
-{% block style %}
-<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='./css/style.css') }}">
-{% endblock %}
-
 {% block title %}
-Mango Homepage
+Question Details - {{ question.questionText | truncate(30) }}
 {% endblock %}
 
 {% block body %}
 <div class="main">
-    <!-- Login Button -->
-    {% if show_login_button %}
-    <a href="{{ url_for('login') }}" class="button">Go to Login</a>
-    {% endif %}
 
-    <!-- Search Section -->
-    <div class="main-query">
-        <h1>Search Bar</h1>
-        <h3>Query by Username, Keyword in Question Text, or Tag!</h3>
-        <form id="search-form" action="{{ url_for('search') }}" method="get">
-            <div>
-                <label for="username">Username:</label>
-                <input type="text" id="username" name="username" placeholder="Enter username">
+    <!-- Question Display Section -->
+    <div class="card question-detail-card">
+        <h1 class="page-heading">{{ question.questionText }}</h1>
+        <div class="metadata info-text">
+            {% if question.userName %}
+            <span class="author"><i class="fa fa-user"></i> Posted by: {{ question.userName }}</span>
+            {% endif %}
+            {% if question.datePosted %}
+            <span class="date"><i class="fa fa-calendar"></i> {{ question.datePosted }}</span>
+            {% endif %}
+        </div>
+        {% if question.questionDescription %}
+        <div class="question-description">
+            <p>{{ question.questionDescription }}</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Conditional Content: Response Form OR Voting/Responses/Comments -->
+    {% if not user_has_responded %}
+    <!-- Response Submission Form -->
+    <div class="card response-form-card">
+        <h2 class="section-heading">Submit Your Response</h2>
+        <form method="POST" action="{{ url_for('question_detail', question_id=question.questionID) }}"
+            class="response-form">
+            <!-- Hidden userID is often unnecessary if handled server-side via session -->
+            <!-- <input type="hidden" name="userID" value="{{ session['userID']}}"> -->
+            <div class="form-group">
+                <textarea name="responseText" class="form-input" rows="4" required
+                    placeholder="Submit your response..."></textarea>
             </div>
-            <div>
-                <label for="keyword">Keyword:</label>
-                <input type="text" id="keyword" name="keyword" placeholder="Enter keyword in question text">
+            <div class="action-buttons">
+                <button type="submit" class="btn primary">Submit Response</button>
             </div>
+<<<<<<< HEAD
             <div>
                 <label for="tag" class="form-group-label">Tag:</label>
                 <select id="tag" name="tag" class="form-input">
@@ -36,191 +50,105 @@ Mango Homepage
                     <option value="{{ tag['tagName'] }}">{{ tag['tagName'] }}</option>
                     {% endfor %}
                 </select>
+=======
+        </form>
+        <p class="note info-text">Submit a response to view others' contributions and vote on this question.</p>
+    </div>
+    {% else %}
+    <!-- Voting Controls -->
+    <div class="card voting-controls-card">
+        <h2 class="section-heading">Vote</h2>
+        <div class="voting-controls card">
+            <div class="vote-buttons">
+                <!-- Upvote Form -->
+                <form method="POST" action="{{ url_for('vote_question') }}" class="vote-form">
+                    <input type="hidden" name="question_id" value="{{ question.questionID }}">
+                    <input type="hidden" name="vote" value="up">
+                    <input type="hidden" name="userID" value="{{ session['userID'] }}">
+                    <button type="submit" class="vote-btn upvote"><i class="fa fa-thumbs-up"></i> Upvote</button>
+                </form>
+                <!-- Downvote Form -->
+                <form method="POST" action="{{ url_for('vote_question') }}" class="vote-form">
+                    <input type="hidden" name="question_id" value="{{ question.questionID }}">
+                    <input type="hidden" name="vote" value="down">
+                    <input type="hidden" name="userID" value="{{ session['userID'] }}">
+                    <button type="submit" class="vote-btn downvote"><i class="fa fa-thumbs-down"></i> Downvote</button>
+                </form>
+>>>>>>> d1c537013d342264d555e20dfb89601cddeb13e4
             </div>
-            <div>
-                <button onclick="validateSearchForm()" class="action-btn">Search</button>
+            <p class="vote-count badge">Current Votes: <span class="upvote-count">+{{ question.upvotes }}</span> / <span
+                    class="downvote-count">-{{ question.downvotes }}</span></p>
+        </div>
+    </div>
+
+    <!-- Responses Section -->
+    <div class="card responses-card">
+        <h2 class="section-heading">Responses</h2>
+        {% if responses %}
+        <ul class="item-list response-list">
+            {% for response in responses %}
+            <li class="item response-item">
+                <p class="item-text">{{ response.responseText }}</p>
+                <div class="metadata info-text">
+                    <span class="author"><i class="fa fa-user"></i> {{ response.userName }}</span>
+                    <!-- Add date/time if available -->
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p class="no-items info-text">No responses yet.</p>
+        {% endif %}
+    </div>
+
+    <!-- Comment Submission Form -->
+    {% if not user_has_commented %}
+    <div class="comment-form-container"> <!-- Added container for better structure -->
+        <h3 class="sub-heading">Leave a Comment</h3> <!-- Use h3 for sub-section -->
+        <form method="POST" action="{{ url_for('question_detail', question_id=question.questionID) }}"
+            class="comment-form">
+            <!-- Hidden userID is often unnecessary if handled server-side via session -->
+            <!-- <input type="hidden" name="userID" value="{{ session['userID']}}"> -->
+            <div class="form-group">
+                <textarea name="commentText" class="form-input" rows="3" required
+                    placeholder="Write your comment..."></textarea>
+            </div>
+            <div class="action-buttons">
+                <button type="submit" class="btn primary">Submit Comment</button>
             </div>
         </form>
     </div>
+    {% else %}
+    <p class="info-text">You have already commented on this question. You cannot leave another response.</p>
+    {% endif %}
 
-    <!-- Post Question Section -->
-    <div class="post-question">
-        <button id="post-question-btn" onclick="toggleQuestionForm()">Post a Question</button>
-        <div id="question-form" style="display: none;">
-            <!-- First form to start a draft question -->
-            <form id="start-question-form" action="{{ url_for('start_question') }}" method="post">
-                <input type="hidden" name="userID" value="{{ session.get('userID', '') }}">
-                <div>
-                    <label for="question-text">Question:</label>
-                    <textarea id="question-text" name="question_text" placeholder="Write your question here..."
-                        required></textarea>
-                </div>
-                <button type="button" onclick="startDraft(event)">Start Draft</button>
-            </form>
-
-            <!-- Form to publish the question with tags (shows after draft creation) -->
-            <form id="publish-question-form" action="{{ url_for('publish_question')}}" method="post"
-                style="display: none;">
-                <div>
-                    <label for="tags">Tags:</label>
-                    <select id="tags" name="tags" multiple required>
-                        {% for tag in tags %}
-                        <option value="{{ tag['tagID'] }}">{{ tag['tagName'] }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <button type="submit">Publish Question</button>
-                <button type="button" onclick="cancelDraft()" id="cancel-question-btn">Cancel</button>
-            </form>
-            <!-- Hidden form to cancel the question draft -->
-            <form id="cancel-question-form" action="{{ url_for('cancel_question')}}" method="post"
-                style="display: none;">
-                <input type="hidden" name="draft_id" id="cancel-draft-id">
-            </form>
-        </div>
-    </div>
-
-    <!-- Most Popular Questions Section -->
-    <div>
-        <h2 class=" section-heading"><a href="{{ url_for('most_popular') }}">Most Popular</a></h2>
-        <ul class="question-list">
-            {% for question in most_popular %}
-            {% if question['questionID'] is defined and question['questionText'] is defined %}
-            <li class="question-item">
-                <a href="{{ url_for('question_detail', question_id=question['questionID']) }}" class="question-link">
-                    {{ question['questionText'] }}
-                </a>
-
-            </li>
-            {% endif %}
-            {% endfor %}
-        </ul>
-        <div class="pagination">
-            {% if most_popular_page > 1 %}
-            <a href="{{ url_for('most_popular', page=most_popular_page-1) }}">Previous</a>
-            {% endif %}
-            <span>Page {{ most_popular_page }} of {{ total_pages }}</span>
-            {% if most_popular_page < total_pages %} <a href="{{ url_for('most_popular', page=most_popular_page+1) }}">
-                Next</a>
+    <!-- Display Comments -->
+    {% if comments %}
+    <ul class="item-list comment-list">
+        {% for c in comments %}
+        <li class="item comment-item">
+            <p class="item-text">{{ c.commentText }}</p>
+            <div class="metadata info-text">
+                {% if c.userName %}
+                <span class="author"><i class="fa fa-user"></i> {{ c.userName }}</span>
                 {% endif %}
-        </div>
-    </div>
-
-    <!-- Most Controversial Questions Section -->
-    <div>
-        <h2 class="section-heading"><a href="{{ url_for('most_controversial') }}">Most Controversial</a></h2>
-        <ul class="question-list">
-            {% for question in most_controversial %}
-            {% if question['questionID'] is defined and question['questionText'] is defined %}
-            <li class="question-item">
-                <a href="{{ url_for('question_detail', question_id=question['questionID']) }}" class="question-link">
-                    {{ question['questionText'] }}
-                </a>
-            </li>
-            {% endif %}
-            {% endfor %}
-        </ul>
-        <div class="pagination">
-            {% if most_controversial_page > 1 %}
-            <a href="{{ url_for('most_controversial', page=most_controversial_page-1) }}">Previous</a>
-            {% endif %}
-            <span>Page {{ most_controversial_page }} of {{ total_pages }}</span>
-            {% if most_controversial_page < total_pages %} <a
-                href="{{ url_for('most_controversial', page=most_controversial_page+1) }}">Next</a>
+                <!-- Add date/time if available -->
+                {% if c.timestamp %}
+                <span class="timestamp"><i class="fa fa-clock"></i> {{ c.timestamp }}</span>
                 {% endif %}
-        </div>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p class="no-items info-text">No comments yet.</p>
+    {% endif %}
+
+
+    <!-- Back Button -->
+    <div class="action-buttons page-actions">
+        <a href="{{ url_for('home') }}" class="btn secondary"><i class="fa fa-arrow-left"></i> Back to Home</a>
     </div>
 
-    <!-- Most Recent Questions Section -->
-    <div>
-        <h2 class="section-heading"><a href="{{ url_for('most_recent') }}">Most Recent</a></h2>
-        <ul class="question-list">
-            {% for question in most_recent %}
-            {% if question['questionID'] is defined and question['questionText'] is defined %}
-            <li class="question-item">
-                <a href="{{ url_for('question_detail', question_id=question['questionID']) }}" class="question-link">
-                    {{ question['questionText'] }}
-                </a>
-            </li>
-            {% endif %}
-            {% endfor %}
-        </ul>
-        <div class="pagination">
-            {% if most_recent_page > 1 %}
-            <a href="{{ url_for('most_recent', page=most_recent_page-1) }}">Previous</a>
-            {% endif %}
-            <span>Page {{ most_recent_page }} of {{ total_pages }}</span>
-            {% if most_recent_page < total_pages %} <a href="{{ url_for('most_recent', page=most_recent_page+1) }}">
-                Next</a>
-                {% endif %}
-        </div>
-    </div>
-
-    <!-- ... rest of the file ... -->
 </div>
-
-<!-- JavaScript -->
-<script>
-    function validateSearchForm() {
-        var username = document.getElementById("username").value;
-        var keyword = document.getElementById("keyword").value;
-        var tag = document.getElementById("tag").value;
-        if (!username && !keyword && !tag) {
-            alert("Please enter either a Username, Keyword, or Tag to search.");
-            return false;
-        }
-        document.getElementById("search-form").submit();
-    }
-
-    function toggleQuestionForm() {
-        const form = document.getElementById('question-form');
-        form.style.display = form.style.display === 'none' ? 'block' : 'none';
-    }
-
-    function startDraft(event) {
-        event.preventDefault();
-        const form = document.getElementById('start-question-form');
-        const formData = new FormData(form);
-
-        fetch(form.action, {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-        })
-            .then(response => {
-                if (response.ok) {
-                    return response.headers.get('content-type').includes('application/json') ?
-                        response.json() :
-                        { success: true };
-                }
-                throw new Error('Network response was not ok');
-            })
-            .then(data => {
-                // Hide the start draft form
-                document.getElementById('start-question-form').style.display = 'none';
-                // Show the publish form
-                document.getElementById('publish-question-form').style.display = 'block';
-                document.getElementById('cancel-question-form').style.display = 'block';
-                // You might want to store the draft ID if returned from backend
-                if (data && data.draftId) {
-                    const hiddenInput = document.createElement('input');
-                    hiddenInput.type = 'hidden';
-                    hiddenInput.name = 'draft_id';
-                    hiddenInput.value = data.draftId;
-                    document.getElementById('publish-question-form').appendChild(hiddenInput);
-                    document.getElementById('cancel-draft-id').value = data.draftId;
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Failed to create draft. Please try again.');
-            });
-    }
-
-    function cancelDraft() {
-        document.getElementById('cancel-question-form').submit();
-    }
-</script>
 {% endblock %}
