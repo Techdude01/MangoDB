@@ -6,14 +6,14 @@ from datetime import datetime
 app = Flask(__name__)
 app.secret_key = 'mango'
 
-def connect_db(username='root', password=''):
+def connect_db(username='mango_user', password='arfaouiRocks123'):
     print(f"Connecting as user: '{username}'")
     try:
         conn = pymysql.connect(
             host='localhost',
             user=username,
             password=password,
-            db='mango',
+            db='Mango',
             charset='utf8mb4',
             cursorclass=pymysql.cursors.DictCursor
         )
@@ -370,7 +370,6 @@ def most_recent():
 @app.route('/start_question', methods=['POST'])
 def start_question():
     userID = request.form.get('userID')  # Assume user ID is passed from the frontend
-    print(f"Received userID: {userID}") # check for userID
     question_text = request.form.get('question_text', '')  # Default to an empty string
 
     conn = connect_db()
@@ -386,36 +385,12 @@ def start_question():
         flash(f'Error starting question: {e}')
     finally:
         conn.close()
-    
+
     return redirect(url_for('home'))
 
 @app.route('/publish_question', methods=['POST'])
 def publish_question():
-    question_id = request.form.get('question_id')
-    if not question_id:
-        # If question_id is not provided directly, find the most recent draft question
-        conn = connect_db()
-        cursor = conn.cursor(pymysql.cursors.DictCursor)
-        userID = session.get('userID')
-        
-        try:
-            # Find latest draft question for this user
-            cursor.execute("""
-                SELECT questionID 
-                FROM Question 
-                WHERE userID = %s AND status = 'draft' 
-                ORDER BY questionID DESC 
-                LIMIT 1
-            """, (userID,))
-            
-            result = cursor.fetchone()
-            if result:
-                question_id = result['questionID']
-            else:
-                flash('No draft question found to publish.', 'danger')
-                return redirect(url_for('home'))
-        finally:
-            cursor.close()
+    question_id = request.form.get('question_id')  # Assume question ID is passed from the frontend
     tag_ids = request.form.getlist('tags')
     userID = session.get('userID')
     print(f"Publishing question {question_id} with tags {tag_ids} for user {userID}")
@@ -448,6 +423,7 @@ def publish_question():
 
 @app.route('/cancel_question', methods=['POST'])
 def cancel_question():
+    question_id = request.form.get('question_id')  # Assume question ID is passed from the frontend
 
     conn = connect_db()
     cursor = conn.cursor()
@@ -875,4 +851,4 @@ def inject_user_data():
     }
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5001)
+    app.run(debug=True)
