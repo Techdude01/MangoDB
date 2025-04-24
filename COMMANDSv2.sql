@@ -560,6 +560,7 @@ BEGIN
     FROM Question q
     JOIN TimeStamp t ON q.TimeStampID = t.TimeStampID
     JOIN User u ON q.userID = u.userID
+    WHERE q.status = 'published'
     ORDER BY t.sentDate DESC, t.sentTime DESC
     LIMIT lim OFFSET offset;
 END//
@@ -575,6 +576,7 @@ BEGIN
     JOIN TimeStamp t ON q.TimeStampID = t.TimeStampID
     LEFT JOIN Comment c ON c.questionID = q.questionID
     JOIN User u ON q.userID = u.userID
+    WHERE q.status = 'published'
     GROUP BY q.questionID, q.questionText, t.sentTime, t.sentDate, q.upvotes, u.userName
     ORDER BY q.upvotes DESC, commentCount DESC, t.sentDate DESC, t.sentTime DESC
     LIMIT lim OFFSET offset;
@@ -592,6 +594,7 @@ BEGIN
     JOIN TimeStamp t ON q.TimeStampID = t.TimeStampID
     LEFT JOIN Comment c ON c.questionID = q.questionID
     JOIN User u ON q.userID = u.userID
+    WHERE q.status = 'published'
     GROUP BY q.questionID, q.questionText, t.sentTime, t.sentDate, q.downvotes, u.userName
     ORDER BY controversyScore DESC, t.sentDate DESC, t.sentTime DESC
     LIMIT lim OFFSET offset;

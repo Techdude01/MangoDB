@@ -17,11 +17,11 @@ Dashboard
     <div class="dashboard-section card">
         <h2 class="section-heading">Your Questions</h2>
 
-        <!-- User's Questions List -->
         <div class="question-list">
             {% for question in questions %}
             <div class="question-item">
-                <a href="#" class="question-link">{{ question['questionText'] }}</a>
+                <a href="{{ url_for('question_detail', question_id=question['questionID']) }}" class="question-link">{{
+                    question['questionText'] }}</a>
                 <div class="question-metadata">
                     <span class="date">Posted: {{ question['sentDate'] }}</span>
                     <span class="votes">👍 {{ question['upvotes'] }} | 👎 {{ question['downvotes'] }}</span>

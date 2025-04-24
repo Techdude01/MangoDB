@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}{{ chat.chatName if chat else 'Chat' }}{% endblock %}
+
+{% block body %}
+<div class="main">
+    <div class="section-header card">
+        <!-- Display chat name -->
+        <h1 class="page-heading">{{ chat.chatName if chat else 'Chat Details' }}</h1>
+        <!-- Display members -->
+        <div class="chat-members info-text">
+            <strong>Members:</strong>
+            {% for member in members %}
+            {{ member.userName }}{% if not loop.last %}, {% endif %}
+            {% else %}
+            Just you!
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Display flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }}">
+        {{ message }}
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    <!-- Message Display Area -->
+    <div class="card dashboard-section chat-messages-container">
+        <h2 class="section-heading">Messages</h2>
+        <div class="message-list">
+            {% for message in messages %}
+            <div
+                class="message-item {% if message.userID == current_user_id %}current-user{% else %}other-user{% endif %}">
+                <div class="message-sender">
+                    <strong>{{ message.userName }}</strong>
+                    <span class="message-timestamp">({{ message.sentDate }} {{ message.sentTime }})</span>
+                </div>
+                <div class="message-text">
+                    {{ message.messageText }}
+                </div>
+            </div>
+            {% else %}
+            <p class="info-text">No messages yet. Start the conversation!</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Message Input Form -->
+    <div class="card dashboard-section">
+        <h2 class="section-heading">Send a Message</h2>
+        <!-- Form posts to the current chat's URL -->
+        <form action="{{ url_for('view_chat', chat_id=chat_id) }}" method="post" class="message-form">
+            <div class="form-group">
+                <!-- Textarea for message input -->
+                <textarea name="message" class="form-input" rows="3" placeholder="Type your message here..."
+                    required></textarea>
+            </div>
+            <div class="action-buttons">
+                <!-- Submit button -->
+                <button type="submit" class="btn primary">Send</button>
+                <!-- Link back to chat list -->
+                <a href="{{ url_for('list_chats') }}" class="btn">Back to Chats</a>
+            </div>
+        </form>
+    </div>
+
+</div>
+
+{% endblock %}
