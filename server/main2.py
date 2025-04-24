@@ -507,10 +507,10 @@ def question_detail(question_id):
     """, (question_id, userID))
     user_has_commented = cursor.fetchone() is not None
 
-    # Handle comment submission if the user hasn't commented already
-    if request.method == 'POST' and 'commentText' in request.form and not user_has_commented:
+  # Handle comment submission if the user hasn't commented already
+    if request.method == 'POST' and not user_has_commented:
         comment_text = request.form['commentText']
-        timestamp_id = get_timestamp_id(cursor)  # Same helper function for timestamps
+        timestamp_id = get_timestamp_id(cursor)  # Ensure this returns a valid TimeStampID
         cursor.execute("""
             INSERT INTO Comment (userID, questionID, commentText, TimeStampID, status)
             VALUES (%s, %s, %s, %s, 'published')
