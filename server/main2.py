@@ -506,7 +506,6 @@ def question_detail(question_id):
         WHERE questionID = %s AND userID = %s AND status = 'published'
     """, (question_id, userID))
     user_has_commented = cursor.fetchone() is not None
-
     # Handle new response submission
     if request.method == 'POST' and not user_has_responded:
         response_text = request.form['responseText']
