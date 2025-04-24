@@ -90,48 +90,48 @@ Question Details - {{ question.questionText | truncate(30) }}
         {% endif %}
     </div>
 
-<!-- Comment Submission Form -->
-{% if not user_has_commented %}
-    <div class="comment-form-container"> <!-- Added container for better structure -->
-        <h3 class="sub-heading">Leave a Comment</h3> <!-- Use h3 for sub-section -->
-        <form method="POST" action="{{ url_for('question_detail', question_id=question.questionID) }}"
-            class="comment-form">
-            <!-- Hidden userID is often unnecessary if handled server-side via session -->
-            <!-- <input type="hidden" name="userID" value="{{ session['userID']}}"> -->
-            <div class="form-group">
-                <textarea name="commentText" class="form-input" rows="3" required
-                    placeholder="Write your comment..."></textarea>
-            </div>
-            <div class="action-buttons">
-                <button type="submit" class="btn primary">Submit Comment</button>
-            </div>
-        </form>
-    </div>
-{% else %}
-    <p class="info-text">You have already commented on this question. You cannot leave another response.</p>
-{% endif %}
-
-<!-- Display Comments -->
-{% if comments %}
-    <ul class="item-list comment-list">
-        {% for c in comments %}
-            <li class="item comment-item">
-                <p class="item-text">{{ c.commentText }}</p>
-                <div class="metadata info-text">
-                    {% if c.userName %}
-                        <span class="author"><i class="fa fa-user"></i> {{ c.userName }}</span>
-                    {% endif %}
-                    <!-- Add date/time if available -->
-                    {% if c.timestamp %}
-                        <span class="timestamp"><i class="fa fa-clock"></i> {{ c.timestamp }}</span>
-                    {% endif %}
+    <!-- Comment Submission Form -->
+    {% if not user_has_commented %}
+        <div class="comment-form-container"> <!-- Added container for better structure -->
+            <h3 class="sub-heading">Leave a Comment</h3> <!-- Use h3 for sub-section -->
+            <form method="POST" action="{{ url_for('question_detail', question_id=question.questionID) }}"
+                class="comment-form">
+                <!-- Hidden userID is often unnecessary if handled server-side via session -->
+                <!-- <input type="hidden" name="userID" value="{{ session['userID']}}"> -->
+                <div class="form-group">
+                    <textarea name="commentText" class="form-input" rows="3" required
+                        placeholder="Write your comment..."></textarea>
                 </div>
-            </li>
-        {% endfor %}
-    </ul>
-{% else %}
-    <p class="no-items info-text">No comments yet.</p>
-{% endif %}
+                <div class="action-buttons">
+                    <button type="submit" class="btn primary">Submit Comment</button>
+                </div>
+            </form>
+        </div>
+    {% else %}
+        <p class="info-text">You have already commented on this question. You cannot leave another response.</p>
+    {% endif %}
+
+    <!-- Display Comments -->
+    {% if comments %}
+        <ul class="item-list comment-list">
+            {% for c in comments %}
+                <li class="item comment-item">
+                    <p class="item-text">{{ c.commentText }}</p>
+                    <div class="metadata info-text">
+                        {% if c.userName %}
+                            <span class="author"><i class="fa fa-user"></i> {{ c.userName }}</span>
+                        {% endif %}
+                        <!-- Add date/time if available -->
+                        {% if c.timestamp %}
+                            <span class="timestamp"><i class="fa fa-clock"></i> {{ c.timestamp }}</span>
+                        {% endif %}
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="no-items info-text">No comments yet.</p>
+    {% endif %}
 
 
     <!-- Back Button -->
