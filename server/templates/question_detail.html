@@ -113,41 +113,41 @@ Question Details - {{ question.questionText | truncate(30) }}
         <div class="comment-form-container">
             <h3 class="sub-heading">Your Comment</h3>
             <div class="form-group">
+                <!-- Display the user's comment in a readonly textarea -->
                 <textarea class="form-input" rows="3" readonly>{{ user_comment_text }}</textarea>
             </div>
         </div>
         {% endif %}
-    </div>
 
-    <!-- Display Comments -->
-    <div class="card voting-controls-card">
-        <h2 class="section-heading">Comments</h2>
-        {% if comments %}
-        <ul class="item-list comment-list">
-            {% for c in comments %}
-            <li class="item comment-item">
-                <p class="item-text">{{ c.commentText }}</p>
-                <div class="metadata info-text">
-                    {% if c.userName %}
-                    <span class="author"><i class="fa fa-user"></i> {{ c.userName }}</span>
-                    {% endif %}
-                    <!-- Add date/time if available -->
-                    {% if c.timestamp %}
-                    <span class="timestamp"><i class="fa fa-clock"></i> {{ c.timestamp }}</span>
-                    {% endif %}
-                </div>
-            </li>
-            {% endfor %}
-        </ul>
-        {% else %}
-        <p class="no-items info-text">No comments yet.</p>
-        {% endif %}
+        <!-- Display Comments -->
+        <div class="card voting-controls-card">
+            <h2 class="section-heading">Comments</h2>
+            {% if comments %}
+            <ul class="item-list comment-list">
+                {% for c in comments %}
+                <li class="item comment-item">
+                    <p class="item-text">{{ c.commentText }}</p>
+                    <div class="metadata info-text">
+                        {% if c.userName %}
+                        <span class="author"><i class="fa fa-user"></i> {{ c.userName }}</span>
+                        {% endif %}
+                        <!-- Add date/time if available -->
+                        {% if c.timestamp %}
+                        <span class="timestamp"><i class="fa fa-clock"></i> {{ c.timestamp }}</span>
+                        {% endif %}
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="no-items info-text">No comments yet.</p>
+            {% endif %}
 
+        </div>
+        <!-- Back Button -->
+        <div class="action-buttons page-actions">
+            <a href="{{ url_for('home') }}" class="btn secondary"><i class="fa fa-arrow-left"></i> Back to Home</a>
+        </div>
     </div>
-    <!-- Back Button -->
-    <div class="action-buttons page-actions">
-        <a href="{{ url_for('home') }}" class="btn secondary"><i class="fa fa-arrow-left"></i> Back to Home</a>
-    </div>
-</div>
-{% endif %}
-{% endblock %}
+    {% endif %}
+    {% endblock %}
