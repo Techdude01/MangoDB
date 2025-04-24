@@ -628,6 +628,7 @@ def vote_question():
     
     return redirect(url_for('question_detail', question_id=question_id))
 
+
 @app.route('/account_settings', methods=['GET', 'POST'])
 def account_settings():
     # Only allow access if user is logged in
@@ -640,15 +641,10 @@ def account_settings():
     conn = connect_db()
     cursor = conn.cursor()
 
-    # Get user ID (for tag handling)
     cursor.execute("SELECT userID FROM User WHERE userName = %s", (username,))
     user_id_row = cursor.fetchone()
-    if not user_id_row:
-        flash("User not found", "danger")
-        return redirect(url_for('login'))
-    user_id = user_id_row['userID'] 
-    
-    
+    user_id = user_id_row['userID']
+
     # Handle form submission (POST)
     if request.method == 'POST':
         # Get form data
@@ -656,7 +652,7 @@ def account_settings():
         confirm_password = request.form.get('confirm_password')
         new_first_name = request.form.get('first_name')
         new_last_name = request.form.get('last_name')
-        selected_tag_ids = request.form.getlist('user_tags')  # List of selected tag IDs
+        selected_tag_ids = request.form.getlist('tags')
 
         
         # Validate and update password if provided
@@ -683,32 +679,41 @@ def account_settings():
                 
             params.append(username)  # For the WHERE clause
             
-            # Update tags
-            cursor.execute("DELETE FROM UserTags WHERE userID = %s", (user_id,))
+            # Get the current tags the user already has
+            cursor.execute("SELECT tagID FROM UserTag WHERE userID = %s", (user_id,))
+            existing_tag_ids = [row['tagID'] for row in cursor.fetchall()]
+    
+            # Add new tags (that the user doesn't already have)
             for tag_id in selected_tag_ids:
-                cursor.execute("INSERT INTO UserTags (userID, tagID) VALUES (%s, %s)", (user_id, tag_id))
+                if int(tag_id) not in existing_tag_ids:  # Avoid duplicates
+                    cursor.execute("""
+                        INSERT INTO UserTag (tagID, userID)
+                        VALUES (%s, %s)
+                    """, (tag_id, user_id))
+            
+            flash('Tags updated successfully!', 'success')
 
             cursor.execute(f"UPDATE User SET {', '.join(update_fields)} WHERE userName = %s", tuple(params))
             flash('Profile information updated!', 'success')
             
         conn.commit()
 
+    # Get current user data to display
+    cursor.execute("SELECT firstName, lastName, role FROM User WHERE userName = %s", (username,))
+    user_data = cursor.fetchone()
+    
     # Fetch all available tags
     cursor.execute("SELECT tagID, tagName FROM Tag")
     all_tags = [{'id': row['tagID'], 'tagName': row['tagName']} for row in cursor.fetchall()]
 
     # Fetch user's selected tags
-    cursor.execute("SELECT tagID FROM UserTags WHERE userID = %s", (user_id,))
-    user_tag_ids = [row['tagID'] for row in cursor.fetchall()]  
-    
-    # Get current user data to display
-    cursor.execute("SELECT firstName, lastName, role FROM User WHERE userName = %s", (username,))
-    user_data = cursor.fetchone()
+    cursor.execute("SELECT tagID FROM UserTag WHERE userID = %s", (user_id,))
+    user_tags = [row['tagID'] for row in cursor.fetchall()]  
     
     cursor.close()
     conn.close()
     
-    return render_template('account_settings.html', username=username, user_data=user_data, all_tags=all_tags, user_tag_ids=user_tag_ids)
+    return render_template('account_settings.html', username=username, user_data=user_data, all_tags=all_tags, user_tags=user_tags)
 @app.route('/chats')
 def list_chats():
     """
