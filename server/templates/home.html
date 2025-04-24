@@ -149,6 +149,7 @@ Question Details - {{ question.questionText | truncate(30) }}
     <div class="action-buttons page-actions">
         <a href="{{ url_for('home') }}" class="btn secondary"><i class="fa fa-arrow-left"></i> Back to Home</a>
     </div>
-
+    {% endif %}
+    
 </div>
 {% endblock %}
