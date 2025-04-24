@@ -30,7 +30,12 @@ Mango Homepage
             </div>
             <div>
                 <label for="tag">Tag:</label>
-                <input type="text" id="tag" name="tag" placeholder="Enter tag name">
+                <select id="tag" name="tag">
+                    <option value="">-- Select a Tag --</option>
+                    {% for tag in tags %}
+                    <option value="{{ tag['tagName'] }}">{{ tag['tagName'] }}</option>
+                    {% endfor %}
+                </select>
             </div>
             <div>
                 <button onclick="validateSearchForm()" class="action-btn">Search</button>

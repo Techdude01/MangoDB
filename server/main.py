@@ -234,10 +234,10 @@ def home():
     
     return render_template(
         'home.html', 
+        tags=tags,
         most_popular=most_popular, 
         most_controversial=most_controversial, 
         most_recent=most_recent,
-        tags=tags,
         most_popular_page=1,
         total_pages=qPage,
         most_controversial_page=1,
