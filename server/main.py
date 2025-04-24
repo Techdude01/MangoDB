@@ -458,6 +458,14 @@ def question_detail(question_id):
     """, (question_id, userID))
     user_has_responded = cursor.fetchone() is not None
 
+    # Check if the user has already commented on this question
+    cursor.execute("""
+        SELECT commentID FROM Comment
+        WHERE questionID = %s AND userID = %s AND status = 'published'
+    """, (question_id, userID))
+    user_has_commented = cursor.fetchone() is not None
+
+
     # Handle new response submission
     if request.method == 'POST' and not user_has_responded:
         response_text = request.form['responseText']
@@ -466,6 +474,17 @@ def question_detail(question_id):
             INSERT INTO Response (userID, questionID, responseText, TimeStampID, status)
             VALUES (%s, %s, %s, %s, 'published')
         """, (userID, question_id, response_text, timestamp_id))
+        conn.commit()
+        return redirect(url_for('question_detail', question_id=question_id))
+
+    # Handle comment submission 
+    if request.method == 'POST' and 'commentText' in request.form and not user_has_commented:
+        comment_text = request.form['commentText']
+        timestamp_id = get_timestamp_id(cursor)  # Same helper function for timestamps
+        cursor.execute("""
+            INSERT INTO Comment (userID, questionID, commentText, TimeStampID, status)
+            VALUES (%s, %s, %s, %s, 'published')
+        """, (userID, question_id, comment_text, timestamp_id))
         conn.commit()
         return redirect(url_for('question_detail', question_id=question_id))
 
