@@ -458,8 +458,8 @@ def publish_question():
 
         # Update the TagList table w selected tags
         for tag_id in tag_ids:
-            cursor.execute("INSERT INTO TagList (tagID, questionID, userID) VALUES (%s, %s, %s)", (tag_id, question_id, userID))
-        
+            cursor.execute("CALL UserAddTag(%s, %s)", (userID, tag_id))
+            cursor.execute("CALL QuestionAddTag(%s, %s)", (question_id, tag_id))
         conn.commit()
         flash('Question published successfully!', 'success')
     except Exception as e:
@@ -534,7 +534,14 @@ def question_detail(question_id):
         WHERE questionID = %s AND userID = %s AND status = 'published'
     """, (question_id, userID))
     user_has_commented = cursor.fetchone() is not None
-
+    # Get question tags
+    cursor.execute("""
+        SELECT t.tagID, t.tagName
+        FROM QuestionTag qt
+        JOIN Tag t ON qt.tagID = t.tagID
+        WHERE qt.questionID = %s
+    """, (question_id,))
+    tags = cursor.fetchall()
 
     # Handle new response submission
     if request.method == 'POST' and not user_has_responded:
@@ -586,7 +593,8 @@ def question_detail(question_id):
         question=question,
         responses=responses,
         comments=comments,
-        user_has_responded=user_has_responded
+        user_has_responded=user_has_responded,
+        tags=tags
     )
 
 @app.route('/vote_question', methods=['POST'])
@@ -632,7 +640,7 @@ def account_settings():
     cursor = conn.cursor()
 
     # Get user ID (for tag handling)
-    cursor.execute("SELECT userID FROM TagList WHERE userName = %s", (username,))
+    cursor.execute("SELECT userID FROM User WHERE userName = %s", (username,))
     user_id_row = cursor.fetchone()
     if not user_id_row:
         flash("User not found", "danger")
@@ -647,7 +655,7 @@ def account_settings():
         confirm_password = request.form.get('confirm_password')
         new_first_name = request.form.get('first_name')
         new_last_name = request.form.get('last_name')
-        selected_tag_ids = request.form.getlist('TagList')  # List of selected tag IDs
+        selected_tag_ids = request.form.getlist('user_tags')  # List of selected tag IDs
 
         
         # Validate and update password if provided
@@ -675,9 +683,9 @@ def account_settings():
             params.append(username)  # For the WHERE clause
             
             # Update tags
-            cursor.execute("DELETE FROM TagList WHERE userID = %s", (user_id,))
+            cursor.execute("DELETE FROM UserTags WHERE userID = %s", (user_id,))
             for tag_id in selected_tag_ids:
-                cursor.execute("INSERT INTO TagList (userID, tagID) VALUES (%s, %s)", (user_id, tag_id))
+                cursor.execute("INSERT INTO UserTags (userID, tagID) VALUES (%s, %s)", (user_id, tag_id))
 
             cursor.execute(f"UPDATE User SET {', '.join(update_fields)} WHERE userName = %s", tuple(params))
             flash('Profile information updated!', 'success')
@@ -689,7 +697,7 @@ def account_settings():
     all_tags = [{'id': row['tagID'], 'tagName': row['tagName']} for row in cursor.fetchall()]
 
     # Fetch user's selected tags
-    cursor.execute("SELECT tagID FROM TagList WHERE userID = %s", (user_id,))
+    cursor.execute("SELECT tagID FROM UserTags WHERE userID = %s", (user_id,))
     user_tag_ids = [row['tagID'] for row in cursor.fetchall()]  
     
     # Get current user data to display
@@ -964,7 +972,6 @@ def add_tag():
     user_id = session.get('userID')
     tag_id = request.form.get('tag_id')
     
-    # Validate the tag_id
     if not tag_id or not tag_id.isdigit():
         flash('Invalid tag selected.', 'danger')
         return redirect(url_for('dashboard'))
@@ -973,22 +980,19 @@ def add_tag():
     cursor = conn.cursor()
     
     try:
-        # Call the AddTag stored procedure
         cursor.execute("CALL UserAddTag(%s, %s)", (user_id, tag_id))
         conn.commit()
         flash('Tag added successfully!', 'success')
     except pymysql.Error as e:
         conn.rollback()
-        # Check if it's a duplicate entry error
-        if e.args[0] == 1062:  # MySQL duplicate entry error code
+        if e.args[0] == 1062:  # Duplicate entry
             flash('You already have this tag.', 'warning')
         else:
-            flash(f'Error adding tag: {e}', 'danger')
+            flash('Error adding tag.', 'danger')
     finally:
         cursor.close()
         conn.close()
     
-    # Redirect back to dashboard or another appropriate page
     return redirect(url_for('dashboard'))
 @app.context_processor
 def inject_user_data():

@@ -18,11 +18,11 @@ Question Details - {{ question.questionText | truncate(30) }}
             <span class="date"><i class="fa fa-calendar"></i> {{ question.datePosted }}</span>
             {% endif %}
             <!-- Display Tags if available -->
-            {% if question.tags %}
+            {% if tags %}
             <div class="tags info-text">
                 <i class="fa fa-tags"></i> Tags:
-                {% for tag in question.tags %}
-                <span class="tag badge">{{ tag }}</span>{% if not loop.last %}, {% endif %}
+                {% for tag in tags %}
+                <span class="tag badge">{{ tag.tagName }}</span>
                 {% endfor %}
             </div>
             {% endif %}
