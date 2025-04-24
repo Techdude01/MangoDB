@@ -41,6 +41,16 @@ Question Details - {{ question.questionText | truncate(30) }}
             <div class="action-buttons">
                 <button type="submit" class="btn primary">Submit Response</button>
             </div>
+<<<<<<< HEAD
+            <div>
+                <label for="tag" class="form-group-label">Tag:</label>
+                <select id="tag" name="tag" class="form-input">
+                    <option value="">-- Select a Tag --</option>
+                    {% for tag in tags %}
+                    <option value="{{ tag['tagName'] }}">{{ tag['tagName'] }}</option>
+                    {% endfor %}
+                </select>
+=======
         </form>
         <p class="note info-text">Submit a response to view others' contributions and vote on this question.</p>
     </div>
@@ -64,6 +74,7 @@ Question Details - {{ question.questionText | truncate(30) }}
                     <input type="hidden" name="userID" value="{{ session['userID'] }}">
                     <button type="submit" class="vote-btn downvote"><i class="fa fa-thumbs-down"></i> Downvote</button>
                 </form>
+>>>>>>> d1c537013d342264d555e20dfb89601cddeb13e4
             </div>
             <p class="vote-count badge">Current Votes: <span class="upvote-count">+{{ question.upvotes }}</span> / <span
                     class="downvote-count">-{{ question.downvotes }}</span></p>

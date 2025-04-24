@@ -136,13 +136,22 @@ h6,
 .user-registration input,
 .form-group input,
 .response-form textarea {
-  width: 100%;
-  padding: 0.6rem; /* Consistent padding */
-  margin-bottom: 1rem; /* Consistent spacing */
+  width: 200px; /* Adjust width as needed */
+  padding: 0.6rem;
   border: 1px solid #ffd54f; /* Theme border */
-  border-radius: 5px; /* Consistent radius */
+  border-radius: 5px;
   background: #fffde7; /* Light background */
-  font-family: inherit; /* Inherit body font */
+  font-family: inherit; /* Inherit font from body */
+  color: #3e2723; /* Theme text color */
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+/* Hover and focus effects for the dropdown */
+.form-input:hover,
+.form-input:focus {
+    border-color: #ffb300; /* Highlight border on hover/focus */
+    box-shadow: 0 0 4px rgba(255, 179, 0, 0.5); /* Subtle glow */
+    outline: none; /* Remove default outline */
 }
 
 .form-group label,
