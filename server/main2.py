@@ -6,14 +6,14 @@ from datetime import datetime
 app = Flask(__name__)
 app.secret_key = 'mango'
 
-def connect_db(username='mango_user', password='arfaouiRocks123'):
+def connect_db(username='root', password=''):
     print(f"Connecting as user: '{username}'")
     try:
         conn = pymysql.connect(
             host='localhost',
             user=username,
             password=password,
-            db='Mango',
+            db='mango',
             charset='utf8mb4',
             cursorclass=pymysql.cursors.DictCursor
         )
@@ -215,34 +215,47 @@ def home():
     conn = connect_db()
     cursor = conn.cursor(pymysql.cursors.DictCursor)
     qCount = 5
-    # Fetch total questions
-    cursor.execute("SELECT COUNT(*) AS total FROM Question WHERE status = 'published'")
-    total_questions = cursor.fetchone()['total']
-    qPage= total_questions // qCount + (total_questions % qCount > 0)
-    #Fetch top 5 questions for each category
-    cursor.execute("CALL GetPopularQuestionsWithPagination(%s, 0)", (qCount,))
-    most_popular = cursor.fetchall()
-    cursor.execute("CALL GetControversialQuestionsWithPagination(%s, 0)", (qCount,))
-    most_controversial = cursor.fetchall()
-    cursor.execute("CALL GetRecentQuestionsWithPagination(%s, 0)", (qCount,))
-    most_recent = cursor.fetchall()
-    cursor.execute("SELECT COUNT(*) AS total FROM Question WHERE status = 'published'")
-    total_questions = cursor.fetchone()['total']
-    cursor.execute("SELECT tagID, tagName FROM Tag")
-    tags = cursor.fetchall()
-    conn.close()
-    
-    return render_template(
-        'home.html', 
-        most_popular=most_popular, 
-        most_controversial=most_controversial, 
-        most_recent=most_recent,
-        tags=tags,
-        most_popular_page=1,
-        total_pages=qPage,
-        most_controversial_page=1,
-        most_recent_page=1,
+
+    try:
+        # Fetch total questions
+        cursor.execute("SELECT COUNT(*) AS total FROM Question WHERE status = 'published'")
+        total_questions = cursor.fetchone()['total']
+        qPage= total_questions // qCount + (total_questions % qCount > 0)
+
+        #Fetch top 5 questions for each category
+        cursor.execute("CALL GetPopularQuestionsWithPagination(%s, 0)", (qCount,))
+        most_popular = cursor.fetchall()
+
+        cursor.execute("CALL GetControversialQuestionsWithPagination(%s, 0)", (qCount,))
+        most_controversial = cursor.fetchall()
+
+        cursor.execute("CALL GetRecentQuestionsWithPagination(%s, 0)", (qCount,))
+        most_recent = cursor.fetchall()
+
+        cursor.execute("SELECT tagID, tagName FROM Tag")
+        tags = cursor.fetchall()
+        
+        # Fetch a specific question (example: the first question)
+        cursor.execute("SELECT * FROM Question WHERE status = 'published' LIMIT 1")
+        question = cursor.fetchone()
+        
+        return render_template(
+            'home.html', 
+            tags=tags,
+            most_popular=most_popular, 
+            most_controversial=most_controversial, 
+            most_recent=most_recent,
+            question=question,
+            most_popular_page=1,
+            total_pages=qPage,
+            most_controversial_page=1,
+            most_recent_page=1,
         )
+    except Exception as e: 
+        flash(f"Error loading homepage: {e}", "danger")
+        return render_template('home.html', tags=[], most_popular=[], most_controversial=[], most_recent=[])
+    finally:
+        conn.close()
 
 @app.route('/search', methods=['GET'])
 def search():
@@ -255,7 +268,7 @@ def search():
 
     # Search by Username
     if username:
-        cursor.execute("SELECT * FROM Question WHERE userID = (SELECT userID FROM User WHERE userName = %s) AND status = 'published'", (username,))
+        cursor.execute("SELECT * FROM Question WHERE userID = (SELECT userID FROM User WHERE userName = %s)", (username,))
         questions = cursor.fetchall()
         conn.close()
         print('i')
@@ -370,25 +383,37 @@ def most_recent():
 
 @app.route('/start_question', methods=['POST'])
 def start_question():
-    userID = request.form.get('userID')  # Assume user ID is passed from the frontend
-    question_text = request.form.get('question_text', '')  # Default to an empty string
+    user_id = session.get('userID') # Get userID from session
+    question_text = request.form.get('question_text', '')
+
+    if not user_id:
+        # Handle case where user is not logged in
+        flash('You must be logged in to ask a question.', 'danger')
+        return redirect(url_for('login')) # Redirect to login
+    if not question_text:
+        flash('Question text cannot be empty.', 'danger')
+        return redirect(url_for('home')) # Redirect back home or wherever the form is
 
     conn = connect_db()
     cursor = conn.cursor()
-
+    # draft_id = None # No longer needed if not returning JSON
     try:
-        # Call StartQuestion() to create a draft question
-        cursor.execute("CALL StartQuestion(%s, %s)", (userID, question_text))
+        # Call StartQuestion procedure
+        cursor.execute("CALL StartQuestion(%s, %s)", (user_id, question_text))
+        # No need to fetch LAST_INSERT_ID() if not returning JSON
         conn.commit()
-        flash('Draft question created successfully!')
+        flash('Draft question started successfully! Now add tags and publish.', 'success') # Updated flash message
+        # Redirect back to home, potentially with info to show the publish form
+        # Simple redirect for now, frontend JS needs adjustment if it relied on draftId
+        return redirect(url_for('home'))
     except Exception as e:
         conn.rollback()
-        flash(f'Error starting question: {e}')
+        print(f"Error starting question draft: {e}")
+        flash(f'Error starting question: {e}', 'danger') # Flash error message
+        return redirect(url_for('home')) # Redirect on error
     finally:
+        cursor.close()
         conn.close()
-
-    return redirect(url_for('home'))
-
 
 @app.route('/publish_question', methods=['POST'])
 def publish_question():
@@ -499,13 +524,15 @@ def question_detail(question_id):
         WHERE questionID = %s AND userID = %s AND status = 'published'
     """, (question_id, userID))
     user_has_responded = cursor.fetchone() is not None
-    
+
     # Check if the user has already commented on this question
     cursor.execute("""
         SELECT commentID FROM Comment
         WHERE questionID = %s AND userID = %s AND status = 'published'
     """, (question_id, userID))
     user_has_commented = cursor.fetchone() is not None
+
+
     # Handle new response submission
     if request.method == 'POST' and not user_has_responded:
         response_text = request.form['responseText']
@@ -516,17 +543,18 @@ def question_detail(question_id):
         """, (userID, question_id, response_text, timestamp_id))
         conn.commit()
         return redirect(url_for('question_detail', question_id=question_id))
-    # Handle comment submission if the user hasn't commented already
-    if request.method == 'POST' and not user_has_commented:
+
+    # Handle comment submission 
+    if request.method == 'POST' and 'commentText' in request.form and not user_has_commented:
         comment_text = request.form['commentText']
-        timestamp_id = get_timestamp_id(cursor)  # Ensure this returns a valid TimeStampID
+        timestamp_id = get_timestamp_id(cursor)  # Same helper function for timestamps
         cursor.execute("""
             INSERT INTO Comment (userID, questionID, commentText, TimeStampID, status)
             VALUES (%s, %s, %s, %s, 'published')
         """, (userID, question_id, comment_text, timestamp_id))
         conn.commit()
         return redirect(url_for('question_detail', question_id=question_id))
-    
+
     # Get the question data
     cursor.execute("SELECT * FROM Question WHERE questionID = %s", (question_id,))
     question = cursor.fetchone()
@@ -544,42 +572,19 @@ def question_detail(question_id):
         """, (question_id,))
         comments = cursor.fetchall()
 
+    conn.close()
+
+    if not question:
+        flash('Question not found.', 'danger')
+        return redirect(url_for('home'))
+
     return render_template(
         'question_detail.html',
         question=question,
         responses=responses,
         comments=comments,
-        user_has_responded=user_has_responded,
-        user_has_commented=user_has_commented,
+        user_has_responded=user_has_responded
     )
-@app.route('/submit_comment', methods=['POST'])
-def submit_comment():
-    question_id = request.form.get('question_id')
-    comment_text = request.form.get('commentText')
-    userID = session.get('userID')
-
-    if not question_id or not comment_text or not userID:
-        flash('Invalid comment submission.', 'danger')
-        return redirect(url_for('home'))
-
-    conn = connect_db()
-    cursor = conn.cursor()
-
-    try:
-        timestamp_id = get_timestamp_id(cursor)  # Helper function to create a timestamp
-        cursor.execute("""
-            INSERT INTO Comment (userID, questionID, commentText, TimeStampID, status)
-            VALUES (%s, %s, %s, %s, 'published')
-        """, (userID, question_id, comment_text, timestamp_id))
-        conn.commit()
-        flash('Comment submitted successfully!', 'success')
-    except Exception as e:
-        conn.rollback()
-        flash(f'Error submitting comment: {e}', 'danger')
-    finally:
-        conn.close()
-
-    return redirect(url_for('question_detail', question_id=question_id))
 
 @app.route('/vote_question', methods=['POST'])
 def vote_question():

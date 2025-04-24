@@ -37,10 +37,37 @@ Mango Homepage
                     <option value="{{ tag['tagName'] }}">{{ tag['tagName'] }}</option>
                     {% endfor %}
                 </select>
+                <<<<<<< HEAD=======</form>
+                    <p class="note info-text">Submit a response to view others' contributions and vote on this question.
+                    </p>
             </div>
-            <div>
-                <button onclick="validateSearchForm()" class="action-btn">Search</button>
-            </div>
+            {% else %}
+            <!-- Voting Controls -->
+            <div class="card voting-controls-card">
+                <h2 class="section-heading">Vote</h2>
+                <div class="voting-controls card">
+                    <div class="vote-buttons">
+                        <!-- Upvote Form -->
+                        <form method="POST" action="{{ url_for('vote_question') }}" class="vote-form">
+                            <input type="hidden" name="question_id" value="{{ question.questionID }}">
+                            <input type="hidden" name="vote" value="up">
+                            <input type="hidden" name="userID" value="{{ session['userID'] }}">
+                            <button type="submit" class="vote-btn upvote"><i class="fa fa-thumbs-up"></i>
+                                Upvote</button>
+                        </form>
+                        <!-- Downvote Form -->
+                        <form method="POST" action="{{ url_for('vote_question') }}" class="vote-form">
+                            <input type="hidden" name="question_id" value="{{ question.questionID }}">
+                            <input type="hidden" name="vote" value="down">
+                            <input type="hidden" name="userID" value="{{ session['userID'] }}">
+                            <button type="submit" class="vote-btn downvote"><i class="fa fa-thumbs-down"></i>
+                                Downvote</button>
+                        </form>
+                        >>>>>>> 0d8cdf953553ff4dade31d26ffebb9c0b9310fca
+                    </div>
+                    <div>
+                        <button onclick="validateSearchForm()" class="action-btn">Search</button>
+                    </div>
         </form>
     </div>
 
@@ -80,6 +107,7 @@ Mango Homepage
             </form>
         </div>
     </div>
+    {% endif %}
 
     <!-- Most Popular Questions Section -->
     <div>
