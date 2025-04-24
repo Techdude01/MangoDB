@@ -736,7 +736,7 @@ BEGIN
            (SELECT COUNT(*) FROM Response r WHERE r.questionID = q.questionID) AS responseCount
     FROM Question q
     JOIN TimeStamp t ON q.TimeStampID = t.TimeStampID
-    WHERE q.userID = p_userID
+    WHERE q.userID = p_userID AND q.status = 'published'
     ORDER BY t.sentDate DESC, t.sentTime DESC;
 END//
 
