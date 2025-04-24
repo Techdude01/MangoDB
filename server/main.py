@@ -683,7 +683,7 @@ def account_settings():
         conn.commit()
 
     # Fetch all available tags
-    cursor.execute("SELECT tagID, tagName FROM Tags")
+    cursor.execute("SELECT tagID, tagName FROM Tag")
     all_tags = [{'id': row[0], 'tagName': row[1]} for row in cursor.fetchall()]
 
     # Fetch user's selected tags
