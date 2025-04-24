@@ -6,7 +6,7 @@ from datetime import datetime
 app = Flask(__name__)
 app.secret_key = 'mango'
 
-def connect_db(username='root', password=''):
+def connect_db(username='mango_user', password='arfaouiRocks123'):
     print(f"Connecting as user: '{username}'")
     try:
         conn = pymysql.connect(
@@ -273,8 +273,8 @@ def search():
         cursor.execute("CALL GetQuestionsByTag(%s)", (tag,))
         questions = cursor.fetchall()
         conn.close()
-        print('k')
-        return render_template('search_results.html', questions=questions, tag_name=tag)
+        print(questions)
+        return render_template('search_results.html', questions=questions, search_type="Tag", tag_name=tag)
 
     # If no input is provided
     else:

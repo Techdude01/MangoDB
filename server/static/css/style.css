@@ -55,7 +55,8 @@ body {
 
 /* ========== MAIN CONTAINER ========== */
 .main {
-  max-width: 90%; /* Increased max-width */
+  min-width: 1000px;
+  max-width: 100%; /* Increased max-width */
   margin: 1rem auto;
   background: rgba(255, 237, 148, 0.85); /* Semi-transparent background */
   border-radius: 12px;
