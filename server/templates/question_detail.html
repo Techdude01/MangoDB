@@ -91,9 +91,10 @@ Question Details - {{ question.questionText | truncate(30) }}
     </div>
 
     <!-- Comment Submission Form -->
-    {% if not user_has_commented %}
-        <div class="comment-form-container"> <!-- Added container for better structure -->
-            <h3 class="sub-heading">Leave a Comment</h3> <!-- Use h3 for sub-section -->
+    <div class="card comment-form-card">
+        <h2 class="section-heading">Leave a Comment</h2>
+        {% if not user_has_commented %}
+        <div class="comment-form-container">
             <form method="POST" action="{{ url_for('question_detail', question_id=question.questionID) }}"
                 class="comment-form">
                 <!-- Hidden userID is often unnecessary if handled server-side via session -->
@@ -107,37 +108,41 @@ Question Details - {{ question.questionText | truncate(30) }}
                 </div>
             </form>
         </div>
-    {% else %}
+        {% else %}
         <p class="info-text">You have already commented on this question. You cannot leave another response.</p>
-    {% endif %}
-
-    <!-- Display Comments -->
-    {% if comments %}
-        <ul class="item-list comment-list">
-            {% for c in comments %}
+        {% endif %}
+        <!-- Display Comments -->
+        <div class="card comments-card">
+            <h2 class="section-heading">Comments</h2>
+            {% if comments %}
+            <ul class="item-list comment-list">
+                {% for c in comments %}
                 <li class="item comment-item">
                     <p class="item-text">{{ c.commentText }}</p>
                     <div class="metadata info-text">
                         {% if c.userName %}
-                            <span class="author"><i class="fa fa-user"></i> {{ c.userName }}</span>
+                        <span class="author"><i class="fa fa-user"></i> {{ c.userName }}</span>
                         {% endif %}
                         <!-- Add date/time if available -->
                         {% if c.timestamp %}
-                            <span class="timestamp"><i class="fa fa-clock"></i> {{ c.timestamp }}</span>
+                        <span class="timestamp"><i class="fa fa-clock"></i> {{ c.timestamp }}</span>
                         {% endif %}
                     </div>
                 </li>
-            {% endfor %}
-        </ul>
-    {% else %}
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="no-items info-text">No comments yet.</p>
+            {% endif %}
+        </div>
         <p class="no-items info-text">No comments yet.</p>
-    {% endif %}
+        {% endif %}
 
 
-    <!-- Back Button -->
-    <div class="action-buttons page-actions">
-        <a href="{{ url_for('home') }}" class="btn secondary"><i class="fa fa-arrow-left"></i> Back to Home</a>
+        <!-- Back Button -->
+        <div class="action-buttons page-actions">
+            <a href="{{ url_for('home') }}" class="btn secondary"><i class="fa fa-arrow-left"></i> Back to Home</a>
+        </div>
+
     </div>
-
-</div>
-{% endblock %}
+    {% endblock %}
