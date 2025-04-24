@@ -684,11 +684,11 @@ def account_settings():
 
     # Fetch all available tags
     cursor.execute("SELECT tagID, tagName FROM Tag")
-    all_tags = [{'id': row[0], 'tagName': row[1]} for row in cursor.fetchall()]
+    all_tags = [{'id': row['tagID'], 'tagName': row['tagName']} for row in cursor.fetchall()]
 
     # Fetch user's selected tags
     cursor.execute("SELECT tagID FROM UserTags WHERE userID = %s", (user_id,))
-    user_tag_ids = [row[0] for row in cursor.fetchall()]
+    user_tag_ids = [row['tagID'] for row in cursor.fetchall()]  
     
     # Get current user data to display
     cursor.execute("SELECT firstName, lastName, role FROM User WHERE userName = %s", (username,))
