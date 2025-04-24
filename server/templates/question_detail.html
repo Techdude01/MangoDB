@@ -90,7 +90,7 @@ Question Details - {{ question.questionText | truncate(30) }}
         {% endif %}
     </div>
     
-    <!-- Comment Submission Form -->
+        <!-- Comment Submission Form -->
     {% if not user_has_commented %}
         <div class="comment-form-container"> <!-- Added container for better structure -->
             <h3 class="sub-heading">Leave a Comment</h3> <!-- Use h3 for sub-section -->
@@ -138,7 +138,6 @@ Question Details - {{ question.questionText | truncate(30) }}
     {% else %}
         <p class="no-items info-text">No comments yet.</p>
     {% endif %}
-
 
         <!-- Back Button -->
         <div class="action-buttons page-actions">
