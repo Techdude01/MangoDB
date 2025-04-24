@@ -506,17 +506,6 @@ def question_detail(question_id):
         WHERE questionID = %s AND userID = %s AND status = 'published'
     """, (question_id, userID))
     user_has_commented = cursor.fetchone() is not None
-
-  # Handle comment submission if the user hasn't commented already
-    if request.method == 'POST' and not user_has_commented:
-        comment_text = request.form['commentText']
-        timestamp_id = get_timestamp_id(cursor)  # Ensure this returns a valid TimeStampID
-        cursor.execute("""
-            INSERT INTO Comment (userID, questionID, commentText, TimeStampID, status)
-            VALUES (%s, %s, %s, %s, 'published')
-        """, (userID, question_id, comment_text, timestamp_id))
-        conn.commit()
-        return redirect(url_for('question_detail', question_id=question_id))
     
     # Handle new response submission
     if request.method == 'POST' and not user_has_responded:
@@ -526,6 +515,17 @@ def question_detail(question_id):
             INSERT INTO Response (userID, questionID, responseText, TimeStampID, status)
             VALUES (%s, %s, %s, %s, 'published')
         """, (userID, question_id, response_text, timestamp_id))
+        conn.commit()
+        return redirect(url_for('question_detail', question_id=question_id))
+
+    # Handle comment submission if the user hasn't commented already
+    if request.method == 'POST' and not user_has_commented:
+        comment_text = request.form['commentText']
+        timestamp_id = get_timestamp_id(cursor)  # Ensure this returns a valid TimeStampID
+        cursor.execute("""
+            INSERT INTO Comment (userID, questionID, commentText, TimeStampID, status)
+            VALUES (%s, %s, %s, %s, 'published')
+        """, (userID, question_id, comment_text, timestamp_id))
         conn.commit()
         return redirect(url_for('question_detail', question_id=question_id))
 
