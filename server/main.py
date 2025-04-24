@@ -635,7 +635,7 @@ def account_settings():
     if not user_id_row:
         flash("User not found", "danger")
         return redirect(url_for('login'))
-    user_id = user_id_row[0]
+    user_id = user_id_row['userID'] 
     
     
     # Handle form submission (POST)
