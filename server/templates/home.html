@@ -42,12 +42,20 @@ Mango Homepage
     <div class="post-question">
         <button id="post-question-btn" onclick="toggleQuestionForm()">Post a Question</button>
         <div id="question-form" style="display: none;">
-            <form action="{{ url_for('publish_question') }}" method="post">
+            <!-- First form to start a draft question -->
+            <form id="start-question-form" action="{{ url_for('start_question') }}" method="post">
+                <input type="hidden" name="userID" value="{{ session.get('userID', '') }}">
                 <div>
                     <label for="question-text">Question:</label>
                     <textarea id="question-text" name="question_text" placeholder="Write your question here..."
                         required></textarea>
                 </div>
+                <button type="button" onclick="startDraft(event)">Start Draft</button>
+            </form>
+
+            <!-- Form to publish the question with tags (shows after draft creation) -->
+            <form id="publish-question-form" action="{{ url_for('publish_question')}}" method="post"
+                style="display: none;">
                 <div>
                     <label for="tags">Tags:</label>
                     <select id="tags" name="tags" multiple required>
@@ -56,12 +64,12 @@ Mango Homepage
                         {% endfor %}
                     </select>
                 </div>
-                <button type="submit">Post Question</button>
+                <button type="submit">Publish Question</button>
+                <button id="cancel-question-form" type="button" onclick="toggleQuestionForm()"
+                    style="display: none;">Cancel</button>
             </form>
         </div>
     </div>
-
-    <!-- ... existing code ... -->
 
     <!-- Most Popular Questions Section -->
     <div>
@@ -73,10 +81,7 @@ Mango Homepage
                 <a href="{{ url_for('question_detail', question_id=question['questionID']) }}" class="question-link">
                     {{ question['questionText'] }}
                 </a>
-                <!-- Optional: Add metadata if available/desired -->
-                <!-- <div class="question-metadata">
-                    <span>👍 {{ question.get('upvotes', 0) }} | 👎 {{ question.get('downvotes', 0) }}</span>
-                </div> -->
+
             </li>
             {% endif %}
             {% endfor %}
@@ -163,10 +168,45 @@ Mango Homepage
         form.style.display = form.style.display === 'none' ? 'block' : 'none';
     }
 
-    function startDraft() {
-        document.getElementById('start-question-form').submit();
-        document.getElementById('publish-question-form').style.display = 'block';
-        document.getElementById('cancel-question-form').style.display = 'block';
+    function startDraft(event) {
+        event.preventDefault();
+        const form = document.getElementById('start-question-form');
+        const formData = new FormData(form);
+
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.headers.get('content-type').includes('application/json') ?
+                        response.json() :
+                        { success: true };
+                }
+                throw new Error('Network response was not ok');
+            })
+            .then(data => {
+                // Hide the start draft form
+                document.getElementById('start-question-form').style.display = 'none';
+                // Show the publish form
+                document.getElementById('publish-question-form').style.display = 'block';
+                document.getElementById('cancel-question-form').style.display = 'block';
+                // You might want to store the draft ID if returned from backend
+                if (data && data.draftId) {
+                    const hiddenInput = document.createElement('input');
+                    hiddenInput.type = 'hidden';
+                    hiddenInput.name = 'draft_id';
+                    hiddenInput.value = data.draftId;
+                    document.getElementById('publish-question-form').appendChild(hiddenInput);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to create draft. Please try again.');
+            });
     }
 </script>
 {% endblock %}

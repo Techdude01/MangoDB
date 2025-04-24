@@ -1,5 +1,5 @@
 -- how to run
--- mysql -u root Mango < PERMISSIONS.sql
+-- mysql -u root Mango < PERMISSIONS.sqlg
 CREATE USER 'mango_user'@'localhost' IDENTIFIED BY 'arfaouiRocks123';
 GRANT SELECT, INSERT, UPDATE, DELETE ON `mango`.* TO 'mango_user'@'localhost';
 GRANT EXECUTE ON PROCEDURE `Mango`.`CancelComment` TO 'mango_user'@'localhost';
