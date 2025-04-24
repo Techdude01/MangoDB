@@ -1,0 +1,2 @@
+To run the application:
+1. Go to mys
