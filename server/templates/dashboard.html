@@ -51,7 +51,7 @@ Dashboard
                 <label for="tag_id">Tag:</label>
                 <select id="tag_id" name="tag_id" class="form-input" required>
                     <option value="">-- Select a Tag --</option>
-                    {% for available_tag in available_tags %}
+                    {% for available_tag in tags2 %}
                     <option value="{{ available_tag.tagID }}">{{ available_tag.tagName }}</option>
                     {% endfor %}
                 </select>

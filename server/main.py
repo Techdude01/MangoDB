@@ -135,9 +135,11 @@ def dashboard():
     # Get tags used by the current user
     cursor.execute("CALL GetTagsByUserID(%s)", (session['userID'],))
     tags = cursor.fetchall()
-    
+    # Get all tags in the system for comparison
+    cursor.execute("SELECT tagID, tagName FROM Tag")
+    tags2 = cursor.fetchall()
     # Render the dashboard template with the user's data
-    return render_template('dashboard.html', tags=tags, questions=questions,numQuestions=len(questions), numTags=len(tags))
+    return render_template('dashboard.html', tags=tags, tags2=tags2,questions=questions,numQuestions=len(questions), numTags=len(tags))
 
 @app.route('/register', methods=['GET', 'POST'])
 def register_route():
