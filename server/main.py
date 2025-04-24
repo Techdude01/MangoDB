@@ -594,6 +594,7 @@ def question_detail(question_id):
         responses=responses,
         comments=comments,
         user_has_responded=user_has_responded,
+        user_has_commented=user_has_commented,
         tags=tags
     )
 
