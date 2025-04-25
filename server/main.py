@@ -217,14 +217,16 @@ def home():
     conn = connect_db()
     cursor = conn.cursor(pymysql.cursors.DictCursor)
     qCount = 5
+    user_id = session.get('userID')
+    active_draft = None
 
     try:
-        # Fetch total questions
+        # Fetch total questions for pagination
         cursor.execute("SELECT COUNT(*) AS total FROM Question WHERE status = 'published'")
         total_questions = cursor.fetchone()['total']
-        qPage= total_questions // qCount + (total_questions % qCount > 0)
+        total_pages = (total_questions + qCount - 1) // qCount
 
-        #Fetch top 5 questions for each category
+        # Fetch questions for each category (first page by default)
         cursor.execute("CALL GetPopularQuestionsWithPagination(%s, 0)", (qCount,))
         most_popular = cursor.fetchall()
 
@@ -234,29 +236,36 @@ def home():
         cursor.execute("CALL GetRecentQuestionsWithPagination(%s, 0)", (qCount,))
         most_recent = cursor.fetchall()
 
+        # Get tags
         cursor.execute("SELECT tagID, tagName FROM Tag")
         tags = cursor.fetchall()
-        print(most_recent)
-        print('g')
-        # Fetch a specific question (example: the first question)
-        cursor.execute("SELECT * FROM Question WHERE status = 'published' LIMIT 1")
-        question = cursor.fetchone()
-        
+
+        # Look for an active draft
+        if user_id:
+            cursor.execute("""
+                SELECT questionID, questionText
+                FROM Question
+                WHERE userID = %s AND status = 'draft'
+                ORDER BY TimeStampID DESC
+                LIMIT 1
+            """, (user_id,))
+            active_draft = cursor.fetchone()
+
         return render_template(
-            'home.html', 
+            'home.html',
             tags=tags,
-            most_popular=most_popular, 
-            most_controversial=most_controversial, 
+            most_popular=most_popular,
+            most_controversial=most_controversial,
             most_recent=most_recent,
-            question=question,
             most_popular_page=1,
-            total_pages=qPage,
             most_controversial_page=1,
             most_recent_page=1,
+            total_pages=total_pages,
+            active_draft=active_draft
         )
-    except Exception as e: 
+    except Exception as e:
         flash(f"Error loading homepage: {e}", "danger")
-        return render_template('home.html', tags=[], most_popular=[], most_controversial=[], most_recent=[])
+        return render_template('home.html', tags=[], most_popular=[], most_controversial=[], most_recent=[], active_draft=None)
     finally:
         conn.close()
 
@@ -386,132 +395,75 @@ def most_recent():
 
 @app.route('/start_question', methods=['POST'])
 def start_question():
-    user_id = session.get('userID') # Get userID from session
+    userID = session.get('userID')
     question_text = request.form.get('question_text', '')
-
-    if not user_id:
-        # Handle case where user is not logged in
+    if not userID:
         flash('You must be logged in to ask a question.', 'danger')
-        return redirect(url_for('login')) # Redirect to login
+        return redirect(url_for('login'))
     if not question_text:
         flash('Question text cannot be empty.', 'danger')
-        return redirect(url_for('home')) # Redirect back home or wherever the form is
+        return redirect(url_for('home'))
 
     conn = connect_db()
     cursor = conn.cursor()
-    # draft_id = None # No longer needed if not returning JSON
     try:
-        # Call StartQuestion procedure
-        cursor.execute("CALL StartQuestion(%s, %s)", (user_id, question_text))
-        # No need to fetch LAST_INSERT_ID() if not returning JSON
+        cursor.execute("CALL StartQuestion(%s, %s)", (userID, question_text))
         conn.commit()
-        flash('Draft question started successfully! Now add tags and publish.', 'success') # Updated flash message
-        # Redirect back to home, potentially with info to show the publish form
-        # Simple redirect for now, frontend JS needs adjustment if it relied on draftId
-        return redirect(url_for('home'))
+        flash('Draft question started successfully!', 'success')
     except Exception as e:
         conn.rollback()
-        print(f"Error starting question draft: {e}")
-        flash(f'Error starting question: {e}', 'danger') # Flash error message
-        return redirect(url_for('home')) # Redirect on error
+        flash(f'Error starting draft: {e}', 'danger')
     finally:
         cursor.close()
         conn.close()
+    return redirect(url_for('home'))
 
 @app.route('/publish_question', methods=['POST'])
 def publish_question():
-    conn = connect_db()
-    cursor = conn.cursor(pymysql.cursors.DictCursor)
-    try:
-        # Get the latest draft question for this user
-        userID = session.get('userID')
-        cursor.execute("""
-            SELECT questionID FROM Question 
-            WHERE userID = %s AND status = 'draft'
-            ORDER BY questionID DESC LIMIT 1
-        """, (userID,))
-        result = cursor.fetchone()
-        if result:
-            question_id = result['questionID']
-        else:
-            flash('No draft question found to publish.', 'danger')
-            return redirect(url_for('home'))
-    except Exception as e:
-        flash(f'Error retrieving draft question: {e}', 'danger')
-        return redirect(url_for('home'))
-    finally:
-        cursor.close()
-    tag_ids = request.form.getlist('tags')
     userID = session.get('userID')
-    print(f"Publishing question {question_id} with tags {tag_ids} for user {userID}")
-
-    if not question_id or not tag_ids or not userID:
-        flash('Please provide a question and at least one tag.')
+    question_id = request.form.get('draft_id')
+    tags = request.form.getlist('tags')
+    if not userID or not question_id or not tags:
+        flash('Missing data for publishing.', 'danger')
         return redirect(url_for('home'))
 
     conn = connect_db()
     cursor = conn.cursor()
-
     try:
-        # Call PublishQuestion() to publish the question
         cursor.execute("CALL PublishQuestion(%s)", (question_id,))
-
-        # Update the TagList table w selected tags
-        for tag_id in tag_ids:
-            cursor.execute("CALL UserAddTag(%s, %s)", (userID, tag_id))
-            cursor.execute("CALL QuestionAddTag(%s, %s)", (question_id, tag_id))
+        for tag_id in tags:
+            cursor.execute("CALL QuestionAddTag(%s, %s)", (question_id,tag_id))
         conn.commit()
         flash('Question published successfully!', 'success')
     except Exception as e:
         conn.rollback()
         flash(f'Error publishing question: {e}', 'danger')
     finally:
+        cursor.close()
         conn.close()
-
     return redirect(url_for('home'))
-
 
 @app.route('/cancel_question', methods=['POST'])
 def cancel_question():
-    print('g')
-    conn = connect_db()
-    cursor = conn.cursor(pymysql.cursors.DictCursor)
-    try:
-        # Get the latest draft question for this user
-        userID = session.get('userID')
-        cursor.execute("""
-            SELECT questionID FROM Question 
-            WHERE userID = %s AND status = 'draft'
-            ORDER BY questionID DESC LIMIT 1
-        """, (userID,))
-        result = cursor.fetchone()
-        if result:
-            question_id = result['questionID']
-        else:
-            flash('No draft question found to publish.', 'danger')
-            return redirect(url_for('home'))
-    except Exception as e:
-        flash(f'Error retrieving draft question: {e}', 'danger')
+    userID = session.get('userID')
+    question_id = request.form.get('draft_id')
+    if not userID or not question_id:
+        flash('No draft question found to cancel.', 'danger')
         return redirect(url_for('home'))
-    finally:
-        cursor.close()
 
     conn = connect_db()
     cursor = conn.cursor()
-
     try:
-        # Call CancelQuestion() to cancel the draft
         cursor.execute("CALL CancelQuestion(%s)", (question_id,))
         conn.commit()
-        flash('Draft question cancelled successfully!')
+        flash('Draft question cancelled successfully!', 'success')
     except Exception as e:
         conn.rollback()
-        flash(f'Error cancelling question: {e}')
+        flash(f'Error cancelling draft: {e}', 'danger')
     finally:
+        cursor.close()
         conn.close()
-
     return redirect(url_for('home'))
-
 @app.route('/question/<int:question_id>', methods=['GET', 'POST'])
 def question_detail(question_id):
     if 'userID' not in session:
@@ -598,35 +550,33 @@ def question_detail(question_id):
         tags=tags
     )
 
+# ...existing code...
 @app.route('/vote_question', methods=['POST'])
 def vote_question():
     userID = session.get('userID')
     question_id = request.form.get('question_id')
-    vote_type = request.form.get('vote')
+    vote_type = request.form.get('vote_type')  # 'up' or 'down'
     if not userID or not question_id or vote_type not in ['up', 'down']:
         flash('Invalid voting request.', 'danger')
         return redirect(url_for('home'))
+
     conn = connect_db()
     cursor = conn.cursor()
     try:
-        print(f"Attempting to {vote_type}vote question {question_id} by user {userID}")
-        
         if vote_type == 'up':
-            print("Calling UpvoteQuestion stored procedure")
             cursor.execute("CALL UpvoteQuestion(%s, %s)", (userID, question_id))
-            print("UpvoteQuestion procedure call completed")
-        elif vote_type == 'down':
+        else:
             cursor.execute("CALL DownvoteQuestion(%s, %s)", (userID, question_id))
-            
         conn.commit()
         flash('Your vote has been recorded!', 'success')
+        # Changed to redirect back to question detail
+        return redirect(url_for('question_detail', question_id=question_id))
     except Exception as e:
         conn.rollback()
         flash(f'Error recording your vote: {e}', 'danger')
+        return redirect(url_for('question_detail', question_id=question_id))
     finally:
         conn.close()
-    
-    return redirect(url_for('question_detail', question_id=question_id))
 
 
 @app.route('/account_settings', methods=['GET', 'POST'])
