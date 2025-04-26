@@ -15,7 +15,13 @@
         <tr>
             <td>{{ question.questionID }}</td>
             <td>{{ question.questionText }}</td>
-            <td>{{ question.visibility }}</td>
+            <td>
+                {% if question.visibility == 'visible' %}
+                <span class="badge badge-success">Visible</span>
+                {% else %}
+                <span class="badge badge-danger">Hidden</span>
+                {% endif %}
+            </td>
             <td>
                 {% if question.visibility == 'visible' %}
                 <form action="{{ url_for('hide_question', question_id=question.questionID) }}" method="POST"
