@@ -94,7 +94,11 @@ def login():
             session['username'] = username
             session['role'] = role  
             session['userID'] = user['userID']
-            return redirect(url_for('dashboard'))
+
+            if role == 'admin':
+                return redirect(url_for('admin_dashboard'))
+            else: 
+                return redirect(url_for('dashboard'))
         else:
             flash('Login failed: Invalid username or password.', 'login-danger')
             return redirect(url_for('login'))
@@ -134,6 +138,17 @@ def dashboard():
     # Render the dashboard template with the user's data
     return render_template('dashboard.html', tags=tags, tags2=tags2,questions=questions,numQuestions=len(questions), numTags=len(tags))
 
+@app.route('/admin_dashboard')
+def admin_dashboard():
+    #only admins access this route
+    if session.get('role') != 'admin':
+        flash('Access denied: Admins only.', 'danger')
+        return redirect(url_for('home'))
+    #fetch admin-specific data (e.g., user/question management)
+    conn = connect_db()
+    cursor = conn.cursor(pymysql.cursors.DictCursor)
+    try: 
+        
 @app.route('/register', methods=['GET', 'POST'])
 def register_route():
     if request.method == 'POST':
@@ -178,26 +193,6 @@ def register_route():
     # Handle GET request
     return render_template('register.html')
 
-@app.route('/admin-login', methods=['GET', 'POST'])
-def admin_login():
-
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-
-        conn = connect_db()
-        authenticated, role = verify_user(conn, username, password)
-
-        # Check if user is authenticated and has admin role
-        if authenticated and role == 'admin':
-            session['username'] = username
-            session['role'] = role
-            # Redirect to admin dashboard or regular dashboard
-            return redirect(url_for('dashboard'))  # You might want a separate admin_dashboard
-        else:
-            flash('Invalid admin credentials')
-
-    return render_template('admin_login.html')  # You'll need to create this template
 
 @app.route('/home')
 def home():
