@@ -19,6 +19,10 @@
                 <li><a href="{{ url_for('most_controversial') }}">Most Controversial</a></li>
                 <li><a href="{{ url_for('most_recent') }}">Most Recent</a></li>
 
+                {% if user_role == 'admin' %}
+                <li><a href="{{ url_for('admin_questions') }}">Questions</a></li>
+                {% endif %}
+
                 {% if show_login_button %}
                 <li style="margin-left: auto;"><a href="{{ url_for('login') }}">Login</a></li>
                 {% else %}

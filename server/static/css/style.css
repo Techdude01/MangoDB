@@ -10,7 +10,7 @@ body {
   font-family: "JetBrains Mono", "Geist Mono", "SFMono-Regular", Consolas,
     "Liberation Mono", Menlo, monospace;
   background: #fffbe6 url("/static/img/mango.jpg") no-repeat center center /
-    50%;
+    80%;
   color: #3e2723;
   min-height: 100vh;
   display: flex;
