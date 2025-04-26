@@ -669,6 +669,41 @@ BEGIN
     LIMIT 10;
 END//
 
+
+-- For admin_question functionality 
+CREATE PROCEDURE GetPublishedQuestionsWithPagination(
+    IN p_perPage INT, 
+    IN p_offset INT
+)
+BEGIN
+    -- Select published questions with pagination
+    SELECT 
+        q.questionID, 
+        q.userID, 
+        q.questionText, 
+        q.upvotes, 
+        q.downvotes, 
+        q.status, 
+        ts.sentDate, 
+        ts.sentTime, 
+        t.tagName,
+        u.userName AS questionUserName
+    FROM 
+        Question q
+    -- Join the TimeStamp table to get sentDate and sentTime
+    JOIN TimeStamp ts ON q.TimeStampID = ts.TimeStampID
+    -- Join the Tag table to get the tag name
+    LEFT JOIN Tag t ON q.tagID = t.tagID
+    -- Join the User table to get the user details of the question's creator
+    JOIN User u ON q.userID = u.userID
+    -- Filter only published questions
+    WHERE q.status = 'published' 
+    -- Order by sentDate and sentTime (newest first)
+    ORDER BY ts.sentDate DESC, ts.sentTime DESC
+    -- Limit the results based on pagination parameters
+    LIMIT p_perPage OFFSET p_offset;
+END //
+
 -- Get questions by tag procedure
 CREATE PROCEDURE GetQuestionsByTag(
   IN p_tagName VARCHAR(16),
