@@ -34,7 +34,7 @@ CREATE TABLE Question (
   tagID INT,
   upvotes INT DEFAULT 0 CHECK (upvotes >= 0),
   downvotes INT DEFAULT 0 CHECK (downvotes >= 0),
-  status ENUM('draft', 'published', 'canceled', 'hidden') DEFAULT 'draft',
+  status ENUM('draft', 'published', 'canceled') DEFAULT 'draft',
   visibility ENUM('visible', 'hidden') NOT NULL DEFAULT 'visible',
   FOREIGN KEY (userID) REFERENCES User(userID),
   FOREIGN KEY (TimeStampID) REFERENCES TimeStamp(TimeStampID),
@@ -74,7 +74,7 @@ CREATE TABLE Response (
   questionID INT,
   responseText TEXT,
   TimeStampID INT,
-  status ENUM('draft', 'published', 'canceled','hidden') DEFAULT 'draft',
+  status ENUM('draft', 'published', 'canceled') DEFAULT 'draft',
   FOREIGN KEY (questionID) REFERENCES Question(questionID),
   FOREIGN KEY (userID) REFERENCES User(userID),
   FOREIGN KEY (TimeStampID) REFERENCES TimeStamp(TimeStampID)
@@ -87,7 +87,7 @@ CREATE TABLE Comment(
   questionID INT,
   commentText TEXT,
   TimeStampID INT,
-  status ENUM('draft', 'published', 'canceled','hidden') DEFAULT 'draft',
+  status ENUM('draft', 'published', 'canceled') DEFAULT 'draft',
   FOREIGN KEY (questionID) REFERENCES Question(questionID),
   FOREIGN KEY (userID) REFERENCES User(userID),
   FOREIGN KEY (TimeStampID) REFERENCES TimeStamp(TimeStampID)
@@ -120,7 +120,7 @@ CREATE TABLE ChatRequest (
   fromUserID INT,
   toUserID INT,
   chatID INT,
-  status ENUM('pending', 'accepted', 'rejected','hidden') DEFAULT 'pending',
+  status ENUM('pending', 'accepted', 'rejected') DEFAULT 'pending',
   TimeStampID INT,
   FOREIGN KEY (fromUserID) REFERENCES `User`(userID),
   FOREIGN KEY (toUserID) REFERENCES `User`(userID),
@@ -597,7 +597,9 @@ END//
 
 -- Get recent questions with pagination procedure
 CREATE PROCEDURE GetRecentQuestionsWithPagination (
-    IN lim INT, IN offset INT
+    IN lim INT, 
+    IN offset INT,
+    IN user_role ENUM('admin', 'user', 'anonymous')
 )
 BEGIN
     SELECT q.questionID, u.userName, q.questionText, t.sentTime, t.sentDate
@@ -605,6 +607,7 @@ BEGIN
     JOIN TimeStamp t ON q.TimeStampID = t.TimeStampID
     JOIN User u ON q.userID = u.userID
     WHERE q.status = 'published'
+    AND (user_role = 'admin' OR q.visibility = 'visible')
     ORDER BY t.sentDate DESC, t.sentTime DESC
     LIMIT lim OFFSET offset;
 END//
@@ -612,7 +615,8 @@ END//
 -- Get popular questions with pagination procedure
 CREATE PROCEDURE GetPopularQuestionsWithPagination (
     IN lim INT, 
-    IN offset INT
+    IN offset INT,
+    IN user_role ENUM('admin', 'user', 'anonymous')
 )
 BEGIN
     SELECT q.questionID, u.userName, q.questionText, t.sentTime, t.sentDate, q.upvotes, COUNT(c.commentID) AS commentCount
@@ -621,6 +625,7 @@ BEGIN
     LEFT JOIN Comment c ON c.questionID = q.questionID
     JOIN User u ON q.userID = u.userID
     WHERE q.status = 'published'
+    AND (user_role = 'admin' OR q.visibility = 'visible')
     GROUP BY q.questionID, q.questionText, t.sentTime, t.sentDate, q.upvotes, u.userName
     ORDER BY q.upvotes DESC, commentCount DESC, t.sentDate DESC, t.sentTime DESC
     LIMIT lim OFFSET offset;
@@ -628,7 +633,9 @@ END//
 
 -- Get controversial questions with pagination procedure
 CREATE PROCEDURE GetControversialQuestionswithPagination (
-    IN lim INT, IN offset INT
+    IN lim INT, 
+    IN offset INT, 
+    IN user_role ENUM('admin', 'user', 'anonymous')
 )
 BEGIN
     SELECT q.questionID, u.userName, q.questionText, t.sentTime, t.sentDate, 
@@ -639,6 +646,7 @@ BEGIN
     LEFT JOIN Comment c ON c.questionID = q.questionID
     JOIN User u ON q.userID = u.userID
     WHERE q.status = 'published'
+    AND (user_role = 'admin' OR q.visibility = 'visible')
     GROUP BY q.questionID, q.questionText, t.sentTime, t.sentDate, q.downvotes, u.userName
     ORDER BY controversyScore DESC, t.sentDate DESC, t.sentTime DESC
     LIMIT lim OFFSET offset;
@@ -646,36 +654,47 @@ END//
 
 -- Get relevant questions procedure
 CREATE PROCEDURE GetRelevantQuestions (
-    IN p_username VARCHAR(16)
+    IN p_username VARCHAR(16),
+    IN user_role ENUM('admin', 'user', 'anonymous')
 )
 BEGIN
     SELECT q.questionText, t.sentTime, t.sentDate
     FROM Question q
     JOIN TimeStamp t ON q.TimeStampID = t.TimeStampID
     JOIN UserTag l ON q.questionID = l.questionID 
-    WHERE l.tagID IN (SELECT tl.tagID FROM UserTag tl JOIN User u ON tl.userID = u.userID WHERE u.userName = p_username) AND q.status = "published"
+    WHERE l.tagID IN (SELECT tl.tagID FROM UserTag tl JOIN User u ON tl.userID = u.userID WHERE u.userName = p_username) 
+    AND q.status = "published"
+    AND (user_role = 'admin' OR q.visibility = 'visible')
     GROUP BY q.questionID, q.questionText, t.sentTime, t.sentDate
     ORDER BY count(*) DESC, t.sentDate DESC, t.sentTime DESC
     LIMIT 10;
 END//
 
 -- Get questions by tag procedure
-CREATE PROCEDURE GetQuestionsByTag(IN p_tagName VARCHAR(16))
+CREATE PROCEDURE GetQuestionsByTag(
+  IN p_tagName VARCHAR(16),
+  IN user_role ENUM('admin', 'user', 'anonymous'))
 BEGIN
     SELECT DISTINCT q.questionID, q.questionText,q.upvotes,q.downvotes
     FROM Question q
     JOIN QuestionTag t1 ON q.questionID = t1.questionID
     JOIN Tag t ON t1.tagID = t.tagID
-    WHERE t.tagName = p_tagName AND q.status = 'published';
+    WHERE t.tagName = p_tagName 
+    AND q.status = 'published'
+    AND (user_role = 'admin' OR q.visibility = 'visible');
 END//
 
 
 -- Search questions procedure
-CREATE PROCEDURE SearchQuestions (IN p_keyword VARCHAR(100))
+CREATE PROCEDURE SearchQuestions (
+  IN p_keyword VARCHAR(100),
+  IN user_role ENUM('admin', 'user', 'anonymous'))
 BEGIN
     SELECT questionID, questionText, upvotes, downvotes
     FROM Question
-    WHERE questionText LIKE CONCAT ('%', p_keyword, '%') AND status = 'published';
+    WHERE questionText LIKE CONCAT ('%', p_keyword, '%') 
+    AND status = 'published'
+    AND (user_role = 'admin' OR q.visibility = 'visible');
 END//
 
 CREATE PROCEDURE UpvoteQuestion(IN p_userID INT, IN p_questionID INT)
