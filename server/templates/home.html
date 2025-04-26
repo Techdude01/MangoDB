@@ -90,7 +90,7 @@
                     <small class="info-text">Hold Cmd/Ctrl to select multiple tags.</small>
                 </div>
                 <div class="action-buttons">
-                    <button type="submit" class="btn primary">Publish Question</button>
+                    <button type="submit" class="btn primary">Publish question</button>
                 </div>
             </form>
 
@@ -117,9 +117,9 @@
                 </a>
                 {% if user_role == 'admin' %}
 
-                
-                <p class="visibility-info"><strong>Visibility:</strong> {{ Question ['visibility'] }}</p>
-                
+
+                <p class="visibility-info"><strong>Visibility:</strong> {{ question['visibility'] }}</p>
+
                 <!-- Admin actions for hiding/unhiding questions-->
                 <form action="{{ url_for('hide_question', question_id=question['questionID']) }}" method="POST"
                     style="display:inline;">
@@ -154,8 +154,8 @@
                 </a>
                 {% if user_role == 'admin' %}
 
-                <p class="visibility-info"><strong>Visibility:</strong> {{ Question ['visibility'] }}</p>
-                
+                <p class="visibility-info"><strong>Visibility:</strong> {{ question['visibility'] }}</p>
+
                 <!-- Admin actions for hiding/unhiding questions-->
                 <form action="{{ url_for('hide_question', question_id=question['questionID']) }}" method="POST"
                     style="display:inline;">
@@ -193,8 +193,8 @@
                 </a>
                 {% if user_role == 'admin' %}
 
-                <p class="visibility-info"><strong>Visibility:</strong> {{ Question ['visibility'] }}</p>
-                
+                <p class="visibility-info"><strong>Visibility:</strong> {{ question['visibility'] }}</p>
+
                 <!-- Admin actions for hiding/unhiding questions-->
                 <form action="{{ url_for('hide_question', question_id=question['questionID']) }}" method="POST"
                     style="display:inline;">
