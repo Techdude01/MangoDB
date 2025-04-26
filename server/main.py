@@ -148,7 +148,63 @@ def admin_dashboard():
     conn = connect_db()
     cursor = conn.cursor(pymysql.cursors.DictCursor)
     try: 
-        
+        cursor.execute("""
+            SELECT questionID, questionText, visibility, userID
+            FROM Question
+            ORDER BY TimeStampID DESC
+        """)
+        questions = cursor.fetchall()
+    except Exception as e:
+        flash(f"Error loading admin dashboard: {e}")
+        questions = []
+    finally:
+        cursor.close()
+        conn.close() 
+    return render_template('admin_dashbard.html', question=questions)
+
+@app.route('/hide_question/<int:question_id>', methods=['POST'])
+def hide_question(question_id):
+    if session.get('role') != 'admin':
+        flash('Access denied: Admins only.', 'danger')
+        return redirect(url_for('home'))
+
+    conn = connect_db()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("UPDATE Question SET visibility = 'hidden' WHERE questionID = %s", (question_id,))
+        conn.commit()
+        flash('Question hidden successfully.', 'success')
+    except Exception as e:
+        conn.rollback()
+        flash(f"Error hiding question: {e}", 'danger')
+    finally:
+        cursor.close()
+        conn.close()
+
+    return redirect(url_for('admin_dashboard'))
+
+
+@app.route('/unhide_question/<int:question_id>', methods=['POST'])
+def unhide_question(question_id):
+    if session.get('role') != 'admin':
+        flash('Access denied: Admins only.', 'danger')
+        return redirect(url_for('home'))
+
+    conn = connect_db()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("UPDATE Question SET visibility = 'visible' WHERE questionID = %s", (question_id,))
+        conn.commit()
+        flash('Question unhidden successfully.', 'success')
+    except Exception as e:
+        conn.rollback()
+        flash(f"Error unhiding question: {e}", 'danger')
+    finally:
+        cursor.close()
+        conn.close()
+
+    return redirect(url_for('admin_dashboard'))
+
 @app.route('/register', methods=['GET', 'POST'])
 def register_route():
     if request.method == 'POST':
@@ -203,19 +259,47 @@ def home():
     active_draft = None
 
     try:
-        # Fetch total questions for pagination
-        cursor.execute("SELECT COUNT(*) AS total FROM Question WHERE status = 'published'")
+        if session.get('role') == 'admin':
+            cursor.execute("SELECT COUNT(*) AS total FROM Question WHERE status = 'published'")
+        else:
+            cursor.execute("SELECT COUNT(*) AS total FROM Question WHERE status = 'published' AND visibility = 'visible'")
         total_questions = cursor.fetchone()['total']
         total_pages = (total_questions + qCount - 1) // qCount
 
         # Fetch questions for each category (first page by default)
-        cursor.execute("CALL GetPopularQuestionsWithPagination(%s, 0)", (qCount,))
+        if session.get('role') == 'admin':
+            cursor.execute("CALL GetPopularQuestionsWithPagination(%s, 0)", (qCount,))
+        else:
+            cursor.execute("""
+                SELECT * FROM Question
+                WHERE status = 'published ' AND visiblity = 'visible'
+                ORDER BY upvotes DESC
+                LIMIT %s
+            """)
         most_popular = cursor.fetchall()
 
-        cursor.execute("CALL GetControversialQuestionsWithPagination(%s, 0)", (qCount,))
+        # Fetch most controversial questions
+        if session.get('role') == 'admin':
+            cursor.execute("CALL GetControversialQuestionsWithPagination(%s, 0)", (qCount,))
+        else:
+            cursor.execute("""
+                SELECT * FROM Question
+                WHERE status = 'published' AND visibility = 'visible'
+                ORDER BY (downvotes - upvotes) DESC
+                LIMIT %s
+            """, (qCount,))
         most_controversial = cursor.fetchall()
 
-        cursor.execute("CALL GetRecentQuestionsWithPagination(%s, 0)", (qCount,))
+        # Fetch most recent questions
+        if session.get('role') == 'admin':
+            cursor.execute("CALL GetRecentQuestionsWithPagination(%s, 0)", (qCount,))
+        else:
+            cursor.execute("""
+                SELECT * FROM Question
+                WHERE status = 'published' AND visibility = 'visible'
+                ORDER BY TimeStampID DESC
+                LIMIT %s
+            """, (qCount,))
         most_recent = cursor.fetchall()
 
         # Get tags
@@ -449,73 +533,83 @@ def question_detail(question_id):
     conn = connect_db()
     cursor = conn.cursor(pymysql.cursors.DictCursor)
 
-    # Check if the user has already responded to this question
-    cursor.execute("""
-        SELECT responseID FROM Response
-        WHERE questionID = %s AND userID = %s AND status = 'published'
-    """, (question_id, userID))
-    user_has_responded = cursor.fetchone() is not None
+    try:
+        # Fetch question
+        cursor.execute("SELECT * FROM Question WHERE questionID = %s", (question_id,))
+        question = cursor.fetchone()
 
-    # Check if the user has already commented on this question
-    cursor.execute("""
-        SELECT commentID FROM Comment
-        WHERE questionID = %s AND userID = %s AND status = 'published'
-    """, (question_id, userID))
-    user_has_commented = cursor.fetchone() is not None
-    
-    # Get question tags
-    cursor.execute("""
-        SELECT t.tagID, t.tagName
-        FROM QuestionTag qt
-        JOIN Tag t ON qt.tagID = t.tagID
-        WHERE qt.questionID = %s
-    """, (question_id,))
-    tags = cursor.fetchall()
-
-    # Handle new response submission
-    if request.method == 'POST' and not user_has_responded:
-        response_text = request.form['responseText']
-        timestamp_id = get_timestamp_id(cursor)  # You should define this helper
+        # CHeck if the question exists
+        if not question:
+            flash('Question not found.', 'danger')
+            return redirect(url_for('home'))
+        
+        # Check visisiblity for regulars users
+        if session.get('role') != 'admin' and question['visibility'] == 'hidden':
+            flash('This question is not available.', 'danger')
+            return redirect(url_for('home'))
+        
+        # Check if the user has already responded to this question
         cursor.execute("""
-            INSERT INTO Response (userID, questionID, responseText, TimeStampID, status)
-            VALUES (%s, %s, %s, %s, 'published')
-        """, (userID, question_id, response_text, timestamp_id))
-        conn.commit()
-        return redirect(url_for('question_detail', question_id=question_id))
+            SELECT responseID FROM Response
+            WHERE questionID = %s AND userID = %s AND status = 'published'
+        """, (question_id, userID))
+        user_has_responded = cursor.fetchone() is not None
 
-    # Handle comment submission 
-    if request.method == 'POST' and 'commentText' in request.form and not user_has_commented:
-        comment_text = request.form['commentText']
-        timestamp_id = get_timestamp_id(cursor)  # Same helper function for timestamps
+        # Check if the user has already commented on this question
         cursor.execute("""
-            INSERT INTO Comment (userID, questionID, commentText, TimeStampID, status)
-            VALUES (%s, %s, %s, %s, 'published')
-        """, (userID, question_id, comment_text, timestamp_id))
-        conn.commit()
-        return redirect(url_for('question_detail', question_id=question_id))
-
-    # Get the question data
-    cursor.execute("SELECT * FROM Question WHERE questionID = %s", (question_id,))
-    question = cursor.fetchone()
-
-    # Get responses and comments only if user has responded
-    responses = []
-    comments = []
-    if user_has_responded:
-        cursor.execute("SELECT * FROM Response JOIN User ON Response.userID = User.userID WHERE questionID = %s AND status = 'published'", (question_id,))
-        responses = cursor.fetchall()
-
+            SELECT commentID FROM Comment
+            WHERE questionID = %s AND userID = %s AND status = 'published'
+        """, (question_id, userID))
+        user_has_commented = cursor.fetchone() is not None
+        
+        # Get question tags
         cursor.execute("""
-            SELECT * FROM Comment
-            WHERE questionID = %s AND status = 'published'
+            SELECT t.tagID, t.tagName
+            FROM QuestionTag qt
+            JOIN Tag t ON qt.tagID = t.tagID
+            WHERE qt.questionID = %s
         """, (question_id,))
-        comments = cursor.fetchall()
+        tags = cursor.fetchall()
 
-    conn.close()
+        # Handle new response submission
+        if request.method == 'POST' and not user_has_responded:
+            response_text = request.form['responseText']
+            timestamp_id = get_timestamp_id(cursor)  # You should define this helper
+            cursor.execute("""
+                INSERT INTO Response (userID, questionID, responseText, TimeStampID, status)
+                VALUES (%s, %s, %s, %s, 'published')
+            """, (userID, question_id, response_text, timestamp_id))
+            conn.commit()
+            return redirect(url_for('question_detail', question_id=question_id))
 
-    if not question:
-        flash('Question not found.', 'danger')
+        # Handle comment submission 
+        if request.method == 'POST' and 'commentText' in request.form and not user_has_commented:
+            comment_text = request.form['commentText']
+            timestamp_id = get_timestamp_id(cursor)  # Same helper function for timestamps
+            cursor.execute("""
+                INSERT INTO Comment (userID, questionID, commentText, TimeStampID, status)
+                VALUES (%s, %s, %s, %s, 'published')
+            """, (userID, question_id, comment_text, timestamp_id))
+            conn.commit()
+            return redirect(url_for('question_detail', question_id=question_id))
+
+        # Get responses and comments only if user has responded
+        responses = []
+        comments = []
+        if user_has_responded:
+            cursor.execute("SELECT * FROM Response JOIN User ON Response.userID = User.userID WHERE questionID = %s AND status = 'published'", (question_id,))
+            responses = cursor.fetchall()
+
+            cursor.execute("""
+                SELECT * FROM Comment
+                WHERE questionID = %s AND status = 'published'
+            """, (question_id,))
+            comments = cursor.fetchall()
+    except Exception as e:
+        flash(f"Error loading question: {e}", 'danger')
         return redirect(url_for('home'))
+    finally:
+        conn.close()
 
     return render_template(
         'question_detail.html',

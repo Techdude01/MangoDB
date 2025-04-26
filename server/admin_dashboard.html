@@ -1,0 +1,30 @@
+<table class="table">
+    <thead>
+        <tr>
+            <th>Question ID</th>
+            <th>Question Text</th>
+            <th>Visibility</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for question in questions %}
+        <tr>
+            <td>{{ question.questionID }}</td>
+            <td>{{ question.questionText }}</td>
+            <td>{{ question.visibility }}</td>
+            <td>
+                {% if question.visibility == 'visible' %}
+                <form action="{{ url_for('hide_question', question_id=question.questionID) }}" method="POST" style="display:inline;">
+                    <button type="submit" class="btn btn-warning">Hide</button>
+                </form>
+                {% else %}
+                <form action="{{ url_for('unhide_question', question_id=question.questionID) }}" method="POST" style="display:inline;">
+                    <button type="submit" class="btn btn-success">Unhide</button>
+                </form>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
