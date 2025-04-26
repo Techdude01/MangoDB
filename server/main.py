@@ -592,8 +592,8 @@ def vote_question():
     try:
         # Check if the user has already voted on this question
         cursor.execute("""
-            SELECT voteType FROM Vote
-            WHERE user_id = %s AND questionID = %s
+            SELECT vote FROM Vote
+            WHERE userID = %s AND questionID = %s
         """, (user_id, question_id))
         existing_vote = cursor.fetchone()
 
@@ -602,7 +602,7 @@ def vote_question():
         else:
             # Insert the new vote
             cursor.execute("""
-                INSERT INTO Vote (user_id, questionID, voteType)
+                INSERT INTO Vote (userID, questionID, vote)
                 VALUES (%s, %s, %s)
             """, (user_id, question_id, vote_type))
 
@@ -614,6 +614,7 @@ def vote_question():
             conn.commit()
             flash('Your vote has been recorded!', 'vote-success')
             return redirect(url_for('question_detail', question_id=question_id))
+        
     except Exception as e:
         conn.rollback()
         flash(f'Error recording your vote: {e}', 'vote-danger')
