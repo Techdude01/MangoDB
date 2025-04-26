@@ -209,6 +209,38 @@
         {% endif %}
     </div>
 
+ <!-- Admin-Only: All Questions Section -->
+    {% if user_role == 'admin' %}
+    <div class="card question-list-card admin-section">
+        <h2 class="section-heading">All Questions (Admin)</h2>
+        <ul class="item-list question-list">
+            {% for question in all_questions %}
+            <li class="item question-item">
+                <a href="{{ url_for('question_detail', question_id=question['questionID']) }}" class="question-link">
+                    {{ question['questionText'] }}
+                </a>
+                <p class="visibility-info">
+                    <strong>Visibility:</strong> {{ question['visibility'] }}
+                </p>
+
+                <!-- Admin actions for hiding/unhiding questions -->
+                {% if question['visibility'] == 'visible' %}
+                <form action="{{ url_for('hide_question', question_id=question['questionID']) }}" method="POST" style="display:inline;">
+                    <button type="submit" class="btn btn-warning">Hide</button>
+                </form>
+                {% else %}
+                <form action="{{ url_for('unhide_question', question_id=question['questionID']) }}" method="POST" style="display:inline;">
+                    <button type="submit" class="btn btn-success">Unhide</button>
+                </form>
+                {% endif %}
+            </li>
+            {% else %}
+            <li class="no-items info-text">No questions found.</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
 </div> <!-- End .main -->
 
 <!-- JavaScript -->
