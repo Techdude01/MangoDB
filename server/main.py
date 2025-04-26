@@ -427,7 +427,7 @@ def admin_questions():
     user_role = session.get('role')
 
     # Fetch paginated recent questions with status 'published'
-     cursor.execute("""
+    cursor.execute("""
         SELECT q.* 
         FROM Question q
         JOIN TimeStamp ts ON q.TimeStampID = ts.TimeStampID
