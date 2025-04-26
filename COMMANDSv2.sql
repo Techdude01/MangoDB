@@ -9,7 +9,7 @@ CREATE TABLE `User` (
   firstName VARCHAR(32),
   lastName VARCHAR(32),
   role VARCHAR(50) NOT NULL DEFAULT 'user',
-  CONSTRAINT CHK_UserRole CHECK (role IN ('user', 'anonymous', 'admin'))
+  CONSTRAINT CHK_UserRole CHECK (role IN ('user', 'admin'))
 );
 
 -- Create Tag table
@@ -34,7 +34,7 @@ CREATE TABLE Question (
   tagID INT,
   upvotes INT DEFAULT 0 CHECK (upvotes >= 0),
   downvotes INT DEFAULT 0 CHECK (downvotes >= 0),
-  status ENUM('draft', 'published', 'canceled') DEFAULT 'draft',
+  status ENUM('draft', 'published', 'canceled', 'hidden') DEFAULT 'draft',
   FOREIGN KEY (userID) REFERENCES User(userID),
   FOREIGN KEY (TimeStampID) REFERENCES TimeStamp(TimeStampID),
   FOREIGN KEY (tagID) REFERENCES Tag(tagID)
@@ -73,7 +73,7 @@ CREATE TABLE Response (
   questionID INT,
   responseText TEXT,
   TimeStampID INT,
-  status ENUM('draft', 'published', 'canceled') DEFAULT 'draft',
+  status ENUM('draft', 'published', 'canceled','hidden') DEFAULT 'draft',
   FOREIGN KEY (questionID) REFERENCES Question(questionID),
   FOREIGN KEY (userID) REFERENCES User(userID),
   FOREIGN KEY (TimeStampID) REFERENCES TimeStamp(TimeStampID)
@@ -86,7 +86,7 @@ CREATE TABLE Comment(
   questionID INT,
   commentText TEXT,
   TimeStampID INT,
-  status ENUM('draft', 'published', 'canceled') DEFAULT 'draft',
+  status ENUM('draft', 'published', 'canceled','hidden') DEFAULT 'draft',
   FOREIGN KEY (questionID) REFERENCES Question(questionID),
   FOREIGN KEY (userID) REFERENCES User(userID),
   FOREIGN KEY (TimeStampID) REFERENCES TimeStamp(TimeStampID)
@@ -119,7 +119,7 @@ CREATE TABLE ChatRequest (
   fromUserID INT,
   toUserID INT,
   chatID INT,
-  status ENUM('pending', 'accepted', 'rejected') DEFAULT 'pending',
+  status ENUM('pending', 'accepted', 'rejected','hidden') DEFAULT 'pending',
   TimeStampID INT,
   FOREIGN KEY (fromUserID) REFERENCES `User`(userID),
   FOREIGN KEY (toUserID) REFERENCES `User`(userID),
