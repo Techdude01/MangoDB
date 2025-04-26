@@ -692,10 +692,6 @@ def list_chats():
 
 @app.route('/create_chat', methods=['GET', 'POST'])
 def create_chat():
-    """
-    Route for creating a new group chat.
-    Handles both 1-on-1 and multi-user chats.
-    """
     # Ensure user is logged in
     if 'username' not in session or 'userID' not in session:
         flash('Please login to create a chat', 'danger')
@@ -729,42 +725,26 @@ def create_chat():
                 potential_users = cursor_get.fetchall()
                 cursor_get.close()
                 return render_template('create_chat.html', potential_users=potential_users, chat_name=chat_name)
-
+            chat_id = None
             cursor = conn.cursor()
             try:
                 # Start transaction
-                # If only one member selected, use CreateChatAndRequest procedure
-                if len(members) == 1:
-                    cursor.callproc('CreateChatAndRequest', (creator_id, chat_name, members[0]))
-                # Otherwise create multi-user chat directly
-                else:
-                    # Create the chat
-                    cursor.execute(
-                        "INSERT INTO Chat (chatName, userID) VALUES (%s, %s)",
-                        (chat_name, creator_id)
-                    )
-                    chat_id = cursor.lastrowid
-                    
-                    # Include creator in members if not already
-                    if creator_id not in members:
-                        members.append(creator_id)
-                        
-                    # Add all members to the chat
-                    for member_id in members:
-                        # Use individual inserts instead of executemany
-                        cursor.execute(
-                            "INSERT INTO ChatMember (chatID, userID) VALUES (%s, %s)",
-                            (chat_id, member_id)
-                        )
-                        print(f"Added member {member_id} to chat {chat_id}")
-                    
-                    # Create welcome message
-                    cursor.execute("INSERT INTO TimeStamp (sentTime, sentDate) VALUES (CURTIME(), CURDATE())")
-                    timestamp_id = cursor.lastrowid
-                    cursor.execute(
-                        "INSERT INTO ChatMessage (chatID, userID, messageText, TimeStampID) VALUES (%s, %s, %s, %s)",
-                        (chat_id, creator_id, f"Group chat '{chat_name}' created", timestamp_id)
-                    )
+                for i in range(len(members)):
+                    if i ==0:
+                        cursor.callproc('CreateChatAndRequest', (creator_id, chat_name, members[i]))
+                        # Get the chat ID from the created chat
+                        cursor.execute("""
+                            SELECT chatID FROM Chat 
+                            WHERE chatName = %s 
+                            ORDER BY chatID DESC LIMIT 1
+                        """, (chat_name,))
+                        chat_result = cursor.fetchone()
+                        if chat_result:
+                            chat_id = chat_result['chatID']
+                        else:
+                            raise Exception("Failed to retrieve created chat ID")
+                    else:
+                        cursor.callproc('CreateChatRequest', (creator_id, members[i], chat_id))
                     
                 conn.commit()
                 flash("Chat created successfully!", 'success')

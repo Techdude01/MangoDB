@@ -443,6 +443,20 @@ BEGIN
     INSERT INTO ChatRequest (fromUserID, toUserID, chatID, status, TimeStampID)
     VALUES (p_fromUserID, p_toUserID, @newChatID, 'pending', @tsID);
 END//
+-- Create chat request procedure (using existing chat ID)
+CREATE PROCEDURE CreateChatRequest(
+  IN p_fromUserID INT, 
+  IN p_toUserID INT,
+  IN p_chatID INT)
+BEGIN
+  -- Create timestamp for request
+  INSERT INTO TimeStamp (sentTime, sentDate) VALUES (CURTIME(), CURDATE());
+  SET @tsID = LAST_INSERT_ID();
+
+  -- Insert chat request with a 'pending' status
+  INSERT INTO ChatRequest (fromUserID, toUserID, chatID, status, TimeStampID)
+  VALUES (p_fromUserID, p_toUserID, p_chatID, 'pending', @tsID);
+END//
 
 -- Trigger to add user to chat when request accepted
 CREATE TRIGGER AfterChatRequestAccepted
@@ -647,9 +661,9 @@ END//
 -- Get questions by tag procedure
 CREATE PROCEDURE GetQuestionsByTag(IN p_tagName VARCHAR(16))
 BEGIN
-    SELECT DISTINCT q.questionID, q.questionText
+    SELECT DISTINCT q.questionID, q.questionText,q.upvotes,q.downvotes
     FROM Question q
-    JOIN UserTag t1 ON q.userID = t1.userID
+    JOIN QuestionTag t1 ON q.questionID = t1.questionID
     JOIN Tag t ON t1.tagID = t.tagID
     WHERE t.tagName = p_tagName AND q.status = 'published';
 END//
@@ -658,7 +672,7 @@ END//
 -- Search questions procedure
 CREATE PROCEDURE SearchQuestions (IN p_keyword VARCHAR(100))
 BEGIN
-    SELECT questionID, questionText
+    SELECT questionID, questionText, upvotes, downvotes
     FROM Question
     WHERE questionText LIKE CONCAT ('%', p_keyword, '%') AND status = 'published';
 END//
@@ -742,6 +756,11 @@ BEGIN
     VALUES (targ_tag_id, target_userID);
 END//
 
+CREATE PROCEDURE QuestionAddTag(IN target_questionID INT, IN targ_tag_id INT)
+BEGIN
+    INSERT INTO QuestionTag (tagID, questionID)
+    VALUES (targ_tag_id, target_questionID);
+END//
 
 -- Get chat IDs for user procedure
 CREATE PROCEDURE GetChatIDsForUser (

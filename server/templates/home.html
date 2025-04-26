@@ -54,7 +54,7 @@
     <!-- Post Question Section (Logged-in users only) -->
     {% if session.get('userID') %}
     <div class="card post-question">
-        {% set button_text = 'Edit/Publish Draft' if active_draft else 'Post a Question' %}
+        {% set button_text = 'Save Draft' if active_draft else 'Post a Question' %}
         <h2 class="section-heading">Ask a Question</h2>
         <button id="post-question-btn" onclick="toggleQuestionForm()" class="btn secondary">{{ button_text }}</button>
 
