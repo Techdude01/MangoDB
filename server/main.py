@@ -330,7 +330,7 @@ def home():
             active_draft=active_draft
         )
     except Exception as e:
-        flash(f"Error loading homepage: {e}", "danger")
+        flash(f"Error loading homepage: {e}", "home-danger")
         return render_template('home.html', tags=[], most_popular=[], most_controversial=[], most_recent=[], active_draft=None)
     finally:
         conn.close()
