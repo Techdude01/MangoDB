@@ -429,6 +429,7 @@ def cancel_question():
         cursor.close()
         conn.close()
     return redirect(url_for('home'))
+    
 @app.route('/question/<int:question_id>', methods=['GET', 'POST'])
 def question_detail(question_id):
     if 'userID' not in session:
@@ -451,6 +452,7 @@ def question_detail(question_id):
         WHERE questionID = %s AND userID = %s AND status = 'published'
     """, (question_id, userID))
     user_has_commented = cursor.fetchone() is not None
+    
     # Get question tags
     cursor.execute("""
         SELECT t.tagID, t.tagName
@@ -626,6 +628,7 @@ def account_settings():
     conn.close()
     
     return render_template('account_settings.html', username=username, user_data=user_data, all_tags=all_tags, user_tags=user_tags)
+    
 @app.route('/chats')
 def list_chats():
     """
@@ -990,6 +993,7 @@ def add_tag():
         cursor.close()
         conn.close()
     return redirect(url_for('dashboard'))
+    
 @app.context_processor
 def inject_user_data():
     """
