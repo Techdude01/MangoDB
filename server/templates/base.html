@@ -18,6 +18,12 @@
                 <li><a href="{{ url_for('most_popular') }}">Most Popular</a></li>
                 <li><a href="{{ url_for('most_controversial') }}">Most Controversial</a></li>
                 <li><a href="{{ url_for('most_recent') }}">Most Recent</a></li>
+
+                {% if user_role == 'admin' %}
+                <!-- Admin-only section for viewing all visible questions -->
+                <li><a href="{{ url_for('view_questions') }}">Questions</a></li>
+                {% endif %}
+                
                 {% if show_login_button %}
                 <li style="margin-left: auto;"><a href="{{ url_for('login') }}">Login</a></li>
                 {% else %}
