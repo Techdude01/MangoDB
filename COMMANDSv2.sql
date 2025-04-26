@@ -694,7 +694,7 @@ BEGIN
     FROM Question
     WHERE questionText LIKE CONCAT ('%', p_keyword, '%') 
     AND status = 'published'
-    AND (user_role = 'admin' OR q.visibility = 'visible');
+    AND (user_role = 'admin' OR visibility = 'visible');
 END//
 
 CREATE PROCEDURE UpvoteQuestion(IN p_userID INT, IN p_questionID INT)

@@ -94,11 +94,7 @@ def login():
             session['username'] = username
             session['role'] = role  
             session['userID'] = user['userID']
-
-            if role == 'admin':
-                return redirect(url_for('admin_dashboard'))
-            else: 
-                return redirect(url_for('dashboard'))
+            return redirect(url_for('dashboard'))
         else:
             flash('Login failed: Invalid username or password.', 'login-danger')
             return redirect(url_for('login'))
@@ -182,8 +178,7 @@ def hide_question(question_id):
         cursor.close()
         conn.close()
 
-    return redirect(url_for('admin_dashboard'))
-
+    return redirect(url_for('home'))
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -301,7 +296,7 @@ def search():
     username = request.args.get('username')
     keyword = request.args.get('keyword')
     tag = request.args.get('tag')
-
+    role= session.get('role', 'user')
     conn = connect_db()
     cursor = conn.cursor(pymysql.cursors.DictCursor)
 
@@ -314,14 +309,14 @@ def search():
 
     # Search by Keyword
     elif keyword:
-        cursor.execute("CALL SearchQuestions(%s)", (keyword,))
+        cursor.execute("CALL SearchQuestions(%s, %s)", (keyword,role))
         questions = cursor.fetchall()
         conn.close()
         return render_template('search_results.html', questions=questions, search_type="Keyword", search_value=keyword)
 
     # Search by Tag
     elif tag:
-        cursor.execute("CALL GetQuestionsByTag(%s)", (tag,))
+        cursor.execute("CALL GetQuestionsByTag(%s,%s)", (tag,role))
         questions = cursor.fetchall()
         conn.close()
         return render_template('search_results.html', questions=questions, search_type="Tag", search_value = tag, tag_name=tag)
