@@ -1,17 +1,16 @@
-<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     {% block style %}{% endblock %}
     <title>{% block title %}{% endblock %}</title>
 </head>
 
 <body>
-
-    <body>
+    <div class="app-container">
         <nav class="navbar">
             <ul>
                 <li><a href="{{ url_for('home') }}">Home</a></li>
@@ -20,7 +19,7 @@
                 <li><a href="{{ url_for('most_recent') }}">Most Recent</a></li>
 
                 {% if user_role == 'admin' %}
-                <li><a href="{{ url_for('admin_questions') }}">Questions</a></li>
+                <li><a href="{{ url_for('admin_dashboard') }}">Admin Dashboard</a></li>
                 {% endif %}
 
                 {% if show_login_button %}
@@ -31,11 +30,25 @@
                 <li><a href="{{ url_for('chat_requests') }}">Chat Requests</a></li>
                 <li><a href="{{ url_for('logout') }}">Logout</a></li>
                 {% endif %}
-
             </ul>
         </nav>
-        {% block body %}{% endblock %}
-    </body>
+
+        <div class="main-content">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert {{ category }}">{{ message }}</div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+
+            {% block body %}{% endblock %}
+        </div>
+
+        <footer>
+            <p>&copy; 2025 MangoDB - Questions, Answers & Discussions</p>
+        </footer>
+    </div>
 </body>
 
 </html>
