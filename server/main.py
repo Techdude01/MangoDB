@@ -256,7 +256,7 @@ def home():
     cursor = conn.cursor(pymysql.cursors.DictCursor)
     qCount = 5
     user_id = session.get('userID')
-    user_role = session.get('role', 'anonymouse')
+    user_role = session.get('role')
     active_draft = None
 
     try:
@@ -268,39 +268,18 @@ def home():
         total_pages = (total_questions + qCount - 1) // qCount
 
         # Fetch questions for each category (first page by default)
-        if session.get('role') == 'admin':
-            cursor.execute("CALL GetPopularQuestionsWithPagination(%s, 0)", (qCount,))
-        else:
-            cursor.execute("""
-                SELECT * FROM Question
-                WHERE status = 'published ' AND visiblity = 'visible'
-                ORDER BY upvotes DESC
-                LIMIT %s
-            """, (qCount,))
+        cursor.execute("CALL GetPopularQuestionsWithPagination(%s, 0,%s)", (qCount,user_role))
+ 
         most_popular = cursor.fetchall()
-
+        print(most_popular)
         # Fetch most controversial questions
-        if session.get('role') == 'admin':
-            cursor.execute("CALL GetControversialQuestionsWithPagination(%s, 0)", (qCount,))
-        else:
-            cursor.execute("""
-                SELECT * FROM Question
-                WHERE status = 'published' AND visibility = 'visible'
-                ORDER BY (downvotes - upvotes) DESC
-                LIMIT %s
-            """, (qCount,))
+        cursor.execute("CALL GetControversialQuestionsWithPagination(%s, 0,%s)", (qCount,user_role))
+
         most_controversial = cursor.fetchall()
 
         # Fetch most recent questions
-        if session.get('role') == 'admin':
-            cursor.execute("CALL GetRecentQuestionsWithPagination(%s, 0)", (qCount,))
-        else:
-            cursor.execute("""
-                SELECT * FROM Question
-                WHERE status = 'published' AND visibility = 'visible'
-                ORDER BY TimeStampID DESC
-                LIMIT %s
-            """, (qCount,))
+        cursor.execute("CALL GetRecentQuestionsWithPagination(%s, 0,%s)", (qCount,user_role))
+       
         most_recent = cursor.fetchall()
 
         # Get tags
@@ -332,7 +311,7 @@ def home():
             active_draft=active_draft
         )
     except Exception as e:
-        flash(f"Error loading homepage: {e}", "danger")
+        flash(f"Error loading homepage: {e}", "home-danger")
         return render_template('home.html', tags=[], most_popular=[], most_controversial=[], most_recent=[], active_draft=None)
     finally:
         conn.close()
@@ -382,9 +361,9 @@ def most_popular():
 
     conn = connect_db()
     cursor = conn.cursor(pymysql.cursors.DictCursor)
-
+    user_role = session.get('role')
     # Fetch paginated popular questions
-    cursor.execute("CALL GetPopularQuestionsWithPagination(%s, %s)",(per_page, offset))
+    cursor.execute("CALL GetPopularQuestionsWithPagination(%s, %s, %s)",(per_page, offset,user_role))
     questions = cursor.fetchall()
 
     # Fetch total num of questions for pagination
@@ -409,9 +388,10 @@ def most_controversial():
     offset = (page - 1 ) * per_page
     conn = connect_db()
     cursor = conn.cursor(pymysql.cursors.DictCursor)
+    user_role = session.get('role')
 
     # Fetch paginated controversial questions
-    cursor.execute("CALL GetControversialQuestionsWithPagination(%s, %s)",(per_page, offset)) 
+    cursor.execute("CALL GetControversialQuestionsWithPagination(%s, %s, %s)",(per_page, offset,user_role))
     questions = cursor.fetchall()
     
     # Fetch total num of questions for pagination
@@ -436,9 +416,10 @@ def most_recent():
     offset = (page - 1 ) * per_page
     conn = connect_db()
     cursor = conn.cursor(pymysql.cursors.DictCursor)
+    user_role = session.get('role')
 
     # Fetch paginated recent questions with createdAt
-    cursor.execute("CALL GetRecentQuestionsWithPagination(%s,%s)", (per_page, offset)) 
+    cursor.execute("CALL GetRecentQuestionsWithPagination(%s, %s, %s)",(per_page, offset,user_role))
     questions = cursor.fetchall()
 
     # Fetch total num of questions for pagination
