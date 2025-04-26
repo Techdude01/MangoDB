@@ -144,23 +144,38 @@ def register_route():
         if not username or not password:
             flash('All fields are required', 'register-danger')
             return redirect(url_for('register_route'))
-        conn = connect_db()
-        cursor = conn.cursor()
-        cursor.execute("SELECT COUNT(*) AS count FROM User WHERE username = %s", (username,))
-        user_exists = cursor.fetchone()['count'] > 0
-        if user_exists:
-            flash('Username already exists. Please choose a different username.', 'register-danger')
-            return redirect(url_for('register_route'))
+        
+        conn = None # Initialize conn to None
+        cursor = None # Initialize cursor to None
         try:
+            conn = connect_db()
+            cursor = conn.cursor(pymysql.cursors.DictCursor) # Use DictCursor for consistency
+            cursor.execute("SELECT COUNT(*) AS count FROM User WHERE username = %s", (username,))
+            user_exists = cursor.fetchone()['count'] > 0
+            
+            if user_exists:
+                flash('Username already exists. Please choose a different username.', 'register-danger')
+                return redirect(url_for('register_route')) # Redirect if user exists
+
+            # Call register_user within the same try block
             register_user(conn, username, password, 'user', firstName, lastName)
+            conn.commit() # Commit after successful registration
             flash('Registration successful! You can now log in.', 'register-success')
-            return redirect(url_for('login'))
+            return redirect(url_for('login')) # Redirect on success
+
         except Exception as e:
-            conn.rollback()
+            if conn: # Check if connection exists before rollback
+                conn.rollback()
             flash(f'Registration error: {e}', 'register-danger')
+            # Redirect back to registration page on error
+            return redirect(url_for('register_route')) 
         finally:
-            conn.close()
-        return redirect(url_for('home'))
+            if cursor: # Check if cursor exists before closing
+                cursor.close()
+            if conn: # Check if connection exists before closing
+                conn.close()
+                
+    # Handle GET request
     return render_template('register.html')
 
 @app.route('/admin-login', methods=['GET', 'POST'])
@@ -579,7 +594,14 @@ def account_settings():
             flash('Passwords do not match!', 'danger')
         
         # Update name fields if provided
-        if new_first_name or new_last_name:
+        # Get current first and last name to compare
+        cursor.execute("SELECT firstName, lastName FROM User WHERE userName = %s", (username,))
+        current_user = cursor.fetchone()
+        current_first_name = current_user['firstName']
+        current_last_name = current_user['lastName']
+
+        # Only update if values are actually different
+        if (new_first_name and new_first_name != current_first_name) or (new_last_name and new_last_name != current_last_name):
             update_fields = []
             params = []
             

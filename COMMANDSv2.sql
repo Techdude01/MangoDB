@@ -677,71 +677,74 @@ BEGIN
     WHERE questionText LIKE CONCAT ('%', p_keyword, '%') AND status = 'published';
 END//
 
--- Upvote question procedure
 CREATE PROCEDURE UpvoteQuestion(IN p_userID INT, IN p_questionID INT)
-BEGIN 
-    DECLARE existingVote VARCHAR(4);
-      -- check if user already upvoted this question
-    SELECT vote INTO existingVote
-    FROM Vote
+BEGIN
+  DECLARE voteCount INT;
+  DECLARE currentVote VARCHAR(4);
+
+  -- Check if the user has already voted on this question
+  SELECT COUNT(*), MAX(vote) INTO voteCount, currentVote
+  FROM Vote
+  WHERE userID = p_userID AND questionID = p_questionID;
+
+  IF voteCount = 0 THEN
+    -- No vote yet; insert upvote
+    INSERT INTO Vote (userID, questionID, vote)
+    VALUES (p_userID, p_questionID, 'up');
+
+  ELSEIF currentVote = 'down' THEN
+    -- Change downvote to upvote
+    UPDATE Vote
+    SET vote = 'up'
     WHERE userID = p_userID AND questionID = p_questionID;
-  
-    IF existingVote = 'up' THEN
-      -- Update the vote to 'up' if it already exists
-    ELSE
-      IF existingVote = 'down' THEN
-        UPDATE Vote
-        SET vote = 'up'
-        WHERE userID = p_userID AND questionID = p_questionID;
-      ELSE
-        -- Insert a new 'up' vote
-        INSERT INTO Vote (userID, questionID, vote)
-        VALUES (p_userID, p_questionID, 'up');
-      END IF;
-    END IF;
-  
-    -- Update the upvote count in the Question table
-    UPDATE Question
-    SET upvotes = (
-      SELECT COUNT(*) FROM Vote
-      WHERE questionID = p_questionID AND vote = 'up'
-    )
-    WHERE questionID = p_questionID;
+
+  -- ELSEIF currentVote = 'up' THEN
+    -- Already upvoted; do nothing
+  END IF;
+
+  -- Update the upvote count in the Question table
+  UPDATE Question
+  SET upvotes = (
+    SELECT COUNT(*) FROM Vote
+    WHERE questionID = p_questionID AND vote = 'up'
+  )
+  WHERE questionID = p_questionID;
 END//
 
--- Downvote question procedure
 CREATE PROCEDURE DownvoteQuestion(IN p_userID INT, IN p_questionID INT)
 BEGIN
-    DECLARE existingVote VARCHAR(4);
-    -- Check if the user has already voted on this question
-    SELECT vote INTO existingVote
-    FROM Vote
+  DECLARE voteCount INT;
+  DECLARE currentVote VARCHAR(4);
+
+  -- Check if the user has already voted on this question
+  SELECT COUNT(*), MAX(vote) INTO voteCount, currentVote
+  FROM Vote
+  WHERE userID = p_userID AND questionID = p_questionID;
+
+  IF voteCount = 0 THEN
+    -- No vote yet; insert downvote
+    INSERT INTO Vote (userID, questionID, vote)
+    VALUES (p_userID, p_questionID, 'down');
+
+  ELSEIF currentVote = 'up' THEN
+    -- Change upvote to downvote
+    UPDATE Vote
+    SET vote = 'down'
     WHERE userID = p_userID AND questionID = p_questionID;
-  
-    IF existingVote = 'down' THEN
-    -- Do nothing
-    ELSE
-      IF existingVote = 'up' THEN 
-      -- Update the vote to 'down' if it already exists
-        UPDATE Vote
-        SET vote = 'down'
-        WHERE userID = p_userID AND questionID = p_questionID;
-      ELSE
-        -- Insert a new 'down' vote
-        INSERT INTO Vote (userID, questionID, vote)
-        VALUES (p_userID, p_questionID, 'down');
-      END IF;
-    END IF;
-  
-    -- Update the downvote count in the Question table
-    UPDATE Question
-    SET downvotes = (
-      SELECT COUNT(*) FROM Vote
-      WHERE questionID = p_questionID AND vote = 'down'
-    )
-    WHERE questionID = p_questionID;
+
+  -- ELSEIF currentVote = 'down' THEN
+    -- Already downvoted; do nothing
+  END IF;
+
+  -- Update the downvote count in the Question table
+  UPDATE Question
+  SET downvotes = (
+    SELECT COUNT(*) FROM Vote
+    WHERE questionID = p_questionID AND vote = 'down'
+  )
+  WHERE questionID = p_questionID;
 END//
-  
+
 -- Get similar users by tags procedure
 CREATE PROCEDURE GetSimilarUsersByTags (
     IN target_userID INT
