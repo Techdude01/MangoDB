@@ -118,7 +118,7 @@
                 {% if user_role == 'admin' %}
 
                 
-                <p class="visibility-info"><strong>Visibility:</strong> {{ Question['visibility'] }}</p>
+                <p class="visibility-info"><strong>Visibility:</strong> {{ Question ['visibility'] }}</p>
                 
                 <!-- Admin actions for hiding/unhiding questions-->
                 <form action="{{ url_for('hide_question', question_id=question['questionID']) }}" method="POST"
@@ -154,7 +154,7 @@
                 </a>
                 {% if user_role == 'admin' %}
 
-                <p class="visibility-info"><strong>Visibility:</strong> {{ Question['visibility'] }}</p>
+                <p class="visibility-info"><strong>Visibility:</strong> {{ Question ['visibility'] }}</p>
                 
                 <!-- Admin actions for hiding/unhiding questions-->
                 <form action="{{ url_for('hide_question', question_id=question['questionID']) }}" method="POST"
@@ -193,7 +193,7 @@
                 </a>
                 {% if user_role == 'admin' %}
 
-                <p class="visibility-info"><strong>Visibility:</strong> {{ Question['visibility'] }}</p>
+                <p class="visibility-info"><strong>Visibility:</strong> {{ Question ['visibility'] }}</p>
                 
                 <!-- Admin actions for hiding/unhiding questions-->
                 <form action="{{ url_for('hide_question', question_id=question['questionID']) }}" method="POST"
