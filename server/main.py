@@ -160,7 +160,7 @@ def admin_dashboard():
     finally:
         cursor.close()
         conn.close() 
-    return render_template('admin_dashboard.html', question=questions)
+    return render_template('admin_dashbard.html', question=questions)
 
 @app.route('/hide_question/<int:question_id>', methods=['POST'])
 def hide_question(question_id):
@@ -276,7 +276,7 @@ def home():
                 WHERE status = 'published ' AND visiblity = 'visible'
                 ORDER BY upvotes DESC
                 LIMIT %s
-            """)
+            """, (qCount,))
         most_popular = cursor.fetchall()
 
         # Fetch most controversial questions
@@ -317,7 +317,7 @@ def home():
                 LIMIT 1
             """, (user_id,))
             active_draft = cursor.fetchone()
-        
+
         return render_template(
             'home.html',
             user_role=user_role,
@@ -332,7 +332,7 @@ def home():
             active_draft=active_draft
         )
     except Exception as e:
-        flash(f"Error loading homepage: {e}", "home-danger")
+        flash(f"Error loading homepage: {e}", "danger")
         return render_template('home.html', tags=[], most_popular=[], most_controversial=[], most_recent=[], active_draft=None)
     finally:
         conn.close()
