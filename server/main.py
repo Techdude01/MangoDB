@@ -580,28 +580,48 @@ def question_detail(question_id):
 
 @app.route('/vote_question', methods=['POST'])
 def vote_question():
-    userID = session.get('userID')
+    user_id = session.get('userID')
     question_id = request.form.get('question_id')
     vote_type = request.form.get('vote_type')
-    if not userID or not question_id or vote_type not in ['up', 'down']:
+
+    if not user_id or not question_id or vote_type not in ['up', 'down']:
         flash('Vote failed: Invalid voting request.', 'vote-danger')
         return redirect(url_for('home'))
     conn = connect_db()
     cursor = conn.cursor()
     try:
-        if vote_type == 'up':
-            cursor.execute("CALL UpvoteQuestion(%s, %s)", (userID, question_id))
+        # Check if the user has already voted on this question
+        cursor.execute("""
+            SELECT voteType FROM Vote
+            WHERE user_id = %s AND questionID = %s
+        """, (user_id, question_id))
+        existing_vote = cursor.fetchone()
+
+        if existing_vote:
+            flash('You have already voted on this question.', 'vote-danger')
         else:
-            cursor.execute("CALL DownvoteQuestion(%s, %s)", (userID, question_id))
-        conn.commit()
-        flash('Your vote has been recorded!', 'vote-success')
-        return redirect(url_for('question_detail', question_id=question_id))
+            # Insert the new vote
+            cursor.execute("""
+                INSERT INTO Vote (user_id, questionID, voteType)
+                VALUES (%s, %s, %s)
+            """, (user_id, question_id, vote_type))
+
+            if vote_type == 'up':
+                cursor.execute("CALL UpvoteQuestion(%s, %s)", (user_id, question_id))
+            elif vote_type == 'down':
+                cursor.execute("CALL DownvoteQuestion(%s, %s)", (user_id, question_id))
+                
+            conn.commit()
+            flash('Your vote has been recorded!', 'vote-success')
+            return redirect(url_for('question_detail', question_id=question_id))
     except Exception as e:
         conn.rollback()
         flash(f'Error recording your vote: {e}', 'vote-danger')
         return redirect(url_for('question_detail', question_id=question_id))
     finally:
+        cursor.close()
         conn.close()
+    return redirect(url_for('question_detail', question_id=question_id))
 
 
 @app.route('/account_settings', methods=['GET', 'POST'])
