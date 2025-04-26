@@ -156,7 +156,7 @@ def admin_dashboard():
     finally:
         cursor.close()
         conn.close() 
-    return render_template('admin_dashboard.html', question=questions)
+    return render_template('admin_dashboard.html', questions=questions)
 
 @app.route('/hide_question/<int:question_id>', methods=['POST'])
 def hide_question(question_id):
@@ -425,6 +425,7 @@ def admin_questions():
     conn = connect_db()
     cursor = conn.cursor(pymysql.cursors.DictCursor)
     user_role = session.get('role')
+    print(user_role)
 
     # Fetch paginated recent questions with status 'published'
     cursor.execute("""
@@ -454,7 +455,8 @@ def admin_questions():
         questions=questions,
         page=page, 
         has_next=has_next,
-        total_pages=total_pages
+        total_pages=total_pages,
+        user_role=user_role
     )
 
 

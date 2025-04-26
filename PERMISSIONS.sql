@@ -35,3 +35,15 @@ GRANT EXECUTE ON PROCEDURE `Mango`.`SearchQuestions` TO 'mango_user'@'localhost'
 GRANT EXECUTE ON PROCEDURE `Mango`.`StartQuestion` TO 'mango_user'@'localhost';
 GRANT EXECUTE ON PROCEDURE `Mango`.`UpvoteQuestion` TO 'mango_user'@'localhost';
 GRANT EXECUTE ON PROCEDURE `Mango`.`ValidResponse` TO 'mango_user'@'localhost';
+-- Revoke potentially dangerous privileges that might have been granted
+REVOKE DROP ON *.* FROM 'mango_user'@'localhost';
+REVOKE CREATE ON *.* FROM 'mango_user'@'localhost';
+REVOKE ALTER ON *.* FROM 'mango_user'@'localhost';
+REVOKE SUPER ON *.* FROM 'mango_user'@'localhost';
+REVOKE SHUTDOWN ON *.* FROM 'mango_user'@'localhost';
+REVOKE PROCESS ON *.* FROM 'mango_user'@'localhost';
+REVOKE FILE ON *.* FROM 'mango_user'@'localhost';
+REVOKE RELOAD ON *.* FROM 'mango_user'@'localhost';
+
+-- Flush privileges to ensure changes take effect
+FLUSH PRIVILEGES;

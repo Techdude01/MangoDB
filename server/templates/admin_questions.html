@@ -3,11 +3,10 @@
 {% block content %}
 
 <!-- Admin-Only: All Questions Section -->
-{% if user_role == 'admin' %}
 <div class="card question-list-card admin-section">
     <h2 class="section-heading">All Questions (Admin)</h2>
     <ul class="item-list question-list">
-        {% for question in all_questions %}
+        {% for question in questions %}
         <li class="item question-item">
             <a href="{{ url_for('question_detail', question_id=question['questionID']) }}" class="question-link">
                 {{ question['questionText'] }}
@@ -39,5 +38,4 @@
         {% endfor %}
     </ul>
 </div>
-{% endif %}
 {% endblock %}
