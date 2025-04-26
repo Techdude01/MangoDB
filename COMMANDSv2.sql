@@ -688,14 +688,16 @@ BEGIN
   
     IF existingVote = 'up' THEN
       -- Update the vote to 'up' if it already exists
-    ELSEIF existingVote = 'down' THEN
-      UPDATE Vote
-      SET vote = 'up'
-      WHERE userID = p_userID AND questionID = p_questionID;
     ELSE
-      -- Insert a new 'up' vote
-      INSERT INTO Vote (userID, questionID, vote)
-      VALUES (p_userID, p_questionID, 'up');
+      IF existingVote = 'down' THEN
+        UPDATE Vote
+        SET vote = 'up'
+        WHERE userID = p_userID AND questionID = p_questionID;
+      ELSE
+        -- Insert a new 'up' vote
+        INSERT INTO Vote (userID, questionID, vote)
+        VALUES (p_userID, p_questionID, 'up');
+      END IF;
     END IF;
   
     -- Update the upvote count in the Question table
@@ -718,15 +720,17 @@ BEGIN
   
     IF existingVote = 'down' THEN
     -- Do nothing
-    ELSEIF existingVote = 'up' THEN 
-      -- Update the vote to 'down' if it already exists
-      UPDATE Vote
-      SET vote = 'down'
-      WHERE userID = p_userID AND questionID = p_questionID;
     ELSE
-      -- Insert a new 'down' vote
-      INSERT INTO Vote (userID, questionID, vote)
-      VALUES (p_userID, p_questionID, 'down');
+      IF existingVote = 'up' THEN 
+      -- Update the vote to 'down' if it already exists
+        UPDATE Vote
+        SET vote = 'down'
+        WHERE userID = p_userID AND questionID = p_questionID;
+      ELSE
+        -- Insert a new 'down' vote
+        INSERT INTO Vote (userID, questionID, vote)
+        VALUES (p_userID, p_questionID, 'down');
+      END IF;
     END IF;
   
     -- Update the downvote count in the Question table
