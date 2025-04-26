@@ -435,13 +435,12 @@ h6,
 }
 
 .comment-item {
-  background: rgba(255, 248, 225, 0.7); /* Slightly different background */
-  border-left-color: #ccc; /* Grey for comments */
-  padding: 0.75rem;
+  border-left-color: #ffb300; /* Orange for questions */
 }
 
 .question-item:hover,
-.response-item:hover {
+.response-item:hover,
+.comment-item:hover {
   background: #fff8e1;
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);

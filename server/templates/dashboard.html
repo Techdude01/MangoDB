@@ -6,81 +6,77 @@ Dashboard
 
 {% block body %}
 <div class="main">
-
-
     <!-- Header Section -->
     <div class="dashboard-header card">
         <h1 class="page-heading">Welcome, {{ username }}!</h1>
         <p class="user-stats">You've posted {{numQuestions}} question{% if numQuestions != 1 %}s{% endif %} and used
             {{numTags}} different tag{% if numTags != 1 %}s{% endif %}.</p>
     </div>
+
     <!-- User Questions Section -->
     <div class="dashboard-section card">
         <h2 class="section-heading">Your Questions</h2>
-
         <div class="question-list">
             {% if questions %}
             {% for question in questions %}
-            <div class="question-item"></div>
-            <a href="{{ url_for('question_detail', question_id=question['questionID']) }}" class="question-link">{{
-                question['questionText'] }}</a>
-            <div class="question-metadata">
-                <span class="date">Posted: {{ question['sentDate'] }}</span>
-                <span class="votes">👍 {{ question['upvotes'] }} | 👎 {{ question['downvotes'] }}</span>
-                <!-- <span class="responses">{{ question['responses'] }} responses</span> -->
+            <div class="question-item">
+                <a href="{{ url_for('question_detail', question_id=question['questionID']) }}" class="question-link">
+                    {{ question['questionText'] }}
+                </a>
+                <div class="question-metadata">
+                    <span class="date">Posted: {{ question['sentDate'] }}</span>
+                    <span class="votes">👍 {{ question['upvotes'] }} | 👎 {{ question['downvotes'] }}</span>
+                    <!-- <span class="responses">{{ question['responses'] }} responses</span> -->
+                </div>
             </div>
+            {% endfor %}
+            {% else %}
+            <p class="no-questions-message">You haven't posted any questions yet.</p>
+            {% endif %}
         </div>
-        {% endfor %}
-        {% else %}
-        <p class="no-questions-message">You haven't posted any questions yet.</p>
-        {% endif %}
     </div>
 
-    <!-- <a href="#" class="action-btn">View All Your Questions</a> -->
-</div>
-{% with messages = get_flashed_messages(with_categories=true,
-category_filter=['dashboard-success','dashboard-danger', 'dashboard-warning']) %}
-{% if messages %}
-{% for category, message in messages %}
-<div class="alert {{ category }}">{{ message }}</div>
-{% endfor %}
-{% endif %}
-{% endwith %}
-<!-- User Tags Section -->
-<div class="dashboard-section card">
-    <h2 class="section-heading">Your Tags</h2>
+    {% with messages = get_flashed_messages(with_categories=true,
+    category_filter=['dashboard-success','dashboard-danger', 'dashboard-warning']) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert {{ category }}">{{ message }}</div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
 
-    <div class="tag-cloud">
-        {% for tag in tags %}
-        <span class="tag">{{ tag.tagName }}</span>
-        {% endfor %}
-    </div>
-    <!-- Add Tag Form -->
-    <div class="add-tag-form">
-        <h3>Add a New Tag</h3>
-        <form action="{{ url_for('add_tag') }}" method="POST">
-            <div class="form-group"></div>
-            <label for="tag_id">Tag:</label>
-            <select id="tag_id" name="tag_id" class="form-input" required>
-                <option value="">-- Select a Tag --</option>
-                {% for available_tag in tags2 %}
-                <option value="{{ available_tag.tagID }}">{{ available_tag.tagName }}</option>
-                {% endfor %}
-            </select>
-    </div>
-    <button type="submit" class="btn">Add Tag</button>
-    </form>
-</div>
-</div>
-</div>
+    <!-- User Tags Section -->
+    <div class="dashboard-section card">
+        <h2 class="section-heading">Your Tags</h2>
+        <div class="tag-cloud">
+            {% for tag in tags %}
+            <span class="tag">{{ tag.tagName }}</span>
+            {% endfor %}
+        </div>
 
-<!-- Quick Actions -->
-<div class="dashboard-actions">
+        <!-- Add Tag Form -->
+        <div class="add-tag-form">
+            <h3>Add a New Tag</h3>
+            <form action="{{ url_for('add_tag') }}" method="POST">
+                <div class="form-group">
+                    <label for="tag_id">Tag:</label>
+                    <select id="tag_id" name="tag_id" class="form-input" required>
+                        <option value="">-- Select a Tag --</option>
+                        {% for available_tag in tags2 %}
+                        <option value="{{ available_tag.tagID }}">{{ available_tag.tagName }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="btn">Add Tag</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="dashboard-actions"></div>
     <a href="{{ url_for('home') }}" class="action-btn primary">Ask New Question</a>
     <a href="{{ url_for('most_popular') }}" class="action-btn">Browse Questions</a>
     <a href="{{ url_for('account_settings') }}" class="action-btn">Account Settings</a>
 </div>
 </div>
-
-
 {% endblock %}
