@@ -35,6 +35,7 @@ CREATE TABLE Question (
   upvotes INT DEFAULT 0 CHECK (upvotes >= 0),
   downvotes INT DEFAULT 0 CHECK (downvotes >= 0),
   status ENUM('draft', 'published', 'canceled', 'hidden') DEFAULT 'draft',
+  visibility ENUM('visible', 'hidden') NOT NULL DEFAULT 'visible',
   FOREIGN KEY (userID) REFERENCES User(userID),
   FOREIGN KEY (TimeStampID) REFERENCES TimeStamp(TimeStampID),
   FOREIGN KEY (tagID) REFERENCES Tag(tagID)
