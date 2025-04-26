@@ -256,7 +256,7 @@ def home():
     cursor = conn.cursor(pymysql.cursors.DictCursor)
     qCount = 5
     user_id = session.get('userID')
-    user_role = session.get('role')
+    user_role = session.get('role', 'user')
     active_draft = None
 
     try:
