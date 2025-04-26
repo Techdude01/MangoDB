@@ -179,6 +179,54 @@ def hide_question(question_id):
 
     return redirect(url_for('home'))
 
+@app.route('/unhide_question/<int:question_id>', methods=['POST'])
+def unhide_question(question_id):
+    if session.get('role') != 'admin':
+        flash('Access denied: Admins only.', 'danger')
+        return redirect(url_for('home'))
+
+    conn = connect_db()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("UPDATE Question SET visibility = 'visible' WHERE questionID = %s", (question_id,))
+        conn.commit()
+        flash('Question unhidden successfully.', 'success')
+    except Exception as e:
+        conn.rollback()
+        flash(f"Error unhiding question: {e}", 'danger')
+    finally:
+        cursor.close()
+        conn.close()
+
+    return redirect(url_for('admin_dashboard'))
+
+@app.route('/delete_question/<int:question_id>', methods=['POST'])
+def delete_question(question_id):
+    if session.get('role') != 'admin':
+        flash('Access denied: Admins only.', 'danger')
+        return redirect(url_for('home'))
+
+    conn = connect_db()
+    cursor = conn.cursor()
+    try:
+        # Delete associated tags, comments, responses, and votes first
+        cursor.execute("DELETE FROM QuestionTag WHERE questionID = %s", (question_id,))
+        cursor.execute("DELETE FROM Comment WHERE questionID = %s", (question_id,))
+        cursor.execute("DELETE FROM Response WHERE questionID = %s", (question_id,))
+        cursor.execute("DELETE FROM Vote WHERE questionID = %s", (question_id,))
+        
+        # Now delete the question itself
+        cursor.execute("DELETE FROM Question WHERE questionID = %s", (question_id,))
+        conn.commit()
+        flash('Question deleted successfully.', 'success')
+    except Exception as e:
+        conn.rollback()
+        flash(f"Error deleting question: {e}", 'danger')
+    finally:
+        cursor.close()
+        conn.close()
+
+    return redirect(url_for('admin_dashboard'))
 
 @app.route('/register', methods=['GET', 'POST'])
 def register_route():
@@ -417,7 +465,7 @@ def most_recent():
 def admin_questions():
     page = request.args.get('page', 1, type=int)
     per_page = 5
-
+    user_role = session.get('role', 'user')
     # Calculate offset for pagination
     offset = (page - 1) * per_page
 
