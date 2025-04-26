@@ -8,6 +8,15 @@
 
 {% block body %}
 <div class="main">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }}">
+        {{ message }}
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
     <!-- Login Button -->
     {% if show_login_button %}
     <div class="action-buttons page-actions" style="margin-bottom: 1rem;">
@@ -51,7 +60,7 @@
         <button id="post-question-btn" onclick="toggleQuestionForm()" class="btn secondary">{{ button_text }}</button>
 
         <!-- Use Jinja to control initial display -->
-        <div id="question-form" style="display: {{ 'block' if active_draft else 'none' }}; margin-top: 1rem;">
+        <div id="question-form" data-show="{{ 'true' if active_draft else 'false' }}" style="margin-top: 1rem;">
             {% if not active_draft %}
             <!-- Start Draft Form -->
             <form id="start-question-form" action="{{ url_for('start_question') }}" method="post">
@@ -179,6 +188,15 @@
 
 <!-- JavaScript -->
 <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const formDiv = document.getElementById('question-form');
+        if (formDiv.dataset.show === 'false') {
+            formDiv.style.display = 'none';
+        } else {
+            formDiv.style.display = 'block';
+        }
+    });
+
     function toggleQuestionForm() {
         const formDiv = document.getElementById('question-form');
         const button = document.getElementById('post-question-btn');

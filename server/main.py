@@ -280,7 +280,7 @@ def search():
 
     # Search by Username
     if username:
-        cursor.execute("SELECT * FROM Question WHERE userID = (SELECT userID FROM User WHERE userName = %s)", (username,))
+        cursor.execute("SELECT * FROM Question WHERE userID = (SELECT userID FROM User WHERE userName = %s) AND Question.status='published' ORDER BY Question.questionID DESC", (username,))
         questions = cursor.fetchall()
         conn.close()
         print('i')
@@ -300,7 +300,7 @@ def search():
         questions = cursor.fetchall()
         conn.close()
         print(questions)
-        return render_template('search_results.html', questions=questions, search_type="Tag", tag_name=tag)
+        return render_template('search_results.html', questions=questions, search_type="Tag", search_value = tag, tag_name=tag)
 
     # If no input is provided
     else:
