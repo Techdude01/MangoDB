@@ -238,13 +238,9 @@ def home():
         if session.get('role') == 'admin':
             cursor.execute("SELECT COUNT(*) AS total FROM Question WHERE status = 'published'")
             total_questions = cursor.fetchone()['total']
-            cursor.execut("SELECT * FROM Question WHERE status = 'published'")
-            all_questions = cursor.fetchone()['all']
         else:
             cursor.execute("SELECT COUNT(*) AS total FROM Question WHERE status = 'published' AND visibility = 'visible'")
             total_questions = cursor.fetchone()['total']
-            cursor.execute("SELECT * FROM Question FROM Question WHERE status = 'published' AND visibility = 'visible'") 
-            all_questions = cursor.fetchone()['all']
         total_pages = (total_questions + qCount - 1) // qCount
 
         # Fetch questions for each category (first page by default)
@@ -291,7 +287,7 @@ def home():
         )
     except Exception as e:
         flash(f"Error loading homepage: {e}", "home-danger")
-        return render_template('home.html', tags=[], most_popular=[], most_controversial=[], most_recent=[], all_questions=[], active_draft=None)
+        return render_template('home.html', tags=[], most_popular=[], most_controversial=[], most_recent=[], active_draft=None)
     finally:
         conn.close()
 
