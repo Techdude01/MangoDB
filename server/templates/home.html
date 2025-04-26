@@ -111,24 +111,28 @@
         <h2 class="section-heading"><a href="{{ url_for('most_popular') }}">Most Popular</a></h2>
         <ul class="item-list question-list">
             {% for question in most_popular %}
-            <li class="item question-item">
-                <a href="{{ url_for('question_detail', question_id=question['questionID']) }}" class="question-link">{{
-                    question['questionText'] }}</a>
-            </li>
-            {% else %}
+                {% if user_role == 'admin' or question['visibility'] == 'visible' %}
+                <li class="item question-item">
+                    <a href="{{ url_for('question_detail', question_id=question['questionID']) }}" class="question-link">
+                        {{ question['questionText'] }}
+                    </a>
+                    {% if user_role == 'admin' %}
+                    <!-- Admin actions for hiding/unhiding questions -->
+                    <form action="{{ url_for('hide_question', question_id=question['questionID']) }}" method="POST" style="display:inline;">
+                        {{ csrf_token() }}
+                        {% if question['visibility'] == 'visible' %}
+                        <button type="submit" class="btn btn-warning">Hide</button>
+                        {% else %}
+                        <button type="submit" class="btn btn-success">Unhide</button>
+                        {% endif %}
+                    </form>
+                    {% endif %}
+                </li>
+            {% endif %}
+        {% else %}
             <li class="no-items info-text">No popular questions found.</li>
-            {% endfor %}
+        {% endfor %}
         </ul>
-        {% if most_popular and total_pages > 1 %}
-        <div class="pagination">
-            {% if most_popular_page > 1 %}<a href="{{ url_for('most_popular', page=most_popular_page-1) }}"
-                class="btn pagination-btn">Previous</a>{% endif %}
-            <span class="page-info info-text">Page {{ most_popular_page }} of {{ total_pages }}</span>
-            {% if most_popular_page < total_pages %}<a href="{{ url_for('most_popular', page=most_popular_page+1) }}"
-                class="btn pagination-btn">Next</a>{%
-                endif %}
-        </div>
-        {% endif %}
     </div>
 
     <!-- Most Controversial Questions -->
@@ -136,12 +140,26 @@
         <h2 class="section-heading"><a href="{{ url_for('most_controversial') }}">Most Controversial</a></h2>
         <ul class="item-list question-list">
             {% for question in most_controversial %}
-            <li class="item question-item">
-                <a href="{{ url_for('question_detail', question_id=question['questionID']) }}" class="question-link">{{
-                    question['questionText'] }}</a>
-            </li>
+                {% if user_role == 'admin' or question['visibility'] == 'visible' %}
+                <li class="item question-item">
+                    <a href="{{ url_for('question_detail', question_id=question['questionID']) }}" class="question-link">{{
+                        question['questionText'] }}
+                    </a>
+                    {% if user_role == 'admin' %}
+                    <!-- Admin actions for hiding/unhiding questions-->
+                    <form action="{{ url_for('hide_question', question_id=question['questionID']) }}" method="POST" style="display:inline;">
+                        {{ csrf_token() }}
+                        {% if question['visibility'] == 'visible' %}
+                        <button type="submit" class="btn btn-warning">Hide</button>
+                        {% else %}
+                        <button type="submit" class="btn btn-success">Unhide</button>
+                        {% endif %}
+                    </form>
+                    {% endif %}
+                </li>
+                {% endif %}
             {% else %}
-            <li class="no-items info-text">No controversial questions found.</li>
+                <li class="no-items info-text">No controversial questions found.</li>
             {% endfor %}
         </ul>
         {% if most_controversial and total_pages > 1 %}
@@ -163,12 +181,26 @@
         <h2 class="section-heading"><a href="{{ url_for('most_recent') }}">Most Recent</a></h2>
         <ul class="item-list question-list">
             {% for question in most_recent %}
-            <li class="item question-item">
-                <a href="{{ url_for('question_detail', question_id=question['questionID']) }}" class="question-link">{{
-                    question['questionText'] }}</a>
-            </li>
+                {% if user_role == 'admin' or question['visibility'] == 'visible' %}
+                <li class="item question-item">
+                    <a href="{{ url_for('question_detail', question_id=question['questionID']) }}" class="question-link">{{
+                        question['questionText'] }}
+                    </a>
+                    {% if user_role == 'admin' %}
+                    <!-- Admin actions for hiding/unhiding-->
+                    <form action="{{ url_for('hide_question', question_id=question['questionID']) }}" method="POST" style="display:inline;">
+                        {{ csrf_token() }}
+                        {% if question['visibility'] == 'visible' %}
+                        <button type="submit" class="btn btn-warning">Hide</button>
+                        {% else %}
+                        <button type="submit" class="btn btn-success">Unhide</button>
+                        {% endif %}
+                    </form>
+                    {% endif %}
+                </li>
+                {% endif %}
             {% else %}
-            <li class="no-items info-text">No recent questions found.</li>
+                <li class="no-items info-text">No recent questions found.</li>
             {% endfor %}
         </ul>
         {% if most_recent and total_pages > 1 %}
@@ -177,8 +209,8 @@
                 class="btn pagination-btn">Previous</a>{% endif %}
             <span class="page-info info-text">Page {{ most_recent_page }} of {{ total_pages }}</span>
             {% if most_recent_page < total_pages %}<a href="{{ url_for('most_recent', page=most_recent_page+1) }}"
-                class="btn pagination-btn">Next</a>{% endif
-                %}
+                class="btn pagination-btn">Next</a>
+            {% endif  %}
         </div>
         {% endif %}
     </div>

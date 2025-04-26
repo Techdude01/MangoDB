@@ -256,6 +256,7 @@ def home():
     cursor = conn.cursor(pymysql.cursors.DictCursor)
     qCount = 5
     user_id = session.get('userID')
+    user_role = session.get('role', 'anonymouse')
     active_draft = None
 
     try:
@@ -319,6 +320,7 @@ def home():
         
         return render_template(
             'home.html',
+            user_role=user_role,
             tags=tags,
             most_popular=most_popular,
             most_controversial=most_controversial,
