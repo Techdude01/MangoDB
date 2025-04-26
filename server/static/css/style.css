@@ -354,6 +354,58 @@ h6,
   border-color: #ebccd1;
 }
 
+/* ========== FLASH MESSAGES / ALERTS (ROUTE-SPECIFIC) ========== */
+.alert,
+.flash-messages {
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid transparent;
+  border-radius: 5px;
+}
+
+/* General categories */
+.alert-success,
+.register-success,
+.home-success,
+.publish-success,
+.cancel-success,
+.dashboard-success,
+.vote-success {
+  color: #3c763d;
+  background-color: #dff0d8;
+  border-color: #d6e9c6;
+}
+.alert-danger,
+.register-danger,
+.home-danger,
+.publish-danger,
+.cancel-danger,
+.dashboard-danger,
+.vote-danger,
+.login-danger {
+  color: #a94442;
+  background-color: #f2dede;
+  border-color: #ebccd1;
+}
+.alert-warning,
+.dashboard-warning {
+  color: #8a6d3b;
+  background-color: #fcf8e3;
+  border-color: #faebcc;
+}
+.alert-info {
+  color: #31708f;
+  background-color: #d9edf7;
+  border-color: #bce8f1;
+}
+
+/* Fallback for unknown categories */
+.alert-default {
+  color: #333;
+  background-color: #f5f5f5;
+  border-color: #ccc;
+}
+
 /* ========== LISTS (Questions, Responses, Comments) ========== */
 .question-list,
 .response-list, /* Assuming a class for response lists */

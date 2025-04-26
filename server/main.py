@@ -85,25 +85,19 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        
         conn = connect_db()
         authenticated, role = verify_user(conn, username, password)
-        
         if authenticated:
-            # Get user information in a single query
             cursor = conn.cursor(pymysql.cursors.DictCursor)
             cursor.execute("SELECT userID, role FROM User WHERE userName = %s", (username,))
             user = cursor.fetchone()
-            
-            # Set session variables
             session['username'] = username
             session['role'] = role  
             session['userID'] = user['userID']
             return redirect(url_for('dashboard'))
         else:
-            flash('Invalid credentials', 'danger')
+            flash('Login failed: Invalid username or password.', 'login-danger')
             return redirect(url_for('login'))
-
     return render_template('user_login.html')
 
 @app.route('/logout')
@@ -131,7 +125,6 @@ def dashboard():
     cursor.execute("CALL GetQuestionsByUserID(%s)", (session['userID'],))
     questions = cursor.fetchall()
 
-    print(questions)
     # Get tags used by the current user
     cursor.execute("CALL GetTagsByUserID(%s)", (session['userID'],))
     tags = cursor.fetchall()
@@ -143,57 +136,36 @@ def dashboard():
 
 @app.route('/register', methods=['GET', 'POST'])
 def register_route():
-    """
-    Handle user registration
-    GET: Display registration form
-    POST: Process registration form submission
-    """
     if request.method == 'POST':
-        # Get form data
         username = request.form.get('username')
         password = request.form.get('password')
         firstName = request.form.get('firstName')
         lastName = request.form.get('lastName')
-        # Basic validation
         if not username or not password:
-            flash('All fields are required', 'danger')
+            flash('All fields are required', 'register-danger')
             return redirect(url_for('register_route'))
-        # Check if user already exists
         conn = connect_db()
         cursor = conn.cursor()
-
-        # Check if the username already exists in the User table
         cursor.execute("SELECT COUNT(*) AS count FROM User WHERE username = %s", (username,))
         user_exists = cursor.fetchone()['count'] > 0
-
         if user_exists:
-            flash('Username already exists. Please choose a different username.', 'danger')
+            flash('Username already exists. Please choose a different username.', 'register-danger')
             return redirect(url_for('register_route'))
-        
         try:
-            # Insert the new user into the database
             register_user(conn, username, password, 'user', firstName, lastName)
-            flash('Registration successful! You can now log in.', 'success')
+            flash('Registration successful! You can now log in.', 'register-success')
             return redirect(url_for('login'))
         except Exception as e:
             conn.rollback()
-            flash(f'Error during registration: {e}', 'danger')
+            flash(f'Registration error: {e}', 'register-danger')
         finally:
             conn.close()
-        
-        flash('Registration successful! Please log in.')
         return redirect(url_for('home'))
-    
-    # GET request - show registration form
     return render_template('register.html')
 
 @app.route('/admin-login', methods=['GET', 'POST'])
 def admin_login():
-    """
-    Handle admin login
-    GET: Display admin login form
-    POST: Process admin login form submission
-    """
+
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
@@ -283,7 +255,6 @@ def search():
         cursor.execute("SELECT * FROM Question WHERE userID = (SELECT userID FROM User WHERE userName = %s) AND Question.status='published' ORDER BY Question.questionID DESC", (username,))
         questions = cursor.fetchall()
         conn.close()
-        print('i')
         return render_template('search_results.html', questions=questions, search_type="Username", search_value=username)
 
     # Search by Keyword
@@ -291,7 +262,6 @@ def search():
         cursor.execute("CALL SearchQuestions(%s)", (keyword,))
         questions = cursor.fetchall()
         conn.close()
-        print('j')
         return render_template('search_results.html', questions=questions, search_type="Keyword", search_value=keyword)
 
     # Search by Tag
@@ -299,13 +269,11 @@ def search():
         cursor.execute("CALL GetQuestionsByTag(%s)", (tag,))
         questions = cursor.fetchall()
         conn.close()
-        print(questions)
         return render_template('search_results.html', questions=questions, search_type="Tag", search_value = tag, tag_name=tag)
 
     # If no input is provided
     else:
         conn.close()
-        print('l')
         return render_template('search_results.html', questions=[], search_type="None", search_value="None")
     
 @app.route('/most_popular')
@@ -398,21 +366,20 @@ def start_question():
     userID = session.get('userID')
     question_text = request.form.get('question_text', '')
     if not userID:
-        flash('You must be logged in to ask a question.', 'danger')
+        flash('You must be logged in to ask a question.', 'home-danger')
         return redirect(url_for('login'))
     if not question_text:
-        flash('Question text cannot be empty.', 'danger')
+        flash('Draft creation failed: You must enter a question.', 'home-danger')
         return redirect(url_for('home'))
-
     conn = connect_db()
     cursor = conn.cursor()
     try:
         cursor.execute("CALL StartQuestion(%s, %s)", (userID, question_text))
         conn.commit()
-        flash('Draft question started successfully!', 'success')
+        flash('Draft question started successfully!', 'home-success')
     except Exception as e:
         conn.rollback()
-        flash(f'Error starting draft: {e}', 'danger')
+        flash(f'Draft creation failed: {e}', 'home-danger')
     finally:
         cursor.close()
         conn.close()
@@ -424,20 +391,19 @@ def publish_question():
     question_id = request.form.get('draft_id')
     tags = request.form.getlist('tags')
     if not userID or not question_id or not tags:
-        flash('Missing data for publishing.', 'danger')
+        flash('Publish failed: Missing data for publishing.', 'publish-danger')
         return redirect(url_for('home'))
-
     conn = connect_db()
     cursor = conn.cursor()
     try:
         cursor.execute("CALL PublishQuestion(%s)", (question_id,))
         for tag_id in tags:
-            cursor.execute("CALL QuestionAddTag(%s, %s)", (question_id,tag_id))
+            cursor.execute("CALL QuestionAddTag(%s, %s)", (question_id, tag_id))
         conn.commit()
-        flash('Question published successfully!', 'success')
+        flash('Question published successfully!', 'publish-success')
     except Exception as e:
         conn.rollback()
-        flash(f'Error publishing question: {e}', 'danger')
+        flash(f'Error publishing question: {e}', 'publish-danger')
     finally:
         cursor.close()
         conn.close()
@@ -448,18 +414,17 @@ def cancel_question():
     userID = session.get('userID')
     question_id = request.form.get('draft_id')
     if not userID or not question_id:
-        flash('No draft question found to cancel.', 'danger')
+        flash('Draft cancellation failed: No draft found.', 'cancel-danger')
         return redirect(url_for('home'))
-
     conn = connect_db()
     cursor = conn.cursor()
     try:
         cursor.execute("CALL CancelQuestion(%s)", (question_id,))
         conn.commit()
-        flash('Draft question cancelled successfully!', 'success')
+        flash('Draft question cancelled successfully!', 'cancel-success')
     except Exception as e:
         conn.rollback()
-        flash(f'Error cancelling draft: {e}', 'danger')
+        flash(f'Error cancelling draft: {e}', 'cancel-danger')
     finally:
         cursor.close()
         conn.close()
@@ -550,16 +515,14 @@ def question_detail(question_id):
         tags=tags
     )
 
-# ...existing code...
 @app.route('/vote_question', methods=['POST'])
 def vote_question():
     userID = session.get('userID')
     question_id = request.form.get('question_id')
-    vote_type = request.form.get('vote_type')  # 'up' or 'down'
+    vote_type = request.form.get('vote_type')
     if not userID or not question_id or vote_type not in ['up', 'down']:
-        flash('Invalid voting request.', 'danger')
+        flash('Vote failed: Invalid voting request.', 'vote-danger')
         return redirect(url_for('home'))
-
     conn = connect_db()
     cursor = conn.cursor()
     try:
@@ -568,12 +531,11 @@ def vote_question():
         else:
             cursor.execute("CALL DownvoteQuestion(%s, %s)", (userID, question_id))
         conn.commit()
-        flash('Your vote has been recorded!', 'success')
-        # Changed to redirect back to question detail
+        flash('Your vote has been recorded!', 'vote-success')
         return redirect(url_for('question_detail', question_id=question_id))
     except Exception as e:
         conn.rollback()
-        flash(f'Error recording your vote: {e}', 'danger')
+        flash(f'Error recording your vote: {e}', 'vote-danger')
         return redirect(url_for('question_detail', question_id=question_id))
     finally:
         conn.close()
@@ -668,25 +630,23 @@ def account_settings():
 def list_chats():
     """
     Display all chats that the logged-in user is a member of.
+    Also checks for pending chat requests to show an alert.
     """
     # Ensure user is logged in
     if 'username' not in session:
         flash('Please login to view your chats.', 'login-error')
         return redirect(url_for('login'))
 
-    # Use the correct session key - userID with capital ID to match login route
     user_id = session.get('userID')
     if not user_id:
-        # Fetch user_id if it's somehow missing from session
         conn = connect_db()
         try:
             cursor = conn.cursor(pymysql.cursors.DictCursor)
             cursor.execute("SELECT userID FROM User WHERE userName = %s", (session['username'],))
             user_result = cursor.fetchone()
-            
             if user_result:
                 user_id = user_result['userID']
-                session['userID'] = user_id  # Store it for future use
+                session['userID'] = user_id
             else:
                 flash('Could not verify user session.', 'danger')
                 return redirect(url_for('logout'))
@@ -699,6 +659,7 @@ def list_chats():
 
     # Fetch all chats this user is a member of
     chats = []
+    has_pending_requests = False
     conn = connect_db()
     try:
         cursor = conn.cursor(pymysql.cursors.DictCursor)
@@ -710,6 +671,13 @@ def list_chats():
             WHERE cm.userID = %s
         """, (user_id,))
         chats = cursor.fetchall()
+        # Check for pending chat requests
+        cursor.execute("""
+            SELECT COUNT(*) as pending_count FROM ChatRequest
+            WHERE toUserID = %s AND status = 'pending'
+        """, (user_id,))
+        pending = cursor.fetchone()
+        has_pending_requests = pending and pending['pending_count'] > 0
     except pymysql.Error as err:
         flash(f"Database error fetching chats: {err}", "danger")
         print(f"Database error: {err}")
@@ -717,7 +685,7 @@ def list_chats():
         if conn:
             conn.close()
 
-    return render_template('chats.html', chats=chats)
+    return render_template('chats.html', chats=chats, has_pending_requests=has_pending_requests)
 
 @app.route('/create_chat', methods=['GET', 'POST'])
 def create_chat():
@@ -919,36 +887,108 @@ def view_chat(chat_id):
                            members=members,
                            messages=messages,
                            current_user_id=user_id)
-@app.route('/add_tag', methods=['POST'])
-def add_tag():
+
+@app.route('/chat_requests', methods=['GET', 'POST'])
+def chat_requests():
+    """
+    Display and handle pending chat requests for the logged-in user.
+    """
     if 'userID' not in session:
-        flash('You must be logged in to add tags.', 'danger')
+        flash('Please login to view chat requests.', 'danger')
         return redirect(url_for('login'))
-    
-    user_id = session.get('userID')
-    tag_id = request.form.get('tag_id')
-    
-    if not tag_id or not tag_id.isdigit():
-        flash('Invalid tag selected.', 'danger')
-        return redirect(url_for('dashboard'))
-    
+
+    user_id = session['userID']
     conn = connect_db()
-    cursor = conn.cursor()
-    
+    cursor = conn.cursor(pymysql.cursors.DictCursor)
     try:
-        cursor.execute("CALL UserAddTag(%s, %s)", (user_id, tag_id))
-        conn.commit()
-        flash('Tag added successfully!', 'success')
-    except pymysql.Error as e:
-        conn.rollback()
-        if e.args[0] == 1062:  # Duplicate entry
-            flash('You already have this tag.', 'warning')
-        else:
-            flash('Error adding tag.', 'danger')
+        # Fetch pending chat requests for this user
+        cursor.execute("""
+            SELECT cr.requestID, c.chatID, c.chatName, u.userName AS fromUserName, u.firstName, u.lastName
+            FROM ChatRequest cr
+            JOIN Chat c ON cr.chatID = c.chatID
+            JOIN User u ON cr.fromUserID = u.userID
+            WHERE cr.toUserID = %s AND cr.status = 'pending'
+        """, (user_id,))
+        requests = cursor.fetchall()
+    except Exception as e:
+        flash(f'Error loading chat requests: {e}', 'danger')
+        requests = []
     finally:
         cursor.close()
         conn.close()
-    
+    return render_template('chat_requests.html', requests=requests)
+
+@app.route('/chat_request/<int:request_id>/accept', methods=['POST'])
+def accept_chat_request(request_id):
+    if 'userID' not in session:
+        flash('Please login to accept chat requests.', 'danger')
+        return redirect(url_for('login'))
+    user_id = session['userID']
+    conn = connect_db()
+    cursor = conn.cursor()
+    try:
+        # Accept the request (update status)
+        cursor.execute("""
+            UPDATE ChatRequest SET status = 'accepted' WHERE requestID = %s AND toUserID = %s
+        """, (request_id, user_id))
+        conn.commit()
+        flash('Chat request accepted!', 'success')
+    except Exception as e:
+        conn.rollback()
+        flash(f'Error accepting chat request: {e}', 'danger')
+    finally:
+        cursor.close()
+        conn.close()
+    return redirect(url_for('chat_requests'))
+
+@app.route('/chat_request/<int:request_id>/reject', methods=['POST'])
+def reject_chat_request(request_id):
+    if 'userID' not in session:
+        flash('Please login to reject chat requests.', 'danger')
+        return redirect(url_for('login'))
+    user_id = session['userID']
+    conn = connect_db()
+    cursor = conn.cursor()
+    try:
+        # Reject the request (update status)
+        cursor.execute("""
+            UPDATE ChatRequest SET status = 'rejected' WHERE requestID = %s AND toUserID = %s
+        """, (request_id, user_id))
+        conn.commit()
+        flash('Chat request rejected.', 'success')
+    except Exception as e:
+        conn.rollback()
+        flash(f'Error rejecting chat request: {e}', 'danger')
+    finally:
+        cursor.close()
+        conn.close()
+    return redirect(url_for('chat_requests'))
+
+@app.route('/add_tag', methods=['POST'])
+def add_tag():
+    if 'userID' not in session:
+        flash('You must be logged in to add tags.', 'dashboard-danger')
+        return redirect(url_for('login'))
+    user_id = session.get('userID')
+    tag_id = request.form.get('tag_id')
+    if not tag_id or not tag_id.isdigit():
+        flash('Invalid tag selected.', 'dashboard-danger')
+        return redirect(url_for('dashboard'))
+    conn = connect_db()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("CALL UserAddTag(%s, %s)", (user_id, tag_id))
+        conn.commit()
+        flash('Tag added successfully!', 'dashboard-success')
+    except pymysql.Error as e:
+        conn.rollback()
+        if e.args[0] == 1062:
+            flash('You already have this tag.', 'dashboard-warning')
+        else:
+            flash('Error adding tag.', 'dashboard-danger')
+    finally:
+        cursor.close()
+        conn.close()
     return redirect(url_for('dashboard'))
 @app.context_processor
 def inject_user_data():

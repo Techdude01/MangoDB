@@ -6,13 +6,14 @@ Dashboard
 
 {% block body %}
 <div class="main">
+
+
     <!-- Header Section -->
     <div class="dashboard-header card">
         <h1 class="page-heading">Welcome, {{ username }}!</h1>
         <p class="user-stats">You've posted {{numQuestions}} question{% if numQuestions != 1 %}s{% endif %} and used
             {{numTags}} different tag{% if numTags != 1 %}s{% endif %}.</p>
     </div>
-
     <!-- User Questions Section -->
     <div class="dashboard-section card">
         <h2 class="section-heading">Your Questions</h2>
@@ -33,7 +34,14 @@ Dashboard
 
         <!-- <a href="#" class="action-btn">View All Your Questions</a> -->
     </div>
-
+    {% with messages = get_flashed_messages(with_categories=true,
+    category_filter=['dashboard-success','dashboard-danger', 'dashboard-warning']) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert {{ category }}">{{ message }}</div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
     <!-- User Tags Section -->
     <div class="dashboard-section card">
         <h2 class="section-heading">Your Tags</h2>

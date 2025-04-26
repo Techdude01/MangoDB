@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block body %}
+<div class="main">
+    <div class="section-header card">
+        <h1 class="page-heading">Pending Chat Requests</h1>
+    </div>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }}">{{ message }}</div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+    <div class="card dashboard-section">
+        {% if requests %}
+        <ul class="question-list">
+            {% for req in requests %}
+            <li class="item question-item d-flex justify-content-between align-items-center">
+                <div>
+                    <strong>{{ req.chatName }}</strong> - from {{ req.fromUserName }} ({{ req.firstName }} {{
+                    req.lastName }})
+                </div>
+                <div>
+                    <form method="post" action="{{ url_for('accept_chat_request', request_id=req.requestID) }}"
+                        style="display:inline;">
+                        <button type="submit" class="btn primary btn-sm">Accept</button>
+                    </form>
+                    <form method="post" action="{{ url_for('reject_chat_request', request_id=req.requestID) }}"
+                        style="display:inline; margin-left:5px;">
+                        <button type="submit" class="btn secondary btn-sm">Reject</button>
+                    </form>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p class="info-text">No pending chat requests.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

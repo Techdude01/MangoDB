@@ -13,6 +13,12 @@
         </div>
     </div>
 
+    {% if has_pending_requests %}
+    <div class="alert alert-warning" style="margin: 1rem 0;">
+        You have pending <a href="{{ url_for('chat_requests') }}">chat requests</a>! Please review them.
+    </div>
+    {% endif %}
+
     <!-- Display flash messages -->
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}

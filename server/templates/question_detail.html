@@ -54,6 +54,13 @@ Question Details - {{ question.questionText | truncate(30) }}
     </div>
     {% else %}
     <!-- Voting Controls -->
+    {% with messages = get_flashed_messages(with_categories=true, category_filter=['vote-success', 'vote-danger']) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert {{ category }}">{{ message }}</div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
     <div class="card voting-controls-card">
         <h2 class="section-heading">Vote</h2>
         <div class="vote-container"> <!-- Removed redundant 'card' class here -->

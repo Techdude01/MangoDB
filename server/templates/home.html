@@ -8,12 +8,11 @@
 
 {% block body %}
 <div class="main">
-    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% with messages = get_flashed_messages(with_categories=true, category_filter=['home-success', 'home-danger',
+    'publish-success', 'publish-danger', 'cancel-success', 'cancel-danger']) %}
     {% if messages %}
     {% for category, message in messages %}
-    <div class="alert alert-{{ category }}">
-        {{ message }}
-    </div>
+    <div class="alert {{ category }}">{{ message }}</div>
     {% endfor %}
     {% endif %}
     {% endwith %}
