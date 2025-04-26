@@ -177,7 +177,7 @@ def hide_question(question_id):
         cursor.close()
         conn.close()
 
-    return redirect(url_for('home'))
+    return redirect(url_for('admin_questions'))
 
 @app.route('/unhide_question/<int:question_id>', methods=['POST'])
 def unhide_question(question_id):
@@ -226,7 +226,7 @@ def delete_question(question_id):
         cursor.close()
         conn.close()
 
-    return redirect(url_for('admin_dashboard'))
+    return redirect(url_for('admin_questions'))
 
 @app.route('/register', methods=['GET', 'POST'])
 def register_route():
