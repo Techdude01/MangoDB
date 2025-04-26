@@ -697,37 +697,37 @@ def account_settings():
     
     return render_template('account_settings.html', username=username, user_data=user_data, all_tags=all_tags, user_tags=user_tags)
 
-@app.route('/delete_account', methods=['POST'])
-def delete_account():
-    """Handles the deletion of the currently logged-in user's account."""
-    if 'username' not in session:
-        flash('You must be logged in to delete your account.', 'danger')
-        return redirect(url_for('login'))
+# @app.route('/delete_account', methods=['POST'])
+# def delete_account():
+#     """Handles the deletion of the currently logged-in user's account."""
+#     if 'username' not in session:
+#         flash('You must be logged in to delete your account.', 'danger')
+#         return redirect(url_for('login'))
 
-    username = session['username']
-    conn = None
-    cursor = None
-    try:
-        conn = connect_db()
-        cursor = conn.cursor()
-        # Call the stored procedure to delete the user by username
-        cursor.execute("CALL DeleteUserByUsername(%s)", (username,))
-        conn.commit()
-        # Log the user out by clearing the session
-        session.clear()
-        flash('Your account has been successfully deleted.', 'success')
-        return redirect(url_for('home')) # Redirect to home page after deletion
-    except Exception as e:
-        if conn:
-            conn.rollback()
-        flash(f'Error deleting account: {e}', 'danger')
-        # Redirect back to account settings if there was an error
-        return redirect(url_for('account_settings')) 
-    finally:
-        if cursor:
-            cursor.close()
-        if conn:
-            conn.close()
+#     username = session['username']
+#     conn = None
+#     cursor = None
+#     try:
+#         conn = connect_db()
+#         cursor = conn.cursor()
+#         # Call the stored procedure to delete the user by username
+#         cursor.execute("DELETE FROM USER WHERE username=%s", (username,))
+#         conn.commit()
+#         # Log the user out by clearing the session
+#         session.clear()
+#         flash('Your account has been successfully deleted.', 'success')
+#         return redirect(url_for('home')) # Redirect to home page after deletion
+#     except Exception as e:
+#         if conn:
+#             conn.rollback()
+#         flash(f'Error deleting account: {e}', 'danger')
+#         # Redirect back to account settings if there was an error
+#         return redirect(url_for('account_settings')) 
+#     finally:
+#         if cursor:
+#             cursor.close()
+#         if conn:
+#             conn.close()
     
 @app.route('/chats')
 def list_chats():
