@@ -542,10 +542,9 @@ BEGIN
     DELETE FROM ChatMember WHERE userID = OLD.userID;
     DELETE FROM Comment WHERE userID = OLD.userID;
     DELETE FROM Question WHERE userID = OLD.userID;
-    DELETE FROM Response WHERE userID = OLD.userID;
-    DELETE FROM TimeStamp WHERE userID = OLD.userID;
+    DELETE FROM Response WHERE userID = OLD.userID;  
     DELETE FROM ChatLog WHERE userID = OLD.userID;
-      DELETE FROM ResponseLog WHERE userID = OLD.userID;
+    DELETE FROM ResponseLog WHERE userID = OLD.userID;
     DELETE FROM CommentLog WHERE userID = OLD.userID;
     DELETE FROM Vote WHERE userID = OLD.userID;
     DELETE FROM ChatRequest WHERE fromUserID = OLD.userID OR toUserID = OLD.userID;
