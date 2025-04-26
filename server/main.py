@@ -316,7 +316,7 @@ def home():
                 LIMIT 1
             """, (user_id,))
             active_draft = cursor.fetchone()
-
+        
         return render_template(
             'home.html',
             tags=tags,
