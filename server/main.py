@@ -156,7 +156,7 @@ def admin_dashboard():
     finally:
         cursor.close()
         conn.close() 
-    return render_template('admin_dashboard.html', questions=questions)
+    return render_template('admin_questions.html', questions=questions)
 
 @app.route('/hide_question/<int:question_id>', methods=['POST'])
 def hide_question(question_id):
@@ -198,7 +198,7 @@ def unhide_question(question_id):
         cursor.close()
         conn.close()
 
-    return redirect(url_for('admin_dashboard'))
+    return redirect(url_for('admin_questions'))
 
 @app.route('/delete_question/<int:question_id>', methods=['POST'])
 def delete_question(question_id):
