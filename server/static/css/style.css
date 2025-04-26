@@ -9,7 +9,8 @@
 body {
   font-family: "JetBrains Mono", "Geist Mono", "SFMono-Regular", Consolas,
     "Liberation Mono", Menlo, monospace;
-  background: #ffffff url("/static/img/mango.jpg") no-repeat center center / 80%;
+  background: #fffbe6 url("/static/img/mango.jpg") no-repeat center center / 80%;
+  background-attachment: fixed;
   color: #3e2723;
   min-height: 100vh;
   display: flex;

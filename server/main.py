@@ -427,10 +427,12 @@ def admin_questions():
     user_role = session.get('role')
 
     # Fetch paginated recent questions with status 'published'
-    cursor.execute("""
-        SELECT * FROM Question
-        WHERE status = 'published'
-        ORDER BY createdAt DESC
+     cursor.execute("""
+        SELECT q.* 
+        FROM Question q
+        JOIN TimeStamp ts ON q.TimeStampID = ts.TimeStampID
+        WHERE q.status = 'published'
+        ORDER BY ts.sentDate DESC, ts.sentTime DESC
         LIMIT %s OFFSET %s
     """, (per_page, offset))
     questions = cursor.fetchall()
