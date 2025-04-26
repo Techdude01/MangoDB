@@ -424,18 +424,9 @@ def admin_questions():
     # Connect to the database
     conn = connect_db()
     cursor = conn.cursor(pymysql.cursors.DictCursor)
-    user_role = session.get('role')
-    print(user_role)
 
-    # Fetch paginated recent questions with status 'published'
-    cursor.execute("""
-        SELECT q.* 
-        FROM Question q
-        JOIN TimeStamp ts ON q.TimeStampID = ts.TimeStampID
-        WHERE q.status = 'published'
-        ORDER BY ts.sentDate DESC, ts.sentTime DESC
-        LIMIT %s OFFSET %s
-    """, (per_page, offset))
+    # Call the stored procedure to fetch paginated questions
+    cursor.execute("CALL GetPublishedQuestionsWithPagination(%s, %s)", (per_page, offset))
     questions = cursor.fetchall()
 
     # Fetch the total number of published questions for pagination
@@ -458,6 +449,7 @@ def admin_questions():
         total_pages=total_pages,
         user_role=user_role
     )
+
 
 
 @app.route('/start_question', methods=['POST'])
