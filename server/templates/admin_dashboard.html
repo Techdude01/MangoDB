@@ -1,42 +1,53 @@
 {% extends 'base.html' %}
 
 {% block body %}
-<table class="table">
-    <thead>
-        <tr>
-            <th>Question ID</th>
-            <th>Question Text</th>
-            <th>Visibility</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for question in questions %}
-        <tr>
-            <td>{{ question.questionID }}</td>
-            <td>{{ question.questionText }}</td>
-            <td>
-                {% if question.visibility == 'visible' %}
-                <span class="badge badge-success">Visible</span>
-                {% else %}
-                <span class="badge badge-danger">Hidden</span>
-                {% endif %}
-            </td>
-            <td>
-                {% if question.visibility == 'visible' %}
-                <form action="{{ url_for('hide_question', question_id=question.questionID) }}" method="POST"
-                    style="display:inline;">
-                    <button type="submit" class="btn btn-warning">Hide</button>
-                </form>
-                {% else %}
-                <form action="{{ url_for('unhide_question', question_id=question.questionID) }}" method="POST"
-                    style="display:inline;">
-                    <button type="submit" class="btn btn-success">Unhide</button>
-                </form>
-                {% endif %}
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<!-- Apply card styling to contain the table -->
+<div class="card dashboard-section">
+    <h2 class="section-heading">Manage Questions</h2>
+    <!-- Basic table structure, styling will come from general element styles or specific overrides if needed -->
+    <table>
+        <thead>
+            <tr>
+                <th>Question ID</th>
+                <th>Question Text</th>
+                <th>Visibility</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for question in questions %}
+            <tr>
+                <td>{{ question.questionID }}</td>
+                <td>{{ question.questionText }}</td>
+                <td>
+                    <!-- Use alert classes for status indication -->
+                    {% if question.visibility == 'visible' %}
+                    <span class="alert alert-success"
+                        style="padding: 0.2rem 0.5rem; display: inline-block; margin: 0;">Visible</span>
+                    {% else %}
+                    <span class="alert alert-danger"
+                        style="padding: 0.2rem 0.5rem; display: inline-block; margin: 0;">Hidden</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <!-- Use action-btn classes -->
+                    {% if question.visibility == 'visible' %}
+                    <form action="{{ url_for('hide_question', question_id=question.questionID) }}" method="POST"
+                        style="display:inline;">
+                        <!-- Using action-btn danger for hide -->
+                        <button type="submit" class="btn action-btn danger">Hide</button>
+                    </form>
+                    {% else %}
+                    <form action="{{ url_for('unhide_question', question_id=question.questionID) }}" method="POST"
+                        style="display:inline;">
+                        <!-- Using action-btn primary for unhide -->
+                        <button type="submit" class="btn action-btn primary">Unhide</button>
+                    </form>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% endblock %}
