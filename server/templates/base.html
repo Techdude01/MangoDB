@@ -20,7 +20,7 @@
                 <li><a href="{{ url_for('most_recent') }}">Most Recent</a></li>
 
                 {% if user_role == 'admin' %}
-                <li><a href="{{ url_for('view_questions') }}">Questions</a></li>
+                <li><a href="{{ url_for('admin_questions') }}">Questions</a></li>
                 {% endif %}
 
                 {% if show_login_button %}
