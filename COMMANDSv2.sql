@@ -599,7 +599,7 @@ END//
 CREATE PROCEDURE GetRecentQuestionsWithPagination (
     IN lim INT, 
     IN offset INT,
-    IN user_role ENUM('admin', 'user', 'anonymous')
+    IN user_role ENUM('admin', 'user')
 )
 BEGIN
     SELECT q.questionID, u.userName, q.questionText, t.sentTime, t.sentDate
@@ -616,7 +616,7 @@ END//
 CREATE PROCEDURE GetPopularQuestionsWithPagination (
     IN lim INT, 
     IN offset INT,
-    IN user_role ENUM('admin', 'user', 'anonymous')
+    IN user_role ENUM('admin', 'user')
 )
 BEGIN
     SELECT q.questionID, u.userName, q.questionText, t.sentTime, t.sentDate, q.upvotes, COUNT(c.commentID) AS commentCount
@@ -635,7 +635,7 @@ END//
 CREATE PROCEDURE GetControversialQuestionswithPagination (
     IN lim INT, 
     IN offset INT, 
-    IN user_role ENUM('admin', 'user', 'anonymous')
+    IN user_role ENUM('admin', 'user')
 )
 BEGIN
     SELECT q.questionID, u.userName, q.questionText, t.sentTime, t.sentDate, 
@@ -655,7 +655,7 @@ END//
 -- Get relevant questions procedure
 CREATE PROCEDURE GetRelevantQuestions (
     IN p_username VARCHAR(16),
-    IN user_role ENUM('admin', 'user', 'anonymous')
+    IN user_role ENUM('admin', 'user')
 )
 BEGIN
     SELECT q.questionText, t.sentTime, t.sentDate
@@ -673,7 +673,7 @@ END//
 -- Get questions by tag procedure
 CREATE PROCEDURE GetQuestionsByTag(
   IN p_tagName VARCHAR(16),
-  IN user_role ENUM('admin', 'user', 'anonymous'))
+  IN user_role ENUM('admin', 'user'))
 BEGIN
     SELECT DISTINCT q.questionID, q.questionText,q.upvotes,q.downvotes
     FROM Question q
@@ -688,7 +688,7 @@ END//
 -- Search questions procedure
 CREATE PROCEDURE SearchQuestions (
   IN p_keyword VARCHAR(100),
-  IN user_role ENUM('admin', 'user', 'anonymous'))
+  IN user_role ENUM('admin', 'user'))
 BEGIN
     SELECT questionID, questionText, upvotes, downvotes
     FROM Question

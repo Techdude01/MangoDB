@@ -161,6 +161,7 @@ def admin_dashboard():
         cursor.close()
         conn.close() 
     return render_template('admin_dashboard.html', question=questions)
+    return render_template('admin_dashboard.html', question=questions)
 
 @app.route('/hide_question/<int:question_id>', methods=['POST'])
 def hide_question(question_id):
@@ -256,7 +257,7 @@ def home():
     cursor = conn.cursor(pymysql.cursors.DictCursor)
     qCount = 5
     user_id = session.get('userID')
-    user_role = session.get('role','user')
+    user_role = session.get('role', 'user')
     active_draft = None
     print(user_role)
     try:
