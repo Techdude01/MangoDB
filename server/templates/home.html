@@ -111,25 +111,19 @@
         <h2 class="section-heading"><a href="{{ url_for('most_popular') }}">Most Popular</a></h2>
         <ul class="item-list question-list">
             {% for question in most_popular %}
-            {% if user_role == 'admin' or question['visibility'] == 'visible' %}
             <li class="item question-item">
-                <a href="{{ url_for('question_detail', question_id=question['questionID']) }}" class="question-link">
-                    {{ question['questionText'] }}
+                <a href="{{ url_for('question_detail', question_id=question['questionID']) }}" class="question-link">{{
+                    question['questionText'] }}
                 </a>
                 {% if user_role == 'admin' %}
-                <!-- Admin actions for hiding/unhiding questions -->
+                <!-- Admin actions for hiding/unhiding questions-->
                 <form action="{{ url_for('hide_question', question_id=question['questionID']) }}" method="POST"
                     style="display:inline;">
-                    {{ csrf_token() }}
-                    {% if question['visibility'] == 'visible' %}
                     <button type="submit" class="btn btn-warning">Hide</button>
-                    {% else %}
-                    <button type="submit" class="btn btn-success">Unhide</button>
-                    {% endif %}
+
                 </form>
                 {% endif %}
             </li>
-            {% endif %}
             {% else %}
             <li class="no-items info-text">No popular questions found.</li>
             {% endfor %}
@@ -200,7 +194,7 @@
                 {% endif %}
             </li>
             {% else %}
-            <li class="no-items info-text">No Recent questions found.</li>
+            <li class="no-items info-text">No recent questions found.</li>
             {% endfor %}
         </ul>
         {% if most_recent and total_pages > 1 %}

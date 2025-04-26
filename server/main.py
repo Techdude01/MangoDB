@@ -185,26 +185,6 @@ def hide_question(question_id):
     return redirect(url_for('admin_dashboard'))
 
 
-@app.route('/unhide_question/<int:question_id>', methods=['POST'])
-def unhide_question(question_id):
-    if session.get('role') != 'admin':
-        flash('Access denied: Admins only.', 'danger')
-        return redirect(url_for('home'))
-
-    conn = connect_db()
-    cursor = conn.cursor()
-    try:
-        cursor.execute("UPDATE Question SET visibility = 'visible' WHERE questionID = %s", (question_id,))
-        conn.commit()
-        flash('Question unhidden successfully.', 'success')
-    except Exception as e:
-        conn.rollback()
-        flash(f"Error unhiding question: {e}", 'danger')
-    finally:
-        cursor.close()
-        conn.close()
-
-    return redirect(url_for('admin_dashboard'))
 
 @app.route('/register', methods=['GET', 'POST'])
 def register_route():
