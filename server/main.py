@@ -880,10 +880,7 @@ def create_chat():
 
 @app.route('/chat/<int:chat_id>', methods=['GET', 'POST'])
 def view_chat(chat_id):
-    """
-    Display an individual chat and handle sending new messages.
-    Supports both 1-on-1 and group chats.
-    """
+
     # Ensure user is logged in
     if 'username' not in session or 'userID' not in session:
         flash('Please login to view chats', 'danger')
@@ -973,9 +970,7 @@ def view_chat(chat_id):
 
 @app.route('/chat_requests', methods=['GET', 'POST'])
 def chat_requests():
-    """
-    Display and handle pending chat requests for the logged-in user.
-    """
+
     if 'userID' not in session:
         flash('Please login to view chat requests.', 'danger')
         return redirect(url_for('login'))
@@ -1076,10 +1071,6 @@ def add_tag():
     
 @app.context_processor
 def inject_user_data():
-    """
-    Make user data available to all templates including base.html
-    This eliminates the need to pass these variables in every route
-    """
     show_login_button = True
     if 'userID' in session:
         show_login_button = False
