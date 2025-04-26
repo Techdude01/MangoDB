@@ -198,7 +198,7 @@ def unhide_question(question_id):
         cursor.close()
         conn.close()
 
-    return redirect(url_for('admin_questions'))
+    return redirect(url_for('admin_dashboard'))
 
 @app.route('/delete_question/<int:question_id>', methods=['POST'])
 def delete_question(question_id):
