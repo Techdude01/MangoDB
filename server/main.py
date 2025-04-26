@@ -160,7 +160,7 @@ def admin_dashboard():
     finally:
         cursor.close()
         conn.close() 
-    return render_template('admin_dashbard.html', question=questions)
+    return render_template('admin_dashboard.html', question=questions)
 
 @app.route('/hide_question/<int:question_id>', methods=['POST'])
 def hide_question(question_id):
@@ -256,9 +256,9 @@ def home():
     cursor = conn.cursor(pymysql.cursors.DictCursor)
     qCount = 5
     user_id = session.get('userID')
-    user_role = session.get('role')
+    user_role = session.get('role','user')
     active_draft = None
-
+    print(user_role)
     try:
         if session.get('role') == 'admin':
             cursor.execute("SELECT COUNT(*) AS total FROM Question WHERE status = 'published'")
@@ -269,9 +269,9 @@ def home():
 
         # Fetch questions for each category (first page by default)
         cursor.execute("CALL GetPopularQuestionsWithPagination(%s, 0,%s)", (qCount,user_role))
+
  
         most_popular = cursor.fetchall()
-        print(most_popular)
         # Fetch most controversial questions
         cursor.execute("CALL GetControversialQuestionsWithPagination(%s, 0,%s)", (qCount,user_role))
 
@@ -281,7 +281,6 @@ def home():
         cursor.execute("CALL GetRecentQuestionsWithPagination(%s, 0,%s)", (qCount,user_role))
        
         most_recent = cursor.fetchall()
-
         # Get tags
         cursor.execute("SELECT tagID, tagName FROM Tag")
         tags = cursor.fetchall()

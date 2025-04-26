@@ -1,3 +1,6 @@
+{% extends 'base.html' %}
+
+{% block content %}
 <table class="table">
     <thead>
         <tr>
@@ -15,11 +18,13 @@
             <td>{{ question.visibility }}</td>
             <td>
                 {% if question.visibility == 'visible' %}
-                <form action="{{ url_for('hide_question', question_id=question.questionID) }}" method="POST" style="display:inline;">
+                <form action="{{ url_for('hide_question', question_id=question.questionID) }}" method="POST"
+                    style="display:inline;">
                     <button type="submit" class="btn btn-warning">Hide</button>
                 </form>
                 {% else %}
-                <form action="{{ url_for('unhide_question', question_id=question.questionID) }}" method="POST" style="display:inline;">
+                <form action="{{ url_for('unhide_question', question_id=question.questionID) }}" method="POST"
+                    style="display:inline;">
                     <button type="submit" class="btn btn-success">Unhide</button>
                 </form>
                 {% endif %}
@@ -28,3 +33,4 @@
         {% endfor %}
     </tbody>
 </table>
+{% endblock %}
