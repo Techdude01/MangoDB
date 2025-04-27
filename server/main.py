@@ -109,10 +109,6 @@ def logout():
 
 @app.route('/dashboard')
 def dashboard():
-    """
-    Display the user's dashboard with their questions and tags.
-    Requires user to be logged in with a valid session.
-    """
     # Redirect to login if user is not authenticated
     if 'username' not in session:
         return redirect(url_for('login'))
@@ -121,17 +117,12 @@ def dashboard():
     conn = connect_db()
     cursor = conn.cursor(pymysql.cursors.DictCursor)
     
-    # Get questions created by the current user
     cursor.execute("CALL GetQuestionsByUserID(%s)", (session['userID'],))
     questions = cursor.fetchall()
-
-    # Get tags used by the current user
     cursor.execute("CALL GetTagsByUserID(%s)", (session['userID'],))
     tags = cursor.fetchall()
-    # Get all tags in the system for comparison
     cursor.execute("SELECT tagID, tagName FROM Tag")
     tags2 = cursor.fetchall()
-    # Render the dashboard template with the user's data
     return render_template('dashboard.html', tags=tags, tags2=tags2,questions=questions,numQuestions=len(questions), numTags=len(tags))
 
 @app.route('/admin_dashboard')
