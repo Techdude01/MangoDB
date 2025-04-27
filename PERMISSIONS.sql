@@ -2,6 +2,7 @@
 -- mysql -u root Mango < PERMISSIONS.sql
 CREATE USER 'mango_user'@'localhost' IDENTIFIED BY 'arfaouiRocks123';
 GRANT SELECT, INSERT, UPDATE, DELETE ON `mango`.* TO 'mango_user'@'localhost';
+-- grant access to procedures
 GRANT EXECUTE ON PROCEDURE `Mango`.`CancelComment` TO 'mango_user'@'localhost';
 GRANT EXECUTE ON PROCEDURE `Mango`.`CancelCommentDraft` TO 'mango_user'@'localhost';
 GRANT EXECUTE ON PROCEDURE `Mango`.`CancelQuestion` TO 'mango_user'@'localhost';

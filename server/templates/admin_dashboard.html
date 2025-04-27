@@ -18,7 +18,11 @@
             {% for question in questions %}
             <tr>
                 <td>{{ question.questionID }}</td>
-                <td>{{ question.questionText }}</td>
+                <td>
+                    <a href="{{ url_for('question_detail', question_id=question.questionID) }}">
+                        {{ question.questionText }}
+                    </a>
+                </td>
                 <td>
                     <!-- Use alert classes for status indication -->
                     {% if question.visibility == 'visible' %}
