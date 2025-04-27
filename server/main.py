@@ -226,7 +226,7 @@ def delete_question(question_id):
         cursor.close()
         conn.close()
 
-    return redirect(url_for('admin_questions'))
+    return redirect(url_for('admin_dashboard'))
 
 @app.route('/register', methods=['GET', 'POST'])
 def register_route():
@@ -460,43 +460,6 @@ def most_recent():
         page=page, 
         has_next=has_next,
         total_pages=total_pages)
-
-@app.route('/admin_questions')
-def admin_questions():
-    page = request.args.get('page', 1, type=int)
-    per_page = 5
-    user_role = session.get('role', 'user')
-    # Calculate offset for pagination
-    offset = (page - 1) * per_page
-
-    # Connect to the database
-    conn = connect_db()
-    cursor = conn.cursor(pymysql.cursors.DictCursor)
-
-    # Call the stored procedure to fetch paginated questions
-    cursor.execute("CALL GetPublishedQuestionsWithPagination(%s, %s)", (per_page, offset))
-    questions = cursor.fetchall()
-
-    # Fetch the total number of published questions for pagination
-    cursor.execute("SELECT COUNT(*) AS total FROM Question WHERE status = 'published'")
-    total_questions = cursor.fetchone()['total']
-    
-    # Close the connection
-    conn.close()
-
-    # Calculate total pages
-    total_pages = (total_questions + per_page - 1) // per_page
-    has_next = page < total_pages
-
-    # Render the template with the paginated questions
-    return render_template(
-        'admin_questions.html', 
-        questions=questions,
-        page=page, 
-        has_next=has_next,
-        total_pages=total_pages,
-        user_role=user_role
-    )
 
 
 
@@ -1057,6 +1020,7 @@ def view_chat(chat_id):
             WHERE cm.chatID = %s
             ORDER BY ts.sentDate ASC, ts.sentTime ASC
         """, (chat_id,))
+
         messages = cursor.fetchall()
         cursor.close()
 
