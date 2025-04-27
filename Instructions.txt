@@ -7,4 +7,9 @@ To run the application locally:
 
 To run the application using ngrok (for demonstration):
 1. One of the team members will run the database/python code from their computer and use ngrok to generate a link
-2. Using the link, everyone can access the database
+2. Using the link, everyone can access the database/app
+
+Use ngrok to run the application as a web app for multiple users
+1. Setup a ngrok account on your machine
+2. Run 'ngrok html ____" where ____ is the localhost link to your account
+3. It will give a web link that can be used to access the app online
