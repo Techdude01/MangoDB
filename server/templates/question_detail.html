@@ -96,7 +96,7 @@ Question Details - {{ question.questionText | truncate(30) }}
                 <p class="item-text">{{ response.responseText }}</p>
                 <div class="metadata info-text">
                     <span class="author"><i class="fa fa-user"></i> {{ response.userName }}</span>
-                    {% if response.timestamp %} {# Assuming timestamp is available #}
+                    {% if response.timestamp %}
                     <span class="timestamp"><i class="fa fa-clock"></i> {{ response.timestamp }}</span>
                     {% endif %}
                 </div>
@@ -118,32 +118,30 @@ Question Details - {{ question.questionText | truncate(30) }}
             <h3 class="sub-heading">Leave a Comment</h3>
             <form method="POST" action="{{ url_for('question_detail', question_id=question.questionID) }}"
                 class="comment-form">
-                <!-- Hidden userID is unnecessary if handled server-side via session -->
                 <div class="form-group">
                     <textarea name="commentText" class="form-input" rows="3" required
                         placeholder="Write your comment..."></textarea>
                 </div>
                 <div class="action-buttons">
-                    <button type="submit" class="btn primary" style="float: right; margin-top: -40px;">Submit
-                        Comment</button>
+                    <button type="submit" class="btn primary">Submit Comment</button>
                 </div>
             </form>
         </div>
         {% else %}
-        <p class="info-text">You have already commented on this question.</p> {# Simplified message #}
+        <p class="info-text">You have already commented on this question.</p>
         {% endif %}
 
         <!-- Display Comments -->
-        <div class="item-list comment-list"> {# Moved list inside comments-card #}
+        <div class="item-list comment-list">
             {% if comments %}
             {% for c in comments %}
-            <div class="item comment-item"> {# Changed to div for consistency #}
+            <div class="item comment-item">
                 <p class="item-text">{{ c.commentText }}</p>
                 <div class="metadata info-text">
                     {% if c.userName %}
                     <span class="author"><i class="fa fa-user"></i> {{ c.userName }}</span>
                     {% endif %}
-                    {% if c.timestamp %} {# Assuming timestamp is available #}
+                    {% if c.timestamp %}
                     <span class="timestamp"><i class="fa fa-clock"></i> {{ c.timestamp }}</span>
                     {% endif %}
                 </div>
@@ -157,12 +155,12 @@ Question Details - {{ question.questionText | truncate(30) }}
             {% endif %}
         </div>
     </div>
-    {% endif %} {# End of the main conditional block for user_has_responded #}
+    {% endif %}
 
     <!-- Back Button (Outside the conditional block) -->
     <div class="action-buttons page-actions">
         <a href="{{ url_for('home') }}" class="btn secondary"><i class="fa fa-arrow-left"></i> Back to Home</a>
     </div>
 
-</div> {# End of .main div #}
+</div>
 {% endblock %}
