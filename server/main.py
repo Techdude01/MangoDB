@@ -6,7 +6,7 @@ from datetime import datetime
 app = Flask(__name__)
 app.secret_key = 'mango'
 
-def connect_db(username='root', password=''):
+def connect_db(username='mango_user', password='arfaouiRocks123'):
     print(f"Connecting as user: '{username}'")
     try:
         conn = pymysql.connect(
